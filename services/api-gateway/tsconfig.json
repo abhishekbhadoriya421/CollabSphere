@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "target": "ES2021", // JS version to output
+        "module": "commonjs", // Node.js module system
+        "rootDir": "src", // Source folder
+        "outDir": "dist", // Output folder for compiled JS
+        "strict": true, // Enable strict type checking
+        "esModuleInterop": true, // Allows `import express from 'express'`
+        "skipLibCheck": true // Skip checking type definitions of dependencies
+    }
+}
