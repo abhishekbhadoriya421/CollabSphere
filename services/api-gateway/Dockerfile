@@ -17,5 +17,7 @@ RUN npm run build
 # Expose port
 EXPOSE 4000
 
+ENV PORT=4000
+
 # Start the service
 CMD ["npm", "start"]

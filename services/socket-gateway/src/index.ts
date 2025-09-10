@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 
 const app = express();
-const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
+const PORT = process.env.PORT ? Number(process.env.PORT) : 5000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -11,5 +11,5 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`API Gateway is running on http://localhost:${PORT}`);
+    console.log(`Scoket Gateway is running on http://localhost:${PORT}`);
 });

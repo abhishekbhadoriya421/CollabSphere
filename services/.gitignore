@@ -1,0 +1,4 @@
+api-gateway/node_modules
+api-gateway/dist
+socket-gateway/node_modules
+socket-gateway/dist
