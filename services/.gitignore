@@ -4,3 +4,5 @@ socket-gateway/node_modules
 socket-gateway/dist
 message-service/node_modules
 message-service/dist
+upload-service/node_modules
+upload-service/dist
