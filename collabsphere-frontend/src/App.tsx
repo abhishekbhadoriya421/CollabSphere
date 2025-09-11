@@ -1,9 +1,10 @@
-import './App.css'
+import LoginPage from "./components/auth/LoginPage"
 function App() {
-
   return (
     <>
-      <h1>Collab-Sphere</h1>
+      <div>
+        <LoginPage />
+      </div>
     </>
   )
 }
