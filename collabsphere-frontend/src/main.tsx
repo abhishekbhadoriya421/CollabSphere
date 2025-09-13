@@ -6,6 +6,8 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { fab } from '@fortawesome/free-brands-svg-icons';
 import { ToastContainer } from "react-toastify";
+import { Provider } from "react-redux";
+import { store } from './store/store.ts';
 library.add(fas, fab);
 
 createRoot(document.getElementById('root')!).render(
@@ -20,6 +22,8 @@ createRoot(document.getElementById('root')!).render(
       draggable
       theme="colored"
     />
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </StrictMode>,
 )
