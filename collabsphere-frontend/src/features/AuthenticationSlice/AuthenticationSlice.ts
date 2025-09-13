@@ -4,17 +4,17 @@ import { toast } from "react-toastify";
 interface AuthenticationState {
     user: object | null;
     loading: boolean | false;
-    error: string | null;
-    accessToken: string | null;
-    refreshToken: string | null;
+
 }
+
+// interface Token {
+//     accessToken: string | null;
+//     refreshToken: string | null;
+// }
 
 const initialState: AuthenticationState = {
     user: null,
-    loading: false,
-    error: null,
-    accessToken: null,
-    refreshToken: null,
+    loading: false
 };
 
 
@@ -123,6 +123,7 @@ interface RegisterThunkPayload {
  */
 const RegisterThunkFulfilled = (state: AuthenticationState, action: { payload: object | undefined }): void => {
     const payload = action.payload as RegisterThunkPayload | undefined;
+    state.loading = false;
     if (payload?.status === true) {
         toast.success(payload.message);
     } else {
@@ -133,17 +134,11 @@ const RegisterThunkFulfilled = (state: AuthenticationState, action: { payload: o
 const RegisterThunkPending = (state: AuthenticationState): void => {
     state.loading = true;
     state.user = null;
-    state.error = null;
-    state.accessToken = null;
-    state.refreshToken = null;
 }
 
 const RegisterThunkRejected = (state: AuthenticationState, action: ReturnType<typeof RegisterThunk.rejected>): void => {
     state.loading = false;
     state.user = null;
-    state.error = action.error.message || null;
-    state.accessToken = null;
-    state.refreshToken = null;
     toast.error(action.error.message || "Registration failed");
 }
 
