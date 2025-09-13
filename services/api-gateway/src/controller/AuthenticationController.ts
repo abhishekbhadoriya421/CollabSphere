@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import db from "../config/sqldb";
 
 function validateEmail(email: string): boolean {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -6,6 +7,8 @@ function validateEmail(email: string): boolean {
 }
 
 export const LoginAction = async (req: Request, res: Response) => {
+    const [row] = await db.query('SELECT * FROM users');
+
     interface LoginRequest {
         email: string;
         password: string;
