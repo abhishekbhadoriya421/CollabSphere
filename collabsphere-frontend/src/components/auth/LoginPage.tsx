@@ -23,10 +23,46 @@ const LoginPage = () => {
             alert("Email and password are required");
             return;
         }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert("Please enter a valid email address");
+            return;
+        }
+
+        if (password.length < 8) {
+            alert("Password must be at least 8 characters long");
+            return;
+        }
+
     }
 
+
+
     const handleRegistration = (name: string, email: string, password: string, confirmPassword: string) => {
-        console.log("Registering with", name, ' ', email, ' ', password, ' ', confirmPassword);
+        /**
+         * validate name, email, password and confirmPassword
+         */
+        if (!name || !email || !password || !confirmPassword) {
+            alert("All fields are required");
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert("Please enter a valid email address");
+            return;
+        }
+
+        if (password.length < 8) {
+            alert("Password must be at least 8 characters long");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert("Passwords do not match");
+            return;
+        }
     }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
