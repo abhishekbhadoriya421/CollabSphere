@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { toast } from "react-toastify";
+import { useAppDispatch } from '../customHooks/reduxCustomHook';
+import { LoginThunk } from '../../features/AuthenticationSlice/AuthenticationSlice';
 
 
 const LoginPage = () => {
+    const dispatch = useAppDispatch();
+
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({
         name: '',
@@ -35,6 +39,8 @@ const LoginPage = () => {
             toast.error("Password must be at least 8 characters long");
             return false;
         }
+
+        dispatch(LoginThunk({ email, password }));
 
         toast.success("Good to go!");
         return true;
