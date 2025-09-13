@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import db from "../config/sqldb";
+
 
 function validateEmail(email: string): boolean {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -7,8 +7,6 @@ function validateEmail(email: string): boolean {
 }
 
 export const LoginAction = async (req: Request, res: Response) => {
-    const [row] = await db.query('SELECT * FROM users');
-
     interface LoginRequest {
         email: string;
         password: string;
@@ -40,6 +38,41 @@ export const LoginAction = async (req: Request, res: Response) => {
             message: 'Invalid email format',
             token: null,
             user: null
+        };
+        return res.status(400).json(response);
+    }
+}
+
+export const RegisterAction = async (req: Request, res: Response) => {
+    interface RegisterRequest {
+        email: string;
+        password: string;
+        confirmPassword: string;
+        username: string;
+    }
+
+    interface RegisterResponse {
+        status: number | 400;
+        message: string | 'Invalid request';
+    }
+
+    const { email, password, confirmPassword, username }: RegisterRequest = req.body;
+    if (!email || !password || !confirmPassword || !username) {
+        const response: RegisterResponse = {
+            status: 400,
+            message: 'All fields are required'
+        };
+        return res.status(400).json(response);
+    }
+
+    /**
+     * validate email format
+     */
+
+    if (!validateEmail(email)) {
+        const response: RegisterResponse = {
+            status: 400,
+            message: 'Invalid email format'
         };
         return res.status(400).json(response);
     }
