@@ -1,5 +1,5 @@
 import { useState } from 'react';
-
+import { toast } from "react-toastify";
 
 const LoginPage = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -15,54 +15,58 @@ const LoginPage = () => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleLogin = (email: string, password: string) => {
+    const handleLogin = (email: string, password: string): boolean => {
         /**
          * validate email and password
          */
         if (!email || !password) {
-            alert("Email and password are required");
-            return;
+            toast.error("Email and password is required!");
+            return false;
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            alert("Please enter a valid email address");
-            return;
+            toast.error("Please enter a valid email address");
+            return false;
         }
 
         if (password.length < 8) {
-            alert("Password must be at least 8 characters long");
-            return;
+            toast.error("Password must be at least 8 characters long");
+            return false;
         }
 
+        toast.success("Good to go!");
+        return true;
     }
 
 
 
-    const handleRegistration = (name: string, email: string, password: string, confirmPassword: string) => {
+    const handleRegistration = (name: string, email: string, password: string, confirmPassword: string): boolean => {
         /**
          * validate name, email, password and confirmPassword
          */
         if (!name || !email || !password || !confirmPassword) {
-            alert("All fields are required");
-            return;
+            toast.error("All fields are required");
+            return false;
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            alert("Please enter a valid email address");
-            return;
+            toast.error("Please enter a valid email address");
+            return false;
         }
 
         if (password.length < 8) {
-            alert("Password must be at least 8 characters long");
-            return;
+            toast.error("Password must be at least 8 characters long");
+            return false;
         }
 
         if (password !== confirmPassword) {
-            alert("Passwords do not match");
-            return;
+            toast.error("Passwords do not match");
+            return false;
         }
+        toast.success("Good to go!");
+        return true;
     }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
