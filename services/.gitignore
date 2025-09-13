@@ -6,3 +6,4 @@ message-service/node_modules
 message-service/dist
 upload-service/node_modules
 upload-service/dist
+api-gateway/.env
