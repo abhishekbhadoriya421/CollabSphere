@@ -10,16 +10,44 @@ const LoginPage = () => {
         confirmPassword: ''
     });
 
-    const handleInputChange = () => {
-
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = () => {
+    const handleLogin = (email: string, password: string) => {
+        /**
+         * validate email and password
+         */
+        if (!email || !password) {
+            alert("Email and password are required");
+            return;
+        }
+    }
 
+    const handleRegistration = (name: string, email: string, password: string, confirmPassword: string) => {
+        console.log("Registering with", name, ' ', email, ' ', password, ' ', confirmPassword);
+    }
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        // Handle form submission logic here
+        if (isLogin) {
+            handleLogin(formData.email, formData.password);
+        } else {
+            // Handle registration logic here
+            handleRegistration(formData.name, formData.email, formData.password, formData.confirmPassword);
+        }
     };
 
     const toggleForm = () => {
-
+        setIsLogin(!isLogin);
+        setFormData({
+            name: '',
+            email: '',
+            password: '',
+            confirmPassword: ''
+        });
     };
 
     return (
@@ -55,6 +83,7 @@ const LoginPage = () => {
                                 value={formData.name}
                                 onChange={handleInputChange}
                                 placeholder="Enter your full name"
+                                onInvalid={(e) => e.currentTarget.setCustomValidity('Please enter your full name')}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
                                 required
                             />
@@ -71,6 +100,7 @@ const LoginPage = () => {
                             name="email"
                             value={formData.email}
                             onChange={handleInputChange}
+                            onInvalid={(e) => e.currentTarget.setCustomValidity('Please enter a valid email address')}
                             placeholder={isLogin ? "Enter your email" : "Enter your email"}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
                             required
@@ -85,6 +115,7 @@ const LoginPage = () => {
                             type="password"
                             id="password"
                             name="password"
+                            onInvalid={(e) => e.currentTarget.setCustomValidity('Password must be at least 8 characters long')}
                             value={formData.password}
                             onChange={handleInputChange}
                             placeholder={isLogin ? "Enter your password" : "Create a password"}
@@ -102,6 +133,7 @@ const LoginPage = () => {
                                 type="password"
                                 id="confirmPassword"
                                 name="confirmPassword"
+                                onInvalid={(e) => e.currentTarget.setCustomValidity('Please confirm your password')}
                                 value={formData.confirmPassword}
                                 onChange={handleInputChange}
                                 placeholder="Confirm your password"
