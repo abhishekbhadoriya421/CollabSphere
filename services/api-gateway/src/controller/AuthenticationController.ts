@@ -1,10 +1,5 @@
 import { Request, Response } from "express";
-
-
-function validateEmail(email: string): boolean {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email.toLowerCase());
-}
+import User from '../models/User';
 
 export const LoginAction = async (req: Request, res: Response) => {
     interface LoginRequest {
@@ -23,19 +18,6 @@ export const LoginAction = async (req: Request, res: Response) => {
         const response: LoginResponse = {
             status: 400,
             message: 'Email and password are required',
-            token: null,
-            user: null
-        };
-        return res.status(400).json(response);
-    }
-
-    /**
-     * validate email format
-     */
-    if (!validateEmail(email)) {
-        const response: LoginResponse = {
-            status: 400,
-            message: 'Invalid email format',
             token: null,
             user: null
         };
@@ -65,15 +47,26 @@ export const RegisterAction = async (req: Request, res: Response) => {
         return res.status(400).json(response);
     }
 
-    /**
-     * validate email format
-     */
+    try {
+        interface CreateUserResponse {
+            status: boolean;
+            message?: string;
+            user: User | null;
+        }
+        const response: CreateUserResponse = await User.createUser(username, email, password, confirmPassword) as CreateUserResponse;
+        if (response.status === true) {
+            return res.status(201).json({
+                status: 201,
+                message: response.message || 'User created successfully'
+            });
+        } else {
+            return res.status(400).json({
+                status: 400,
+                message: response.message || 'User creation failed'
+            });
+        }
+    }
+    catch (error) {
 
-    if (!validateEmail(email)) {
-        const response: RegisterResponse = {
-            status: 400,
-            message: 'Invalid email format'
-        };
-        return res.status(400).json(response);
     }
 }

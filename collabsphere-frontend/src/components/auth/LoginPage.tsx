@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from "react-toastify";
 import { useAppDispatch } from '../customHooks/reduxCustomHook';
-import { LoginThunk } from '../../features/AuthenticationSlice/AuthenticationSlice';
+import { LoginThunk, RegisterThunk } from '../../features/AuthenticationSlice/AuthenticationSlice';
 
 
 const LoginPage = () => {
@@ -72,6 +72,7 @@ const LoginPage = () => {
             toast.error("Passwords do not match");
             return false;
         }
+        dispatch(RegisterThunk({ username: name, email, password, confirmPassword }));
         toast.success("Good to go!");
         return true;
     }
