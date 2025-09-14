@@ -53,7 +53,19 @@ export const RegisterAction = async (req: Request, res: Response) => {
             message?: string;
             user: User | null;
         }
+
+        const isUserExist = await User.findOne({
+            where: { email: email }
+        })
+
+        if (isUserExist) {
+            return res.status(400).json({
+                status: 400,
+                message: 'Account exist please login'
+            });
+        }
         const response: CreateUserResponse = await User.createUser(username, email, password, confirmPassword) as CreateUserResponse;
+
         if (response.status === true) {
             return res.status(201).json({
                 status: 201,

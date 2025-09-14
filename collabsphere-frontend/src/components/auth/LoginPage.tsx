@@ -72,7 +72,7 @@ const LoginPage = () => {
     }
 
     useEffect(() => {
-        if (!loading) {
+        if (!loading && message) {
             if (status === 'success') {
                 toast.success(message);
             } else if (status === 'error') {
