@@ -22,6 +22,8 @@ export const LoginAction = async (req: Request, res: Response) => {
         };
         return res.status(400).json(response);
     }
+
+    console.log(email, '   ', password);
 }
 
 export const RegisterAction = async (req: Request, res: Response) => {

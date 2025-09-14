@@ -60,7 +60,7 @@ interface APIResponse {
 /**
  * handle the bussiness logic of login and safely save the accessToken and refreshTokect
  */
-const createLoginSlice = createAsyncThunk<LoginResponse, LoginRequest, { rejectValue: LoginResponse }>(
+export const LoginThunk = createAsyncThunk<LoginResponse, LoginRequest, { rejectValue: LoginResponse }>(
     'user/login',
     async (user: LoginRequest, { rejectWithValue }) => {
         try {
@@ -119,8 +119,11 @@ const LoginSlice = createSlice({
     name: "login",
     initialState: initialState,
     reducers: {},
+    /**
+     * handle Respose Ok, Error And Pending 
+     */
     extraReducers(builder) {
-        builder.addCase(createLoginSlice.fulfilled, (state, action) => {
+        builder.addCase(LoginThunk.fulfilled, (state, action) => {
             if (action.payload.status === 'success') {
                 state.loading = false;
                 state.accessToken = action.payload.accessToken;
@@ -137,10 +140,10 @@ const LoginSlice = createSlice({
                 state.message = action.payload.message;
             }
         })
-            .addCase(createLoginSlice.pending, (state) => {
+            .addCase(LoginThunk.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(createLoginSlice.rejected, (state, action) => {
+            .addCase(LoginThunk.rejected, (state, action) => {
                 state.loading = false;
                 state.status = 'error';
                 state.accessToken = '';

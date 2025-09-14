@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useAppDispatch } from '../customHooks/reduxCustomHook';
+import { LoginThunk } from '../../features/AuthenticationSlice/LoginSlice';
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
@@ -8,6 +10,7 @@ const LoginPage = () => {
         password: '',
     });
 
+    const dispatch = useAppDispatch();
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -22,8 +25,15 @@ const LoginPage = () => {
         if (formData.password.length < 8) {
             toast.error("Password must have atleast 8 character");
         }
-
-
+        interface LoginRequest {
+            email: string,
+            password: string
+        }
+        const payload: LoginRequest = {
+            email: formData.email,
+            password: formData.password
+        }
+        dispatch(LoginThunk(payload));
     };
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 to-indigo-800 p-4">
