@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import User from '../models/User';
+import { Authentication } from "../service/JWT_Authentication";
 
 export const LoginAction = async (req: Request, res: Response) => {
     interface LoginRequest {
@@ -22,7 +23,24 @@ export const LoginAction = async (req: Request, res: Response) => {
         };
         return res.status(400).json(response);
     }
+    interface UserAuthenticationResponse {
+        status: boolean;
+        user: User | null;
+        message: string;
+    }
 
+    const user: UserAuthenticationResponse = await User.AuthenticateUserByEmailAndPassword(email, password);
+    /**
+     * if status is true the create accesstoken
+     */
+    if (user.status == false) {
+        return res.status(400).json({
+            status: 400,
+            message: user.message,
+            token: null,
+            user: null
+        });
+    }
 
 }
 

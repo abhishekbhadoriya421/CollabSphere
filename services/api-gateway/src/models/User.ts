@@ -3,6 +3,18 @@ import { DataTypes, Model, Optional } from "sequelize";
 import bcrypt from 'bcrypt';
 import { ValidationError } from "sequelize";
 
+interface CreateUserResponse {
+    status: boolean;
+    user?: User | null;
+    message: string;
+}
+
+interface LoginUserResponse {
+    status: boolean;
+    user: User | null;
+    message: string;
+}
+
 class User extends Model {
     public id!: number;
     public email!: string;
@@ -17,12 +29,19 @@ class User extends Model {
         return re.test(email.toLowerCase());
     }
 
-    public static hashPassword(password: string): string {
+    /**
+     * hash the password and compare the password 
+     */
+    private static hashPassword(password: string): string {
         const salt = bcrypt.genSaltSync(10);
         return bcrypt.hashSync(password, salt);
     }
 
-    public static async createUser(username: string, email: string, password: string, confirmPassword: string) {
+    public static async comparePassword(hash_password: string, password: string): Promise<boolean> {
+        return await bcrypt.compare(password, hash_password);
+    }
+
+    public static async createUser(username: string, email: string, password: string, confirmPassword: string): Promise<CreateUserResponse> {
         /**
          * validate email format
          * check if password and confirmPassword match
@@ -30,12 +49,6 @@ class User extends Model {
          * create the user in the database
          * return success or error message
          */
-        interface CreateUserResponse {
-            status: boolean;
-            user?: User | null;
-            message: string;
-        }
-
 
         try {
             if (this.validateEmail(email) === false) {
@@ -68,7 +81,76 @@ class User extends Model {
                     user: null
                 };
                 return response;
+            } else {
+                return {
+                    status: false,
+                    message: 'Unexpected error occurred',
+                    user: null
+                };
             }
+        }
+    }
+
+    /**
+     * Get User By Email 
+     */
+    public static async getUserByEmail(email: string): Promise<User | null> {
+        if (!email) {
+            return null;
+        }
+        try {
+            const user = await User.findOne({
+                where: { email: email }
+            })
+
+            if (!user) {
+                return null;
+            } else {
+                return user;
+            }
+        } catch (err) {
+            return null;
+        }
+    }
+
+    /**
+     * Validate Login Authentication
+     * 1. check email and password is not null
+     * 2. check email pattern is valid or not
+     * 4. find user by email if not found return status false
+     * 5. compair the password if compairsion returns true the create 
+     * 6. access token and refresh token 
+     */
+    public static async AuthenticateUserByEmailAndPassword(email: string, password: string): Promise<LoginUserResponse> {
+        if (!email || !password) {
+            return {
+                status: false,
+                user: null,
+                message: "Must provide email and password"
+            }
+        }
+
+        if (!this.validateEmail(email)) {
+            return {
+                status: false,
+                user: null,
+                message: "Email format is not valid"
+            }
+        }
+
+        const user = await this.getUserByEmail(email) as User | null
+
+        if (!user) {
+            return {
+                status: false,
+                user: null,
+                message: "User not found! Please create account first"
+            }
+        }
+        return {
+            status: true,
+            user: user,
+            message: 'Successfully user varified'
         }
     }
 }
