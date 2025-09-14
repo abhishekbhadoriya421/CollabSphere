@@ -76,7 +76,7 @@ export const RegisterThunk = createAsyncThunk<RegisterResponse, RegisterRequest,
 
 
 const RegistrationSlice = createSlice({
-    name: "authentication",
+    name: "sign-up",
     initialState,
     reducers: {},
     extraReducers: (builder) => {
