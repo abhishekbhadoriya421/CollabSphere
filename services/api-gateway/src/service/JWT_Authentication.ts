@@ -12,9 +12,18 @@ interface ResponseRefreshToken {
 export class Authentication {
     private accessTokenSecret: string;
     private refreshTokenSecret: string;
-    constructor() {
+    private static instance: Authentication;
+
+    private constructor() {
         this.accessTokenSecret = process.env.JWT_SECRET || '45dfg34fguhefgyheftreq@#$%@w#$@edzsab&4#%^%$@';
         this.refreshTokenSecret = process.env.JWT_REFRESH_SECRET || '47#EDCGT#Wsdfgndsjfcgj@#$%@w#$@edzsab&4#%^%$@';
+    }
+
+    public static getInstance(): Authentication {
+        if (!Authentication.instance) {
+            Authentication.instance = new Authentication();
+        }
+        return Authentication.instance;
     }
 
     public Generate_Access_Token(user_id: string): ResponseAccessToken {
