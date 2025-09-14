@@ -6,7 +6,6 @@ export const LoginAction = async (req: Request, res: Response) => {
         email: string;
         password: string;
     }
-
     interface LoginResponse {
         status: number | 400;
         message: string | 'Invalid request';
@@ -59,23 +58,26 @@ export const RegisterAction = async (req: Request, res: Response) => {
         })
 
         if (isUserExist) {
-            return res.status(400).json({
+            const response: RegisterResponse = {
                 status: 400,
                 message: 'Account exist please login'
-            });
+            };
+            return res.status(400).json(response);
         }
-        const response: CreateUserResponse = await User.createUser(username, email, password, confirmPassword) as CreateUserResponse;
+        const result: CreateUserResponse = await User.createUser(username, email, password, confirmPassword) as CreateUserResponse;
 
-        if (response.status === true) {
-            return res.status(201).json({
+        if (result.status === true) {
+            const response: RegisterResponse = {
                 status: 201,
-                message: response.message || 'User created successfully'
-            });
+                message: result.message || 'User created successfully'
+            };
+            return res.status(201).json(response);
         } else {
-            return res.status(400).json({
+            const response: RegisterResponse = {
                 status: 400,
-                message: response.message || 'User creation failed'
-            });
+                message: result.message || 'User creation failed'
+            };
+            return res.status(400).json(response);
         }
     }
     catch (error) {
