@@ -1,6 +1,5 @@
 import Jwt, { JwtPayload } from "jsonwebtoken";
 
-
 interface ResponseAccessToken {
     token: string | null,
     message: string
@@ -10,83 +9,100 @@ interface ResponseRefreshToken {
     refreshToken: string | null,
     message: string
 }
+export class Authentication {
+    private accessTokenSecret: string;
+    private refreshTokenSecret: string;
+    constructor() {
+        this.accessTokenSecret = process.env.JWT_SECRET || '45dfg34fguhefgyheftreq@#$%@w#$@edzsab&4#%^%$@';
+        this.refreshTokenSecret = process.env.JWT_REFRESH_SECRET || '47#EDCGT#Wsdfgndsjfcgj@#$%@w#$@edzsab&4#%^%$@';
+    }
 
-const ACCESS_TOKEN_SECRET: string = process.env.JWT_SECRET || '45dfg34fguhefgyheftreq@#$%@w#$@edzsab&4#%^%$@';
-const REFRESH_TOKEN_SECRET: string = process.env.JWT_REFRESH_SECRET || '47#EDCGT#Wsdfgndsjfcgj@#$%@w#$@edzsab&4#%^%$@';
+    public Generate_Access_Token(user_id: string): ResponseAccessToken {
+        if (!user_id) {
+            const response: ResponseAccessToken = {
+                token: null,
+                message: 'User Details Not Found'
+            }
+            return response
+        }
 
-export const Generate_Access_Token = (user_id: string): ResponseAccessToken => {
-    if (!user_id) {
+        const accessToken = Jwt.sign({ user_id }, this.accessTokenSecret, { expiresIn: "1h" });
+        if (!accessToken) {
+            const response: ResponseAccessToken = {
+                token: null,
+                message: 'Something went wrong access token not generated'
+            }
+            return response
+        }
+
         const response: ResponseAccessToken = {
-            token: null,
-            message: 'User Details Not Found'
+            token: accessToken,
+            message: 'successfully generated'
         }
-        return response
+        return response;
     }
 
-    const accessToken = Jwt.sign({ user_id }, ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
-    if (!accessToken) {
-        const response: ResponseAccessToken = {
-            token: null,
-            message: 'Something went wrong access token not generated'
+
+
+    public Generate_Refresh_Token(user_id: string): ResponseRefreshToken {
+        if (!user_id) {
+            const response: ResponseRefreshToken = {
+                refreshToken: null,
+                message: 'User Details Not Found'
+            }
+            return response
         }
-        return response
-    }
 
-    const response: ResponseAccessToken = {
-        token: accessToken,
-        message: 'successfully generated'
-    }
-    return response;
-}
+        const refreshToken = Jwt.sign({ user_id }, this.refreshTokenSecret, { expiresIn: "7d" });
+        if (!refreshToken) {
+            const response: ResponseRefreshToken = {
+                refreshToken: null,
+                message: 'Something went wrong refresh token not generated'
+            }
+            return response
+        }
 
-
-
-export const Generate_Refresh_Token = (user_id: string): ResponseRefreshToken => {
-    if (!user_id) {
         const response: ResponseRefreshToken = {
-            refreshToken: null,
-            message: 'User Details Not Found'
+            refreshToken: refreshToken,
+            message: 'successfully generated'
         }
-        return response
+        return response;
     }
 
-    const refreshToken = Jwt.sign({ user_id }, REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
-    if (!refreshToken) {
-        const response: ResponseRefreshToken = {
-            refreshToken: null,
-            message: 'Something went wrong access token not generated'
+
+    public Verify_Access_Token(token: string): JwtPayload | null {
+        if (!token) {
+            return null;
         }
-        return response
+
+        try {
+            return Jwt.verify(token, this.accessTokenSecret) as JwtPayload
+        } catch (err) {
+            return null;
+        }
     }
 
-    const response: ResponseRefreshToken = {
-        refreshToken: refreshToken,
-        message: 'successfully generated'
-    }
-    return response;
-}
 
-
-export const Verify_Access_Token = (token: string): JwtPayload | null => {
-    if (!token) {
-        return null;
+    public Verify_Refresh_Token(refreshToken: string): JwtPayload | null {
+        if (!refreshToken) {
+            return null;
+        }
+        try {
+            return Jwt.verify(refreshToken, this.refreshTokenSecret) as JwtPayload
+        } catch (err) {
+            return null;
+        }
     }
 
-    try {
-        return Jwt.verify(token, ACCESS_TOKEN_SECRET) as JwtPayload
-    } catch (err) {
-        return null;
+    /**
+     * Don't use this method just for hard
+     */
+    public get_Access_Token() {
+        return this.accessTokenSecret;
     }
-}
 
+    public get_Refresh_Token() {
+        return this.refreshTokenSecret;
+    }
 
-export const Verify_Refresh_Token = (refreshToken: string): JwtPayload | null => {
-    if (!refreshToken) {
-        return null;
-    }
-    try {
-        return Jwt.verify(refreshToken, REFRESH_TOKEN_SECRET) as JwtPayload
-    } catch (err) {
-        return null;
-    }
 }
