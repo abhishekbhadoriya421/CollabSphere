@@ -4,13 +4,18 @@ import { toast } from "react-toastify";
 interface AuthenticationState {
     user: object | null;
     loading: boolean | false;
-
 }
 
 // interface Token {
 //     accessToken: string | null;
 //     refreshToken: string | null;
 // }
+
+interface RegisterResponse {
+    message: string;
+    status: boolean;
+}
+
 
 const initialState: AuthenticationState = {
     user: null,
@@ -59,12 +64,6 @@ export const LoginThunk = createAsyncThunk(
 export const RegisterThunk = createAsyncThunk(
     'user/register',
     async (user: { username: string, email: string, password: string, confirmPassword: string }): Promise<object | undefined> => {
-        interface RegisterResponse {
-            message: string;
-            status: boolean;
-            data: object;
-        }
-
         try {
             interface RegisterRequest {
                 username: string;
@@ -98,14 +97,12 @@ export const RegisterThunk = createAsyncThunk(
             const result: RegisterResponse = {
                 message: 'Successfully Created Account',
                 status: true,
-                data: data
             };
             return result;
         } catch (error: unknown) {
             const result: RegisterResponse = {
                 message: (error instanceof Error ? error.message : 'An unknown error occurred'),
                 status: false,
-                data: {}
             };
             return result;
         }
