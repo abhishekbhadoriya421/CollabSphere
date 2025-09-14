@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from "react-toastify";
-import { useAppDispatch } from '../customHooks/reduxCustomHook';
-import { LoginThunk, RegisterThunk } from '../../features/AuthenticationSlice/AuthenticationSlice';
+import { useAppDispatch, useAppSelector } from '../customHooks/reduxCustomHook';
+import { RegisterThunk } from '../../features/AuthenticationSlice/RegistrationSlice';
 
 
 const LoginPage = () => {
     const dispatch = useAppDispatch();
-
+    const { loading, message, status } = useAppSelector((state) => state.RegistrationReducer)
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({
         name: '',
@@ -39,14 +39,9 @@ const LoginPage = () => {
             toast.error("Password must be at least 8 characters long");
             return false;
         }
-
-        dispatch(LoginThunk({ email, password }));
-
         toast.success("Good to go!");
         return true;
     }
-
-
 
     const handleRegistration = (name: string, email: string, password: string, confirmPassword: string): boolean => {
         /**
@@ -73,9 +68,18 @@ const LoginPage = () => {
             return false;
         }
         dispatch(RegisterThunk({ username: name, email, password, confirmPassword }));
-        toast.success("Good to go!");
         return true;
     }
+
+    useEffect(() => {
+        if (!loading) {
+            if (status === 'success') {
+                toast.success(message);
+            } else if (status === 'error') {
+                toast.error(message);
+            }
+        }
+    }, [loading, status, message])
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
