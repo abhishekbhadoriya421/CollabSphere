@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from '../customHooks/reduxCustomHook';
 import { RegisterThunk } from '../../features/AuthenticationSlice/RegistrationSlice';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const RegistrationPage = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const { loading, message, status } = useAppSelector((state) => state.RegistrationReducer)
     const [formData, setFormData] = useState({
         name: '',
@@ -51,11 +52,12 @@ const RegistrationPage = () => {
         if (!loading && message) {
             if (status === 'success') {
                 toast.success(message);
+                navigate('/auth/site/login')
             } else if (status === 'error') {
                 toast.error(message);
             }
         }
-    }, [loading, status, message])
+    }, [loading, status, message, navigate])
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

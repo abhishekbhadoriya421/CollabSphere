@@ -1,6 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { toast } from "react-toastify";
-
 interface AuthenticationState {
     status: "idle" | "success" | "error";
     message: string;
@@ -86,7 +84,7 @@ const RegistrationSlice = createSlice({
             .addCase(RegisterThunk.fulfilled, (state, action) => {
                 state.loading = false;
                 state.status = action.payload.status;
-                toast.success(action.payload.message);
+                state.message = action.payload.message
             })
             .addCase(RegisterThunk.pending, (state) => {
                 state.loading = true;
@@ -95,9 +93,9 @@ const RegistrationSlice = createSlice({
                 state.loading = false;
                 if (action.payload) {
                     state.status = action.payload.status;
-                    toast.error(action.payload.message);
+                    state.message = action.payload.message
                 } else {
-                    toast.error(action.error.message || "Something went wrong");
+                    state.message = (action.error.message) ? action.error.message : 'Request Fail'
                 }
             })
     },
