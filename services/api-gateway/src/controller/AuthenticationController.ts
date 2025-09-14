@@ -67,6 +67,9 @@ export const RegisterAction = async (req: Request, res: Response) => {
         }
     }
     catch (error) {
-
+        return res.status(400).json({
+            status: 400,
+            message: error || 'User creation failed'
+        });
     }
 }

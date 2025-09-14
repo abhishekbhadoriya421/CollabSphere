@@ -1,6 +1,7 @@
 import sequelize from "../config/sqldb";
 import { DataTypes, Model, Optional } from "sequelize";
 import bcrypt from 'bcrypt';
+import { ValidationError } from "sequelize";
 
 class User extends Model {
     public id!: number;
@@ -21,7 +22,7 @@ class User extends Model {
         return bcrypt.hashSync(password, salt);
     }
 
-    public static async createUser(username: string, email: string, password: string, confirmPassword: string): Promise<Object> {
+    public static async createUser(username: string, email: string, password: string, confirmPassword: string) {
         /**
          * validate email format
          * check if password and confirmPassword match
@@ -59,12 +60,15 @@ class User extends Model {
             };
             return response;
         } catch (error) {
-            const response: CreateUserResponse = {
-                status: false,
-                message: (error as Error).message || 'User creation failed',
-                user: null
-            };
-            return response;
+            if (error instanceof ValidationError) {
+                const messages = error.errors.map(e => `${e.path}: ${e.message}`).join('\n');
+                const response: CreateUserResponse = {
+                    status: false,
+                    message: messages || 'User creation failed',
+                    user: null
+                };
+                return response;
+            }
         }
     }
 }
