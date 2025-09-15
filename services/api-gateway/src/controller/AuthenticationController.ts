@@ -29,19 +29,49 @@ export const LoginAction = async (req: Request, res: Response) => {
         message: string;
     }
 
-    const user: UserAuthenticationResponse = await User.AuthenticateUserByEmailAndPassword(email, password);
+    const validationStatus: UserAuthenticationResponse = await User.AuthenticateUserByEmailAndPassword(email, password);
     /**
      * if status is true the create accesstoken
      */
-    if (user.status == false) {
+    if (validationStatus.status === false || validationStatus.user === null) {
         return res.status(400).json({
             status: 400,
-            message: user.message,
+            message: validationStatus.message,
             token: null,
             user: null
         });
     }
 
+    const userData = validationStatus.user.toJSON();
+
+    /**
+     * create access token and refresh token
+     */
+    const authenticationObject: Authentication = Authentication.getInstance();
+    const accessToken = authenticationObject.Generate_Access_Token(userData.id);
+    const refreshToken = authenticationObject.Generate_Refresh_Token(userData.id);
+    if (!accessToken.token || !refreshToken.refreshToken) {
+        return res.status(400).json({
+            status: 400,
+            message: 'Somthing went wrong could not generate access token and refresh token',
+            token: null,
+            user: null
+        });
+    }
+    res.cookie("refreshToken", refreshToken.refreshToken, {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: process.env.NODE_ENVIRONMENT == "PRODUCTION",
+        // maxAge: 5 * 24 * 60 * 60 * 1000
+        maxAge: 50000
+    });
+
+    return res.status(200).json({
+        status: 200,
+        message: 'Login SuccessFully',
+        token: accessToken.token,
+        user: userData
+    })
 }
 
 export const RegisterAction = async (req: Request, res: Response) => {

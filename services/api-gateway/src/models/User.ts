@@ -122,36 +122,45 @@ class User extends Model {
      * 6. access token and refresh token 
      */
     public static async AuthenticateUserByEmailAndPassword(email: string, password: string): Promise<LoginUserResponse> {
-        if (!email || !password) {
+        try {
+            if (!email || !password) {
+                return {
+                    status: false,
+                    user: null,
+                    message: "Must provide email and password"
+                }
+            }
+
+            if (!this.validateEmail(email)) {
+                return {
+                    status: false,
+                    user: null,
+                    message: "Email format is not valid"
+                }
+            }
+
+            const user = await this.getUserByEmail(email) as User | null
+
+            if (!user) {
+                return {
+                    status: false,
+                    user: null,
+                    message: "User not found! Please create account first"
+                }
+            }
+            return {
+                status: true,
+                user: user,
+                message: 'Successfully user varified'
+            }
+        } catch (err: any) {
             return {
                 status: false,
                 user: null,
-                message: "Must provide email and password"
+                message: err.toString()
             }
         }
 
-        if (!this.validateEmail(email)) {
-            return {
-                status: false,
-                user: null,
-                message: "Email format is not valid"
-            }
-        }
-
-        const user = await this.getUserByEmail(email) as User | null
-
-        if (!user) {
-            return {
-                status: false,
-                user: null,
-                message: "User not found! Please create account first"
-            }
-        }
-        return {
-            status: true,
-            user: user,
-            message: 'Successfully user varified'
-        }
     }
 }
 

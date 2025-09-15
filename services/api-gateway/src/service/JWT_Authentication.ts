@@ -35,7 +35,7 @@ export class Authentication {
             return response
         }
 
-        const accessToken = Jwt.sign({ user_id }, this.accessTokenSecret, { expiresIn: "1h" });
+        const accessToken = Jwt.sign({ user_id }, this.accessTokenSecret, { expiresIn: "5m" });
         if (!accessToken) {
             const response: ResponseAccessToken = {
                 token: null,
@@ -62,7 +62,7 @@ export class Authentication {
             return response
         }
 
-        const refreshToken = Jwt.sign({ user_id }, this.refreshTokenSecret, { expiresIn: "7d" });
+        const refreshToken = Jwt.sign({ user_id }, this.refreshTokenSecret, { expiresIn: "5m" });
         if (!refreshToken) {
             const response: ResponseRefreshToken = {
                 refreshToken: null,
