@@ -5,7 +5,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
  */
 interface LoginState {
     accessToken: string | null,
-    refreshToken: string | null,
     user: object | null,
     loading: boolean,
     status: 'idle' | 'success' | 'error',
@@ -15,7 +14,6 @@ interface LoginState {
 
 const initialState: LoginState = {
     accessToken: '',
-    refreshToken: '',
     user: null,
     loading: false,
     status: 'idle',
@@ -35,7 +33,6 @@ interface LoginRequest {
  */
 interface LoginResponse {
     accessToken: string | null,
-    refreshToken: string | null,
     user: object | null,
     status: 'idle' | 'success' | 'error',
     message: string
@@ -50,8 +47,7 @@ status => api response status code
 message => message return by the response (error or success) 
 */
 interface APIResponse {
-    accessToken: string | null,
-    refreshToken: string | null,
+    token: string | null,
     user: object | null,
     status: number,
     message: string
@@ -85,7 +81,6 @@ export const LoginThunk = createAsyncThunk<LoginResponse, LoginRequest, { reject
             if (!apiResponse.ok) {
                 const response: LoginResponse = {
                     accessToken: '',
-                    refreshToken: '',
                     user: null,
                     message: apiResponsedata.message,
                     status: 'error',
@@ -94,8 +89,7 @@ export const LoginThunk = createAsyncThunk<LoginResponse, LoginRequest, { reject
             }
 
             const response: LoginResponse = {
-                accessToken: apiResponsedata.accessToken,
-                refreshToken: apiResponsedata.refreshToken,
+                accessToken: apiResponsedata.token,
                 user: apiResponsedata.user,
                 message: apiResponsedata.message,
                 status: 'success',
@@ -104,7 +98,6 @@ export const LoginThunk = createAsyncThunk<LoginResponse, LoginRequest, { reject
         } catch (error: unknown) {
             const response: LoginResponse = {
                 accessToken: '',
-                refreshToken: '',
                 user: null,
                 message: (error instanceof Error ? error.message : 'An unknown error occurred'),
                 status: 'error',
@@ -124,17 +117,16 @@ const LoginSlice = createSlice({
      */
     extraReducers(builder) {
         builder.addCase(LoginThunk.fulfilled, (state, action) => {
+            console.log(action.payload);
             if (action.payload.status === 'success') {
                 state.loading = false;
                 state.accessToken = action.payload.accessToken;
-                state.refreshToken = action.payload.refreshToken;
                 state.status = action.payload.status;
                 state.user = action.payload.user;
                 state.message = action.payload.message;
             } else {
                 state.loading = false
                 state.accessToken = '';
-                state.refreshToken = '';
                 state.status = action.payload.status;
                 state.user = null;
                 state.message = action.payload.message;
@@ -147,7 +139,6 @@ const LoginSlice = createSlice({
                 state.loading = false;
                 state.status = 'error';
                 state.accessToken = '';
-                state.refreshToken = '';
                 state.user = null;
                 if (action.payload) {
                     state.message = action.payload.message

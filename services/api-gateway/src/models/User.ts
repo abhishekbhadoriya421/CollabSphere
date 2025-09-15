@@ -148,11 +148,23 @@ class User extends Model {
                     message: "User not found! Please create account first"
                 }
             }
-            return {
-                status: true,
-                user: user,
-                message: 'Successfully user varified'
+            const isValidPassword: boolean = await this.comparePassword(user.password_hash, password);
+            if (isValidPassword) {
+                const plainUser = user.toJSON();
+                const { password_hash, ...safeUser } = plainUser;
+                return {
+                    status: true,
+                    user: safeUser,
+                    message: 'Successfully user varified'
+                }
+            } else {
+                return {
+                    status: false,
+                    user: null,
+                    message: 'Incorrect Password'
+                }
             }
+
         } catch (err: any) {
             return {
                 status: false,

@@ -26,7 +26,7 @@ export class Authentication {
         return Authentication.instance;
     }
 
-    public Generate_Access_Token(user_id: string): ResponseAccessToken {
+    public Generate_Access_Token(user_id: number): ResponseAccessToken {
         if (!user_id) {
             const response: ResponseAccessToken = {
                 token: null,
@@ -53,7 +53,7 @@ export class Authentication {
 
 
 
-    public Generate_Refresh_Token(user_id: string): ResponseRefreshToken {
+    public Generate_Refresh_Token(user_id: number): ResponseRefreshToken {
         if (!user_id) {
             const response: ResponseRefreshToken = {
                 refreshToken: null,

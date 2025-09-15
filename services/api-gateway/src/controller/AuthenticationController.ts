@@ -42,8 +42,12 @@ export const LoginAction = async (req: Request, res: Response) => {
         });
     }
 
-    const userData = validationStatus.user.toJSON();
-
+    interface UserDataResponse {
+        id: number,
+        email: string,
+        username: string
+    }
+    const userData: UserDataResponse = validationStatus.user;
     /**
      * create access token and refresh token
      */
