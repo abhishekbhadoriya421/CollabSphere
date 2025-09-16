@@ -70,7 +70,7 @@ export const LoginThunk = createAsyncThunk<LoginResponse, LoginRequest, { reject
                 password: user.password
             }
 
-            const apiResponse: Response = await fetch('http://localhost:8080/api/auth/login', {
+            const apiResponse: Response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ export const RefreshPageThunk = createAsyncThunk<LoginResponse, void, { rejectVa
     'user/reload',
     async (_, { rejectWithValue }) => {
         try {
-            const apiResponse: Response = await fetch('http://localhost:8080/api/auth/refresh', {
+            const apiResponse: Response = await fetch('/api/auth/refresh', {
                 method: 'POST',
                 credentials: "include"
             });

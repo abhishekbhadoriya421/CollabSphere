@@ -62,7 +62,7 @@ export class Authentication {
             return response
         }
 
-        const refreshToken = Jwt.sign({ user_id }, this.refreshTokenSecret, { expiresIn: "5m" });
+        const refreshToken = Jwt.sign({ user_id }, this.refreshTokenSecret, { expiresIn: "7d" });
         if (!refreshToken) {
             const response: ResponseRefreshToken = {
                 refreshToken: null,

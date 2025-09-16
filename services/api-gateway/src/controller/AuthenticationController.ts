@@ -70,13 +70,14 @@ export const LoginAction = async (req: Request, res: Response) => {
             user: null
         });
     }
+
     res.cookie("refreshToken", refreshToken.refreshToken, {
         httpOnly: true,
-        sameSite: 'strict',
+        sameSite: 'lax',
         secure: process.env.NODE_ENVIRONMENT == "PRODUCTION",
-        // maxAge: 5 * 24 * 60 * 60 * 1000
-        maxAge: 50000
+        maxAge: 7 * 24 * 60 * 60 * 1000
     });
+
 
     return res.status(200).json({
         status: 200,
@@ -155,4 +156,44 @@ export const RegisterAction = async (req: Request, res: Response) => {
             message: error || 'User creation failed'
         });
     }
+}
+
+
+export const PageReloadAction = async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken;
+    console.log('refreshToken: ', req.cookies.refreshToken);
+    /**
+     * user has been logged out need to login again
+     */
+    interface PageReloadResponse {
+        status: number | 400;
+        message: string | 'Invalid request';
+        token: string | null;
+        user: object | null;
+    }
+
+    if (!refreshToken) {
+        return {
+            status: 400,
+            message: 'Not Authenticated',
+            token: null,
+            user: null
+        }
+    }
+
+    const authenticationObject: Authentication = Authentication.getInstance();
+
+    const validateRefreshToken = authenticationObject.Verify_Refresh_Token(refreshToken);
+    console.log(validateRefreshToken);
+    if (!validateRefreshToken) {
+        return {
+            status: 200,
+            message: 'Refresh token has been expired login again ',
+            token: null,
+            user: null
+        }
+    }
+
+
+
 }
