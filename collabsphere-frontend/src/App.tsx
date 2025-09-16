@@ -9,7 +9,7 @@ function App() {
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(RefreshPageThunk());
-  });
+  }, [dispatch]);
   return (
     <div>
       <BrowserRouter>

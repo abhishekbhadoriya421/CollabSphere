@@ -161,7 +161,6 @@ export const RegisterAction = async (req: Request, res: Response) => {
 
 export const PageReloadAction = async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
-    console.log('refreshToken: ', req.cookies.refreshToken);
     /**
      * user has been logged out need to login again
      */
@@ -173,27 +172,54 @@ export const PageReloadAction = async (req: Request, res: Response) => {
     }
 
     if (!refreshToken) {
-        return {
-            status: 400,
+        return res.status(401).json({
+            status: 401,
             message: 'Not Authenticated',
             token: null,
             user: null
-        }
+        })
     }
 
     const authenticationObject: Authentication = Authentication.getInstance();
 
     const validateRefreshToken = authenticationObject.Verify_Refresh_Token(refreshToken);
-    console.log(validateRefreshToken);
+
     if (!validateRefreshToken) {
-        return {
+        return res.status(200).json({
             status: 200,
             message: 'Refresh token has been expired login again ',
             token: null,
             user: null
-        }
+        })
+    }
+    const UserDetail = await User.getUserDetailsById(validateRefreshToken.user_id);
+    if (!UserDetail) {
+        return res.status(404).json({
+            status: 404,
+            message: 'User not found',
+            token: null,
+            user: null
+        })
+    }
+    /**
+     * generate new access token
+     */
+    const newAccessToken = authenticationObject.Generate_Access_Token(validateRefreshToken.user_id);
+    if (!newAccessToken) {
+        return res.status(500).json({
+            status: 500,
+            message: 'Something went wrong could not generate access token',
+            token: null,
+            user: null
+        })
     }
 
+    const response: PageReloadResponse = {
+        status: 200,
+        message: 'access token generated ',
+        token: newAccessToken.token,
+        user: UserDetail
+    }
 
-
+    return res.status(200).json(response);
 }

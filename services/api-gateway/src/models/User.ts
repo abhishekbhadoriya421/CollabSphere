@@ -174,6 +174,21 @@ class User extends Model {
         }
 
     }
+
+    public static async getUserDetailsById(user_id: number) {
+        const user = await User.findOne({
+            where: {
+                id: user_id
+            },
+            attributes: ['id', 'username', 'email']
+        })
+
+        if (!user) {
+            return null
+        } else {
+            return user.toJSON();
+        }
+    }
 }
 
 User.init({

@@ -10,7 +10,7 @@ export default function Dashboard() {
         if (!accessToken) {
             navigate('/auth/site/login');
         }
-    })
+    }, [navigate, accessToken])
     return (
         <div>
             Dashboard: {user?.username}
