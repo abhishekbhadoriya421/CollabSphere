@@ -110,7 +110,58 @@ export const LoginThunk = createAsyncThunk<LoginResponse, LoginRequest, { reject
         }
     });
 
+/**
+ * every time user reload the page fetch the new access token 
+ * but why for sceurity reason we cannot store access token in
+ * local store so we store in variable: access toke but each time
+ * we reload the page the value of access token will become null as default value 
+ * now we need to track if user is logged in or not
+ * 
+ * Function takes no argument only need response data 
+ */
+export const RefreshPageThunk = createAsyncThunk<LoginResponse, void, { rejectValue: LoginResponse }>(
+    'user/reload',
+    async (_, { rejectWithValue }) => {
+        try {
+            const apiResponse: Response = await fetch('http://localhost:8080/api/auth/refresh', {
+                method: 'POST',
+                credentials: "include"
+            });
 
+            const apiResponsedata: APIResponse = await apiResponse.json();
+            /**
+             * If status code is 400 
+             */
+            if (!apiResponse.ok) {
+                const response: LoginResponse = {
+                    accessToken: '',
+                    user: null,
+                    message: apiResponsedata.message,
+                    status: 'error',
+                }
+                return response;
+            }
+
+            const response: LoginResponse = {
+                accessToken: apiResponsedata.token,
+                user: apiResponsedata.user,
+                message: apiResponsedata.message,
+                status: 'success',
+            }
+            return response;
+        } catch (error: unknown) {
+            return rejectWithValue(
+                {
+                    accessToken: '',
+                    user: null,
+                    message: (error instanceof Error ? error.message : 'An unknown error occurred'),
+                    status: 'error',
+                }
+            );
+        }
+
+    }
+)
 
 const LoginSlice = createSlice({
     name: "login",
@@ -139,6 +190,35 @@ const LoginSlice = createSlice({
                 state.loading = true;
             })
             .addCase(LoginThunk.rejected, (state, action) => {
+                state.loading = false;
+                state.status = 'error';
+                state.accessToken = '';
+                state.user = null;
+                if (action.payload) {
+                    state.message = action.payload.message
+                } else {
+                    state.message = (action.error.message) ? action.error.message : 'Request Fail'
+                }
+            })
+            .addCase(RefreshPageThunk.fulfilled, (state, action) => {
+                if (action.payload.status === 'success') {
+                    state.loading = false;
+                    state.accessToken = action.payload.accessToken;
+                    state.status = action.payload.status;
+                    state.user = action.payload.user;
+                    state.message = action.payload.message;
+                } else {
+                    state.loading = false
+                    state.accessToken = '';
+                    state.status = action.payload.status;
+                    state.user = null;
+                    state.message = action.payload.message;
+                }
+            })
+            .addCase(RefreshPageThunk.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(RefreshPageThunk.rejected, (state, action) => {
                 state.loading = false;
                 state.status = 'error';
                 state.accessToken = '';
