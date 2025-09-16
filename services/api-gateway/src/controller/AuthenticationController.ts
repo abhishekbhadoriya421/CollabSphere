@@ -1,7 +1,15 @@
 import { Request, Response } from "express";
 import User from '../models/User';
 import { Authentication } from "../service/JWT_Authentication";
-
+/**
+ * Validate User email and password if validation is passed return access token and set refresh token in cookie 
+ *  return {
+        status: number | 400;
+        message: string | 'Invalid request';
+        token: string | null;
+        user: object | null;
+    }
+ */
 export const LoginAction = async (req: Request, res: Response) => {
     interface LoginRequest {
         email: string;
@@ -78,6 +86,13 @@ export const LoginAction = async (req: Request, res: Response) => {
     })
 }
 
+/**
+ * User Request for creation of account if account is not created already then create new account and save in db 
+ * return {
+        status: number | 400;
+        message: string | 'Invalid request';
+    }
+ */
 export const RegisterAction = async (req: Request, res: Response) => {
     interface RegisterRequest {
         email: string;
