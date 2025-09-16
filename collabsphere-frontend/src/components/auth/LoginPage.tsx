@@ -1,15 +1,25 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useAppDispatch } from '../customHooks/reduxCustomHook';
+import { useAppDispatch, useAppSelector } from '../customHooks/reduxCustomHook';
 import { LoginThunk } from '../../features/AuthenticationSlice/LoginSlice';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
+    const navigate = useNavigate();
+    const { accessToken, loading, user, message, status } = useAppSelector(state => state.LoginReducer);
+    /**
+     * Redirect to dashboard page if user has logged in 
+     */
+    useEffect(() => {
+        if (accessToken) {
+            navigate("/dashboard");
+        }
+    }, [accessToken, navigate]);
     const [formData, setFormData] = useState({
         email: '',
         password: '',
     });
-
     const dispatch = useAppDispatch();
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -35,6 +45,13 @@ const LoginPage = () => {
         }
         dispatch(LoginThunk(payload));
     };
+
+    useEffect(() => {
+        if (accessToken && user && user.username) {
+            toast.success(`${user.username} logged in successfully`)
+            navigate('/dashboard');
+        }
+    }, [accessToken, loading, user, message, status, navigate]);
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 to-indigo-800 p-4">
             <div className="bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-md transition-all duration-300 hover:translate-y-[-5px]">

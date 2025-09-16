@@ -3,9 +3,14 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 /**
  * Hold Intial State
  */
+interface UserObject {
+    email: string,
+    id: number,
+    username: string
+}
 interface LoginState {
     accessToken: string | null,
-    user: object | null,
+    user: UserObject | null,
     loading: boolean,
     status: 'idle' | 'success' | 'error',
     message: string
@@ -33,7 +38,7 @@ interface LoginRequest {
  */
 interface LoginResponse {
     accessToken: string | null,
-    user: object | null,
+    user: UserObject | null,
     status: 'idle' | 'success' | 'error',
     message: string
 }
@@ -48,7 +53,7 @@ message => message return by the response (error or success)
 */
 interface APIResponse {
     token: string | null,
-    user: object | null,
+    user: UserObject | null,
     status: number,
     message: string
 }
@@ -74,7 +79,6 @@ export const LoginThunk = createAsyncThunk<LoginResponse, LoginRequest, { reject
             });
 
             const apiResponsedata: APIResponse = await apiResponse.json();
-            console.log(apiResponse);
             /**
              * If status code is 400 
              */
@@ -117,7 +121,6 @@ const LoginSlice = createSlice({
      */
     extraReducers(builder) {
         builder.addCase(LoginThunk.fulfilled, (state, action) => {
-            console.log(action.payload);
             if (action.payload.status === 'success') {
                 state.loading = false;
                 state.accessToken = action.payload.accessToken;
