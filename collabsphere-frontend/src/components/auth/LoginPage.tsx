@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 const LoginPage = () => {
     const navigate = useNavigate();
     const { accessToken, loading, user, message, status } = useAppSelector(state => state.LoginReducer);
+    const [firstTimeLogin, setFirstTimeLogin] = useState(false);
     /**
      * Redirect to dashboard page if user has logged in 
      */
@@ -27,6 +28,7 @@ const LoginPage = () => {
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        setFirstTimeLogin(true);
         e.preventDefault();
         if (!formData.email || !formData.password) {
             toast.error("Email and password required");
@@ -48,10 +50,13 @@ const LoginPage = () => {
 
     useEffect(() => {
         if (accessToken && user && user.username) {
-            toast.success(`${user.username} logged in successfully`)
+            if (firstTimeLogin) {
+                setFirstTimeLogin(false);
+                toast.success(`${user.username} logged in successfully`)
+            }
             navigate('/dashboard');
         }
-    }, [accessToken, loading, user, message, status, navigate]);
+    }, [accessToken, loading, user, message, status, navigate, firstTimeLogin]);
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 to-indigo-800 p-4">
             <div className="bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-md transition-all duration-300 hover:translate-y-[-5px]">

@@ -206,13 +206,13 @@ const LoginSlice = createSlice({
                     state.accessToken = action.payload.accessToken;
                     state.status = action.payload.status;
                     state.user = action.payload.user;
-                    state.message = action.payload.message;
+                    state.message = '';
                 } else {
                     state.loading = false
                     state.accessToken = '';
                     state.status = action.payload.status;
                     state.user = null;
-                    state.message = action.payload.message;
+                    state.message = '';
                 }
             })
             .addCase(RefreshPageThunk.pending, (state) => {

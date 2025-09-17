@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAppSelector } from "../customHooks/reduxCustomHook"
 import { useNavigate } from "react-router-dom";
-
+import Navigation from "../header/Navigation";
 export default function Dashboard() {
     const navigate = useNavigate();
     const { accessToken, user } = useAppSelector((state) => state.LoginReducer);
@@ -13,6 +13,7 @@ export default function Dashboard() {
     }, [navigate, accessToken])
     return (
         <div>
+            <Navigation />
             Dashboard: {user?.username}
         </div>
     )
