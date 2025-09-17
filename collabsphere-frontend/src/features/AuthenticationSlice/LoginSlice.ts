@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
 
 /**
  * Hold Intial State
@@ -163,6 +164,47 @@ export const RefreshPageThunk = createAsyncThunk<LoginResponse, void, { rejectVa
     }
 )
 
+interface LogoutResponse {
+    status: 'idle' | 'success' | 'error',
+    message: string
+}
+
+interface LogoutApiResponse {
+    status: number,
+    message: string
+}
+
+export const LogoutThunk = createAsyncThunk<LogoutResponse, void, { rejectValue: LogoutResponse }>(
+    'user/logout',
+    async (_, { rejectWithValue }) => {
+        try {
+
+            const logoutApiResponse: Response = await fetch('/api/auth/logout', {
+                method: 'POST',
+                credentials: "include"
+            });
+
+            const data: LogoutApiResponse = await logoutApiResponse.json();
+
+            if (!logoutApiResponse.ok) {
+                return {
+                    status: 'error',
+                    message: data.message
+                }
+            }
+            return {
+                status: 'success',
+                message: data.message
+            }
+        } catch (error: unknown) {
+            return rejectWithValue({
+                status: 'error',
+                message: (error instanceof Error ? error.message : 'An unknown error occurred'),
+            })
+        }
+    }
+)
+
 const LoginSlice = createSlice({
     name: "login",
     initialState: initialState,
@@ -171,6 +213,9 @@ const LoginSlice = createSlice({
      * handle Respose Ok, Error And Pending 
      */
     extraReducers(builder) {
+        /**
+        * Login Api Response Status handle
+        */
         builder.addCase(LoginThunk.fulfilled, (state, action) => {
             if (action.payload.status === 'success') {
                 state.loading = false;
@@ -200,6 +245,9 @@ const LoginSlice = createSlice({
                     state.message = (action.error.message) ? action.error.message : 'Request Fail'
                 }
             })
+            /**
+             * Refresh Page Api Response Status handle
+             */
             .addCase(RefreshPageThunk.fulfilled, (state, action) => {
                 if (action.payload.status === 'success') {
                     state.loading = false;
@@ -229,6 +277,26 @@ const LoginSlice = createSlice({
                     state.message = (action.error.message) ? action.error.message : 'Request Fail'
                 }
             })
+            /**
+             * Logout Api response status handle
+             */
+            .addCase(LogoutThunk.fulfilled, (state, action) => {
+                if (action.payload.status === 'success') {
+                    state.accessToken = null;
+                    state.loading = false;
+                    state.message = '';
+                    state.status = 'idle';
+                    state.user = null
+                    toast.success(action.payload.message);
+                } else {
+                    toast.error(`Couldn't logged due to : ${action.payload.message}`);
+                }
+            }).addCase(LogoutThunk.pending, (state) => {
+                state.loading = true;
+            }).addCase(LogoutThunk.rejected, (state, action) => {
+                state.loading = false;
+                toast.error(action.error.message);
+            });
     },
 });
 

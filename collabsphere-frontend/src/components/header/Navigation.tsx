@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { useAppSelector } from "../customHooks/reduxCustomHook";
+import { useAppSelector, useAppDispatch } from "../customHooks/reduxCustomHook";
+import { LogoutThunk } from "../../features/AuthenticationSlice/LoginSlice";
 
-const handleLogOut = () => {
-
-}
 const Navigation = () => {
     const { user } = useAppSelector((state) => state.LoginReducer);
     const [OpenSetting, setSetting] = useState(false);
+    const dispatch = useAppDispatch();
+    const handleLogOut = () => {
+        dispatch(LogoutThunk());
+    }
     return (
         <div className="">
             <div className="w-[100%] h-18 bg-white flex justify-between px-4 items-center" id="navigation-bar">

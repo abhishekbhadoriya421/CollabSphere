@@ -45,7 +45,7 @@ export const RegisterThunk = createAsyncThunk<RegisterResponse, RegisterRequest,
                 confirmPassword: user.confirmPassword
             }
 
-            const response: Response = await fetch('http://localhost:8080/api/auth/register', {
+            const response: Response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
