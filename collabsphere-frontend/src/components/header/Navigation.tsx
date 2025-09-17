@@ -1,7 +1,12 @@
+import { useState } from "react";
 import { useAppSelector } from "../customHooks/reduxCustomHook";
 
+const handleLogOut = () => {
+
+}
 const Navigation = () => {
-    const { user } = useAppSelector((state) => state.LoginReducer)
+    const { user } = useAppSelector((state) => state.LoginReducer);
+    const [OpenSetting, setSetting] = useState(false);
     return (
         <div className="">
             <div className="w-[100%] h-18 bg-white flex justify-between px-4 items-center" id="navigation-bar">
@@ -18,8 +23,20 @@ const Navigation = () => {
                     <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#ebecef] mx-2.5 cursor-pointer hover:bg-gray-300">
                         <i className="fas fa-bell text-xl text-gray-700"></i>
                     </div>
-                    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#ebecef] mx-2.5 cursor-pointer hover:bg-gray-300">
-                        <i className="fas fa-cog text-xl text-gray-700"></i>
+                    <div className="relative">
+                        <div
+                            onClick={() => setSetting(!OpenSetting)}
+                            className="w-10 h-10 flex items-center justify-center rounded-full bg-[#ebecef] mx-2.5 cursor-pointer hover:bg-gray-300">
+                            <i className="fas fa-cog text-xl text-gray-700"></i>
+                        </div>
+                        {OpenSetting ?
+                            <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg border border-gray-200">
+                                <ul className="py-2">
+                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogOut}>Logout</li>
+                                </ul>
+                            </div>
+                            : null}
                     </div>
                 </div>
 
