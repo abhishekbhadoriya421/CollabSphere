@@ -223,3 +223,28 @@ export const PageReloadAction = async (req: Request, res: Response) => {
 
     return res.status(200).json(response);
 }
+
+/**
+ * Logout The User
+ */
+
+
+export const LogoutAction = async (req: Request, res: Response) => {
+    try {
+        res.cookie("refreshToken", {
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: process.env.NODE_ENVIRONMENT == "PRODUCTION",
+        });
+        return res.status(200).json({
+            status: 200,
+            message: 'Logged out successfully'
+        })
+    } catch (error) {
+        return res.status(200).json({
+            status: 500,
+            message: 'Somting went wrong'
+        })
+    }
+
+}
