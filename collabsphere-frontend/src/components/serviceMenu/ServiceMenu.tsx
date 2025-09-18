@@ -5,21 +5,25 @@ export default function ServiceMenu() {
 
     const activityItems = [
         {
+            index: 1,
             icon: 'fas fa-comment',
             content: 'Chat',
             isActive: true
         },
         {
+            index: 2,
             icon: 'fas fa-phone',
             content: 'Calls',
             isActive: false
         },
         {
+            index: 3,
             icon: 'fas fa-video',
             content: 'Meetings',
             isActive: false
         },
         {
+            index: 4,
             icon: 'fas fa-file',
             content: 'Files',
             isActive: false
