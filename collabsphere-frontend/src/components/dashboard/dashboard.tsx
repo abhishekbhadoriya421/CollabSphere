@@ -14,10 +14,10 @@ export default function Dashboard() {
     }, [navigate, accessToken])
     return (
         <div className="flex w-full h-full bg-[#ebecef]">
-            <div className="w-[25%] border-1 h-screen">
+            <div className="w-[25%] h-screen bg-[#1f2937]">
                 <ServiceMenu />
             </div>
-            <div className="w-[75%] border-1 h-screen">
+            <div className="w-[75%] h-screen">
                 <Navigation />
             </div>
         </div>
