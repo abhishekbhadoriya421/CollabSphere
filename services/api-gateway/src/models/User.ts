@@ -1,5 +1,5 @@
 import sequelize from "../config/sqldb";
-import { DataTypes, Model, Optional } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import bcrypt from 'bcrypt';
 import { ValidationError } from "sequelize";
 
