@@ -27,7 +27,7 @@ interface ActivityApiResponse {
     activities: object | null
 }
 
-const ActivityItemThunk = createAsyncThunk<ActivityItemResponse, void, { rejectValue: ActivityItemResponse }>(
+export const ActivityItemThunk = createAsyncThunk<ActivityItemResponse, void, { rejectValue: ActivityItemResponse }>(
     'service-activity',
     async (_, { rejectWithValue }) => {
         try {
@@ -37,7 +37,7 @@ const ActivityItemThunk = createAsyncThunk<ActivityItemResponse, void, { rejectV
             });
 
             const responseData: ActivityApiResponse = await ApiResponce.json();
-
+            console.log(responseData);
             if (!ApiResponce.ok) {
                 return {
                     status: 'error',
@@ -72,7 +72,7 @@ const ActivityItemSlice = createSlice({
             if (action.payload.status === 'success') {
                 state.activities = action.payload.activities;
             } else {
-                state.activities = null
+                state.activities = {}
             }
         })
             .addCase(ActivityItemThunk.pending, (state) => {
@@ -80,7 +80,7 @@ const ActivityItemSlice = createSlice({
             })
             .addCase(ActivityItemThunk.rejected, (state, action) => {
                 state.loading = false;
-                state.activities = null;
+                state.activities = {};
                 if (action.error.message) {
                     state.message = action.error.message
                 }
