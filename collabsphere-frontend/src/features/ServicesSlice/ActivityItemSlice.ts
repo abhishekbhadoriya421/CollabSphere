@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 
 interface Activity {
@@ -44,7 +44,6 @@ export const ActivityItemThunk = createAsyncThunk<ActivityItemResponse, void, { 
             });
 
             const responseData: ActivityApiResponse = await ApiResponce.json();
-            console.log(responseData);
             if (!ApiResponce.ok) {
                 return {
                     status: 'error',
@@ -70,7 +69,27 @@ export const ActivityItemThunk = createAsyncThunk<ActivityItemResponse, void, { 
 const ActivityItemSlice = createSlice({
     name: "activity",
     initialState: initialState,
-    reducers: {},
+    reducers: {
+        /**
+         * change the activity type
+         * if id found update the make it current active activity else by default 0th index will be active
+         */
+        ChangeActivity: (state, action: PayloadAction<number>) => {
+            if (state.activities.length > 0) {
+                const id = action.payload
+                let itemIndex = 0;
+                state.activities.forEach((item, indx) => {
+                    if (item.id === id) {
+                        itemIndex = indx
+                    } else {
+                        item.is_active = 'IN-ACTIVE';
+                    }
+                });
+
+                state.activities[itemIndex].is_active = 'ACTIVE';
+            }
+        }
+    },
     extraReducers: (builder) => {
         builder.addCase(ActivityItemThunk.fulfilled, (state, action) => {
             state.message = action.payload.message;
@@ -96,5 +115,5 @@ const ActivityItemSlice = createSlice({
     }
 });
 
-
+export const { ChangeActivity } = ActivityItemSlice.actions;
 export default ActivityItemSlice.reducer;

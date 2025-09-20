@@ -1,11 +1,9 @@
 import { Request, Response } from 'express';
 import Activities from '../models/Activities';
 import ErrorHandler from '../utils/ErrorHandler';
-import { error } from 'console';
 export const GetActivityAction = async (req: Request, res: Response) => {
     try {
         const activities = await Activities.findAll();
-        console.log(activities);
         return res.json({
             message: 'Fetch Activites',
             activities: activities

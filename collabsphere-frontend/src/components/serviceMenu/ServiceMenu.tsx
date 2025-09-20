@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import ActivityMenu from "./ActivityMenu";
 import ServiceMenuHeader from "./ServiceMenuHeader";
-import { ActivityItemThunk } from "../../features/ServicesSlice/ActivityItemSlice";
+import { ActivityItemThunk, ChangeActivity } from "../../features/ServicesSlice/ActivityItemSlice";
 import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook";
 import { toast } from "react-toastify";
 
@@ -18,7 +18,9 @@ export default function ServiceMenu() {
     useEffect(() => {
         dispatch(ActivityItemThunk())
     }, [dispatch]);
+
     useEffect(() => {
+
         if (status == 'error') {
             toast.error(message);
         } else if (status == 'success') {
@@ -27,6 +29,14 @@ export default function ServiceMenu() {
             }
         }
     }, [dispatch, loading, status, activities, message]);
+
+    /**
+     * handle is active
+     */
+
+    const handleActiveActivity = (index: number): void => {
+        dispatch(ChangeActivity(index));
+    }
     return (
         <div className="w-[100%] h-screen text-white">
             <div className="h-1/8">
@@ -37,9 +47,12 @@ export default function ServiceMenu() {
                 {
                     activities?.map((activity: Activity) => (
                         <ActivityMenu key={activity.id}
+                            id={activity.id}
                             content={activity.content}
                             icon={activity.icon_class}
-                            isActive={activity.is_active} />
+                            isActive={activity.is_active}
+                            handleActiveActivity={handleActiveActivity}
+                        />
                     ))
                 }
 
