@@ -1,30 +1,37 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 
+interface Activity {
+    id: number,
+    icon_class: string,
+    content: string,
+    is_active: 'ACTIVE' | 'IN-ACTIVE'
+}
+
 interface InitailStateResponse {
     loading: boolean | false,
     status: 'idel' | 'success' | 'error',
-    activities: object | null,
+    activities: Array<Activity> | [],
     message: string
 }
 
 const initialState: InitailStateResponse = {
     loading: false,
     status: 'idel',
-    activities: null,
+    activities: [],
     message: ''
 }
 
 interface ActivityItemResponse {
     status: 'success' | 'error',
     message: string,
-    activities: object | null
+    activities: Array<Activity> | []
 }
 
 interface ActivityApiResponse {
     status: number,
     message: string,
-    activities: object | null
+    activities: Array<Activity> | []
 }
 
 export const ActivityItemThunk = createAsyncThunk<ActivityItemResponse, void, { rejectValue: ActivityItemResponse }>(
@@ -42,7 +49,7 @@ export const ActivityItemThunk = createAsyncThunk<ActivityItemResponse, void, { 
                 return {
                     status: 'error',
                     message: responseData.message,
-                    activities: null
+                    activities: []
                 }
             }
             return {
@@ -54,7 +61,7 @@ export const ActivityItemThunk = createAsyncThunk<ActivityItemResponse, void, { 
             return rejectWithValue({
                 status: 'error',
                 message: (error instanceof Error ? error.message : 'An unknown error occurred'),
-                activities: null
+                activities: []
             })
         }
     }
@@ -72,7 +79,7 @@ const ActivityItemSlice = createSlice({
             if (action.payload.status === 'success') {
                 state.activities = action.payload.activities;
             } else {
-                state.activities = {}
+                state.activities = []
             }
         })
             .addCase(ActivityItemThunk.pending, (state) => {
@@ -80,7 +87,7 @@ const ActivityItemSlice = createSlice({
             })
             .addCase(ActivityItemThunk.rejected, (state, action) => {
                 state.loading = false;
-                state.activities = {};
+                state.activities = [];
                 if (action.error.message) {
                     state.message = action.error.message
                 }

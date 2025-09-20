@@ -5,36 +5,16 @@ import { ActivityItemThunk } from "../../features/ServicesSlice/ActivityItemSlic
 import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook";
 import { toast } from "react-toastify";
 
+interface Activity {
+    id: number,
+    icon_class: string,
+    content: string,
+    is_active: 'ACTIVE' | 'IN-ACTIVE'
+}
 
 export default function ServiceMenu() {
     const { loading, status, activities, message } = useAppSelector((state) => state.ActivityItemReducer);
     const dispatch = useAppDispatch();
-    const activityItems = [
-        {
-            index: 1,
-            icon: 'fas fa-comment',
-            content: 'Chat',
-            isActive: true
-        },
-        {
-            index: 2,
-            icon: 'fas fa-phone',
-            content: 'Calls',
-            isActive: false
-        },
-        {
-            index: 3,
-            icon: 'fas fa-video',
-            content: 'Meetings',
-            isActive: false
-        },
-        {
-            index: 4,
-            icon: 'fas fa-file',
-            content: 'Files',
-            isActive: false
-        }
-    ];
     useEffect(() => {
         dispatch(ActivityItemThunk())
     }, [dispatch]);
@@ -54,11 +34,14 @@ export default function ServiceMenu() {
             </div>
             <hr />
             <div className="h-3/9">
-                {/* {
-                   activities?.map((activity:ActivityData) => (
-                        <ActivityMenu key={activity.index} content={activity.content} icon={activity.icon} isActive={activity.isActive} />
+                {
+                    activities?.map((activity: Activity) => (
+                        <ActivityMenu key={activity.id}
+                            content={activity.content}
+                            icon={activity.icon_class}
+                            isActive={activity.is_active} />
                     ))
-                } */}
+                }
 
             </div>
             <hr />

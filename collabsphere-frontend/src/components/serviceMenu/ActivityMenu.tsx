@@ -1,7 +1,7 @@
 type ActivityMenuProps = {
     content: string;
     icon: string;
-    isActive: boolean
+    isActive: 'ACTIVE' | 'IN-ACTIVE'
 };
 
 export default function ActivityMenu({ content, icon, isActive }: ActivityMenuProps) {
