@@ -35,7 +35,7 @@ interface GetChannelApiResponse {
 
 interface GetChannelApiRequest {
     user_id: number,
-    accessTokken: string
+    accessToken: string
 }
 
 export const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetChannelApiRequest, { rejectValue: InitailStateResponse }>(
