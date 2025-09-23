@@ -1,4 +1,4 @@
-import { createAsyncThunk } from "@reduxjs/toolkit"
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 
 /**
  * id           =>  is a unique channel name between to user
@@ -38,7 +38,7 @@ interface GetChannelApiRequest {
     accessTokken: string
 }
 
-const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetChannelApiRequest, { rejectValue: InitailStateResponse }>(
+export const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetChannelApiRequest, { rejectValue: InitailStateResponse }>(
     'user/channel',
     async (user: GetChannelApiRequest, { rejectWithValue }) => {
         try {
@@ -57,7 +57,7 @@ const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetChannelApi
                 return {
                     status: 'success',
                     message: responseData.message,
-                    channels: responseData.message,
+                    channels: responseData.channels,
                     loading: false
                 }
             } else {
@@ -79,3 +79,39 @@ const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetChannelApi
         }
     }
 )
+
+
+
+const GetMyChannelSlice = createSlice({
+    name: 'getChannel',
+    initialState: initialState,
+    reducers: {},
+    extraReducers: (builder) => {
+        builder.addCase(GetAllChannelThunks.fulfilled, (state, action) => {
+            state.loading = false;
+            state.message = action.payload.message;
+            if (action.payload.status === 'success') {
+                state.status = 'success';
+                state.channels = action.payload.channels;
+            } else {
+                state.status = 'error';
+                state.channels = [];
+            }
+        })
+            .addCase(GetAllChannelThunks.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(GetAllChannelThunks.rejected, (state, action) => {
+                state.loading = false;
+                state.channels = [];
+                state.status = 'error';
+                if (action.error.message) {
+                    state.message = action.error.message;
+                } else {
+                    state.message = 'Unexpected Error Occured'
+                }
+            })
+    }
+});
+
+export default GetMyChannelSlice.reducer;
