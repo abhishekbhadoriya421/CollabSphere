@@ -1,3 +1,5 @@
+import { createAsyncThunk } from "@reduxjs/toolkit"
+
 /**
  * id           =>  is a unique channel name between to user
  * channel_type =>  its type of channel like group chat, personal dm message or broadcast message in eniter organization created by admin
@@ -10,7 +12,7 @@ interface channels {
     channel_name: string,
     created_by: string
 }
-interface initailStateResponse {
+interface InitailStateResponse {
     loading: boolean | false
     message: string,
     status: 'error' | 'success' | 'idel',
@@ -18,9 +20,62 @@ interface initailStateResponse {
 }
 
 
-const initialState: initailStateResponse = {
+const initialState: InitailStateResponse = {
     loading: false,
     message: '',
     status: 'idel',
     channels: []
 }
+
+interface GetChannelApiResponse {
+    channels: Array<channels> | [],
+    status: number,
+    message: ''
+}
+
+interface GetChannelApiRequest {
+    user_id: number,
+    accessTokken: string
+}
+
+const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetChannelApiRequest, { rejectValue: InitailStateResponse }>(
+    'user/channel',
+    async (user: GetChannelApiRequest, { rejectWithValue }) => {
+        try {
+            const apiResponse: Response = await fetch('channel/get-user-channel', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(user)
+            });
+
+            const responseData: GetChannelApiResponse = await apiResponse.json();
+
+            if (!apiResponse.ok) {
+                return {
+                    status: 'success',
+                    message: responseData.message,
+                    channels: responseData.message,
+                    loading: false
+                }
+            } else {
+                return rejectWithValue({
+                    status: 'error',
+                    message: responseData.message,
+                    channels: [],
+                    loading: false
+                })
+            }
+
+        } catch (error: unknown) {
+            return rejectWithValue({
+                loading: false,
+                message: (error instanceof Error ? error.message : 'An unknown error occurred'),
+                status: 'error',
+                channels: []
+            })
+        }
+    }
+)
