@@ -42,7 +42,7 @@ export const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetCha
     'user/channel',
     async (user: GetChannelApiRequest, { rejectWithValue }) => {
         try {
-            const apiResponse: Response = await fetch('channel/get-user-channel', {
+            const apiResponse: Response = await fetch('/api/channel/get-user-channel', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
