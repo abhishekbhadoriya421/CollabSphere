@@ -15,12 +15,10 @@ class ChannelMember extends Model {
         ChannelMember.belongsTo(Model.User, {
             foreignKey: 'user_id',
             targetKey: 'id',
-            as: 'user'
         });
         ChannelMember.belongsTo(Model.Channel, {
             foreignKey: 'channel_id',
             targetKey: 'id',
-            as: 'channel'
         });
     }
 

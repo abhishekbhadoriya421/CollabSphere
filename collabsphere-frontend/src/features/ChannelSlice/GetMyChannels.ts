@@ -54,19 +54,19 @@ export const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetCha
             const responseData: GetChannelApiResponse = await apiResponse.json();
 
             if (!apiResponse.ok) {
-                return {
-                    status: 'success',
-                    message: responseData.message,
-                    channels: responseData.channels,
-                    loading: false
-                }
-            } else {
                 return rejectWithValue({
                     status: 'error',
                     message: responseData.message,
-                    channels: [],
+                    channels: responseData.channels,
                     loading: false
                 })
+            } else {
+                return {
+                    status: 'success',
+                    message: responseData.message,
+                    channels: [],
+                    loading: false
+                }
             }
 
         } catch (error: unknown) {
@@ -105,8 +105,8 @@ const GetMyChannelSlice = createSlice({
                 state.loading = false;
                 state.channels = [];
                 state.status = 'error';
-                if (action.error.message) {
-                    state.message = action.error.message;
+                if (action.payload?.message) {
+                    state.message = action.error.message || 'Unexpected Error';
                 } else {
                     state.message = 'Unexpected Error Occured'
                 }
