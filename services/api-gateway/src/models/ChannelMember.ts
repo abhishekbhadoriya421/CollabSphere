@@ -1,6 +1,7 @@
 import sequelize from "../config/sqldb";
 import { DataTypes, Model, } from "sequelize";
 import { ValidationError } from "sequelize";
+import models from './CentralModel';
 
 class ChannelMember extends Model {
     public id!: number;
@@ -9,6 +10,38 @@ class ChannelMember extends Model {
     public joined_at!: number;
     public created_at!: Date;
     public updated_at!: Date;
+
+    public static associate(Model: any) {
+        ChannelMember.belongsTo(Model.User, {
+            foreignKey: 'user_id',
+            targetKey: 'id'
+        });
+        ChannelMember.belongsTo(Model.Channel, {
+            foreignKey: 'channel_id',
+            targetKey: 'id'
+        });
+    }
+
+    public static async getChannelByUserId(user_id: number) {
+        const channelData = await this.findAll({
+            where: { user_id: user_id },
+            include: [
+                {
+                    model: models.User, as: 'user', attributes: ['id', 'username', 'email']
+                },
+                {
+                    model: models.Channel, as: 'channel', attributes: ['org_id', 'name', 'type', 'created_by', 'created_at']
+                }
+            ],
+            attributes: ['user_id', 'joined_at', 'id']
+        });
+
+        if (!channelData) {
+            return null;
+        } else {
+            return channelData;
+        }
+    }
 }
 
 ChannelMember.init({
