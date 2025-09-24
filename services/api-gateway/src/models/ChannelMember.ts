@@ -14,23 +14,25 @@ class ChannelMember extends Model {
     public static associate(Model: any) {
         ChannelMember.belongsTo(Model.User, {
             foreignKey: 'user_id',
-            targetKey: 'id'
+            targetKey: 'id',
+            as: 'user'
         });
         ChannelMember.belongsTo(Model.Channel, {
             foreignKey: 'channel_id',
-            targetKey: 'id'
+            targetKey: 'id',
+            as: 'channel'
         });
     }
 
     public static async getChannelByUserId(user_id: number) {
-        const channelData = await this.findAll({
+        const channelData = await ChannelMember.findAll({
             where: { user_id: user_id },
             include: [
                 {
-                    model: models.User, as: 'user', attributes: ['id', 'username', 'email']
+                    model: models.User, attributes: ['id', 'username', 'email'], required: false
                 },
                 {
-                    model: models.Channel, as: 'channel', attributes: ['org_id', 'name', 'type', 'created_by', 'created_at']
+                    model: models.Channel, attributes: ['org_id', 'name', 'type', 'created_by', 'created_at'], required: false
                 }
             ],
             attributes: ['user_id', 'joined_at', 'id']
@@ -76,8 +78,8 @@ ChannelMember.init({
     }
 }, {
     sequelize,
-    tableName: 'channels',
-    modelName: 'Channel',
+    tableName: 'channel_members',
+    modelName: 'ChannelMember',
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     hooks: {
