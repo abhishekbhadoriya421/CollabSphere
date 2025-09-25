@@ -33,20 +33,17 @@ interface ActivityApiResponse {
     message: string,
     activities: Array<Activity> | []
 }
-interface ActivityApiRequest {
-    accessToken: string
-}
 
-export const ActivityItemThunk = createAsyncThunk<ActivityItemResponse, ActivityApiRequest, { rejectValue: ActivityItemResponse }>(
+export const ActivityItemThunk = createAsyncThunk<ActivityItemResponse, string, { rejectValue: ActivityItemResponse }>(
     'service-activity',
-    async (token: ActivityApiRequest, { rejectWithValue }) => {
+    async (accessToken: string, { rejectWithValue }) => {
         try {
             const ApiResponce: Response = await fetch('/api/service/get-activity', {
                 method: 'GET',
                 credentials: "include",
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token.accessToken}`
+                    Authorization: `Bearer ${accessToken}`
                 }
             });
 

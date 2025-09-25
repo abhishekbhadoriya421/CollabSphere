@@ -3,7 +3,8 @@ import { Request, Response, NextFunction } from 'express';
 
 
 export const ValidateAccessToken = (req: Request, res: Response, next: NextFunction) => {
-    const { accessToken } = req.body;
+    const authHeader = req.headers["authorization"];
+    const accessToken = authHeader?.split(' ')[1];
     if (!accessToken) {
         return res.redirect('back');
     }

@@ -22,7 +22,7 @@ export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuPro
     const dispatch = useAppDispatch();
     useEffect(() => {
         if (accessToken) {
-            dispatch(ActivityItemThunk());
+            dispatch(ActivityItemThunk(accessToken));
         }
     }, [dispatch, accessToken]);
 
