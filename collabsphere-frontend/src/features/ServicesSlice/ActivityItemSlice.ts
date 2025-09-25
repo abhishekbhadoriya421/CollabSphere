@@ -39,11 +39,15 @@ interface ActivityApiRequest {
 
 export const ActivityItemThunk = createAsyncThunk<ActivityItemResponse, ActivityApiRequest, { rejectValue: ActivityItemResponse }>(
     'service-activity',
-    async (_, { rejectWithValue }) => {
+    async (token: ActivityApiRequest, { rejectWithValue }) => {
         try {
             const ApiResponce: Response = await fetch('/api/service/get-activity', {
                 method: 'GET',
-                credentials: "include"
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token.accessToken}`
+                }
             });
 
             const responseData: ActivityApiResponse = await ApiResponce.json();

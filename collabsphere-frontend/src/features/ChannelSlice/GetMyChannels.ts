@@ -46,9 +46,10 @@ export const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetCha
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${user.accessToken}`
                 },
                 credentials: 'include',
-                body: JSON.stringify(user)
+                body: JSON.stringify({ user_id: user.user_id })
             });
 
             const responseData: GetChannelApiResponse = await apiResponse.json();
