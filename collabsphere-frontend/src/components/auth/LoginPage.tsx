@@ -9,19 +9,25 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const { accessToken, loading, user, message, status } = useAppSelector(state => state.LoginReducer);
     const [firstTimeLogin, setFirstTimeLogin] = useState(false);
-    /**
-     * Redirect to dashboard page if user has logged in 
-     */
-    useEffect(() => {
-        if (accessToken) {
-            navigate("/dashboard");
-        }
-    }, [accessToken, navigate]);
     const [formData, setFormData] = useState({
         email: '',
         password: '',
     });
     const dispatch = useAppDispatch();
+
+    /**
+ * Redirect to dashboard page if user has logged in 
+ */
+    useEffect(() => {
+        if (accessToken) {
+            setFormData({
+                email: '',
+                password: '',
+            });
+            navigate("/dashboard");
+        }
+    }, [accessToken, navigate]);
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });

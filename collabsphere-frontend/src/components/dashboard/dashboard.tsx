@@ -33,11 +33,8 @@ export default function Dashboard() {
     return (
         <div className="flex w-full h-full bg-[#ebecef]">
             <div className="w-[25%] h-screen bg-[#1f2937] text-white">
-                {!loading && channels.length > 0 ?
-                    <ServiceMenu />
-                    :
-                    loading ? <h1>Loading....</h1> : <h1>Channels Not Found</h1>
-                }
+                <ServiceMenu channels={channels} loadingChannel={loading} />
+
             </div>
             <div className="w-[75%] h-screen">
                 <Navigation />

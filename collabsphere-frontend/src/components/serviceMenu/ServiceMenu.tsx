@@ -12,12 +12,19 @@ interface Activity {
     is_active: 'ACTIVE' | 'IN-ACTIVE'
 }
 
-export default function ServiceMenu() {
+interface ServiceMenuProp {
+    channels: Array<object>;
+    loadingChannel: boolean;
+}
+export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuProp) {
     const { loading, status, activities, message } = useAppSelector((state) => state.ActivityItemReducer);
+    const { accessToken } = useAppSelector((state) => state.LoginReducer);
     const dispatch = useAppDispatch();
     useEffect(() => {
-        dispatch(ActivityItemThunk())
-    }, [dispatch]);
+        if (accessToken) {
+            dispatch(ActivityItemThunk());
+        }
+    }, [dispatch, accessToken]);
 
     useEffect(() => {
 
@@ -58,6 +65,11 @@ export default function ServiceMenu() {
 
             </div>
             <hr />
+            {!loadingChannel && channels.length > 0 ?
+                <h1>Found</h1>
+                :
+                loading ? <i className="fas fa-spinner fa-spin"></i> : <h1><i className="fas fa-exclamation-triangle"></i> Channels Not Found</h1>
+            }
         </div>
     );
 }

@@ -33,8 +33,11 @@ interface ActivityApiResponse {
     message: string,
     activities: Array<Activity> | []
 }
+interface ActivityApiRequest {
+    accessToken: string
+}
 
-export const ActivityItemThunk = createAsyncThunk<ActivityItemResponse, void, { rejectValue: ActivityItemResponse }>(
+export const ActivityItemThunk = createAsyncThunk<ActivityItemResponse, ActivityApiRequest, { rejectValue: ActivityItemResponse }>(
     'service-activity',
     async (_, { rejectWithValue }) => {
         try {
@@ -105,6 +108,7 @@ const ActivityItemSlice = createSlice({
                 state.loading = true
             })
             .addCase(ActivityItemThunk.rejected, (state, action) => {
+                console.log(action.payload)
                 state.loading = false;
                 state.activities = [];
                 if (action.error.message) {
