@@ -1,5 +1,6 @@
 
 import { X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 interface SideBarProps {
   isOpen: boolean
   onClose(): void
@@ -29,7 +30,9 @@ const SettingsSidebar = ({ isOpen, onClose }: SideBarProps) => {
         </div>
 
         <ul className="space-y-4">
-          <li className="text-gray-700">Organization Management</li>
+          <li >
+            <Link to={'/organization/dashboard/index'} className="text-gray-700">Organization Management</Link>
+          </li>
           <li className="text-gray-700">Notification Preferences</li>
           <li className="text-gray-700">Theme Selector (Light/Dark)</li>
         </ul>
