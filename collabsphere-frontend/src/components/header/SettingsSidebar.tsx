@@ -31,7 +31,7 @@ const SettingsSidebar = ({ isOpen, onClose }: SideBarProps) => {
 
         <ul className="space-y-4">
           <li >
-            <Link to={'/organization/dashboard/index'} className="text-gray-700">Organization Management</Link>
+            <Link onClick={onClose} to={'/organization/dashboard/index'} className="text-gray-700">Organization Management</Link>
           </li>
           <li className="text-gray-700">Notification Preferences</li>
           <li className="text-gray-700">Theme Selector (Light/Dark)</li>

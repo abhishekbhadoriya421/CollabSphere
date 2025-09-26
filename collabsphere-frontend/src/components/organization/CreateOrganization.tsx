@@ -1,21 +1,20 @@
 // src/pages/OrganizationManagement.tsx
 
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 
 // Assuming you have the Organization interface defined
 interface Organization {
     code: string;
     name: string;
     description: string;
-    created_by: number | null;
 }
 
 const OrganizationManagement: React.FC = () => {
     const [formData, setFormData] = useState<Organization>({
         code: '',
         name: '',
-        description: '',
-        created_by: null,
+        description: ''
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -28,14 +27,16 @@ const OrganizationManagement: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Submitting Organization:', formData);
-        alert(`Organization ${formData.name} submitted!`);
+        if (!formData.code || !formData.name) {
+            toast.error('code and name required');
+            return;
+        }
+
     };
 
     return (
         <div className="p-8 bg-gray-50 h-full">
             <h1 className="text-3xl font-bold text-gray-800 mb-8">Organization Management</h1>
-            {/* Organization Form */}
             <div className="bg-white p-6 rounded-lg shadow-xl mb-10">
                 <h2 className="text-xl font-semibold text-indigo-600 mb-4">Create Organization</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
