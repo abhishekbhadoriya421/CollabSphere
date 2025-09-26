@@ -15,7 +15,7 @@ interface LoginState {
     loading: boolean,
     status: 'idle' | 'success' | 'error',
     message: string,
-    userOu: Array<unknown> | null
+    userOu: Array<unknown>
 }
 
 
@@ -25,7 +25,7 @@ const initialState: LoginState = {
     loading: false,
     status: 'idle',
     message: '',
-    userOu: null
+    userOu: []
 }
 
 /**
@@ -44,7 +44,7 @@ interface LoginResponse {
     user: UserObject | null,
     status: 'idle' | 'success' | 'error',
     message: string,
-    userOu: Array<unknown> | null
+    userOu: Array<unknown>
 }
 
 /* 
@@ -60,7 +60,7 @@ interface APIResponse {
     user: UserObject | null,
     status: number,
     message: string,
-    userOu: Array<unknown> | null
+    userOu: Array<unknown>
 }
 
 /**
@@ -93,7 +93,7 @@ export const LoginThunk = createAsyncThunk<LoginResponse, LoginRequest, { reject
                     user: null,
                     message: apiResponsedata.message,
                     status: 'error',
-                    userOu: null
+                    userOu: []
                 }
                 return response;
             }
@@ -112,7 +112,7 @@ export const LoginThunk = createAsyncThunk<LoginResponse, LoginRequest, { reject
                 user: null,
                 message: (error instanceof Error ? error.message : 'An unknown error occurred'),
                 status: 'error',
-                userOu: null
+                userOu: []
             }
             return rejectWithValue(response);
         }
@@ -146,7 +146,7 @@ export const RefreshPageThunk = createAsyncThunk<LoginResponse, void, { rejectVa
                     user: null,
                     message: apiResponsedata.message,
                     status: 'error',
-                    userOu: null
+                    userOu: []
                 }
                 return response;
             }
@@ -166,7 +166,7 @@ export const RefreshPageThunk = createAsyncThunk<LoginResponse, void, { rejectVa
                     user: null,
                     message: (error instanceof Error ? error.message : 'An unknown error occurred'),
                     status: 'error',
-                    userOu: null
+                    userOu: []
                 }
             );
         }
@@ -240,7 +240,7 @@ const LoginSlice = createSlice({
                 state.status = action.payload.status;
                 state.user = null;
                 state.message = action.payload.message;
-                state.userOu = null;
+                state.userOu = [];
             }
         })
             .addCase(LoginThunk.pending, (state) => {
@@ -251,7 +251,7 @@ const LoginSlice = createSlice({
                 state.status = 'error';
                 state.accessToken = '';
                 state.user = null;
-                state.userOu = null;
+                state.userOu = [];
                 if (action.payload) {
                     state.message = action.payload.message
                 } else {
@@ -275,7 +275,7 @@ const LoginSlice = createSlice({
                     state.status = action.payload.status;
                     state.user = null;
                     state.message = '';
-                    state.userOu = null;
+                    state.userOu = [];
                 }
             })
             .addCase(RefreshPageThunk.pending, (state) => {
@@ -286,7 +286,7 @@ const LoginSlice = createSlice({
                 state.status = 'error';
                 state.accessToken = '';
                 state.user = null;
-                state.userOu = null;
+                state.userOu = [];
                 if (action.payload) {
                     state.message = action.payload.message
                 } else {
@@ -303,7 +303,7 @@ const LoginSlice = createSlice({
                     state.message = '';
                     state.status = 'idle';
                     state.user = null;
-                    state.userOu = null;
+                    state.userOu = [];
                     toast.success(action.payload.message);
                 } else {
                     toast.error(`Couldn't logged due to : ${action.payload.message}`);

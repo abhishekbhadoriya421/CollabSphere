@@ -29,7 +29,7 @@ export default function AppLayout() {
             </div>
             <div className="w-[75%] h-full flex flex-col">
                 <Navigation />
-                <main className="flex-1 overflow-y-auto">
+                <main className="flex-1 overflow-y-auto mt-1">
                     <Outlet />
                 </main>
             </div>
