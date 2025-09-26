@@ -1,14 +1,26 @@
 import { useState } from "react";
 import { useAppSelector, useAppDispatch } from "../customHooks/reduxCustomHook";
 import { LogoutThunk } from "../../features/AuthenticationSlice/LoginSlice";
+import SettingsSidebar from "./SettingsSidebar";
 
 const Navigation = () => {
     const { user } = useAppSelector((state) => state.LoginReducer);
     const [OpenSetting, setSetting] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const dispatch = useAppDispatch();
     const handleLogOut = () => {
         dispatch(LogoutThunk());
     }
+
+    const handleOpenSettingsSidebar = () => {
+        setSetting(false);
+        setIsSidebarOpen(true);
+    };
+
+    // Handler for closing the main Settings Sidebar
+    const handleCloseSettingsSidebar = () => {
+        setIsSidebarOpen(false);
+    };
     return (
         <div className="">
             <div className="w-[100%] h-18 bg-white flex justify-between px-4 items-center" id="navigation-bar">
@@ -34,12 +46,21 @@ const Navigation = () => {
                         {OpenSetting ?
                             <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg border border-gray-200">
                                 <ul className="py-2">
-                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                    <li
+                                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                        onClick={handleOpenSettingsSidebar}
+                                    >Settings</li>
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogOut}>Logout</li>
                                 </ul>
                             </div>
                             : null}
                     </div>
+                    {isSidebarOpen && (
+                        <SettingsSidebar
+                            isOpen={isSidebarOpen}
+                            onClose={handleCloseSettingsSidebar}
+                        />
+                    )}
                 </div>
 
             </div>
