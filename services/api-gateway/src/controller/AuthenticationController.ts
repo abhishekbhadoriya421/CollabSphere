@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import User from '../models/User';
 import { Authentication } from "../service/JWT_Authentication";
 import ErrorHandler from "../utils/ErrorHandler";
+import Memberships from "../models/Memberships";
+import models from "../models/CentralModel";
 /**
  * Validate User email and password if validation is passed return access token and set refresh token in cookie 
  *  return {
@@ -17,19 +19,15 @@ export const LoginAction = async (req: Request, res: Response) => {
             email: string;
             password: string;
         }
-        interface LoginResponse {
-            status: number | 400;
-            message: string | 'Invalid request';
-            token: string | null;
-            user: object | null;
-        }
+
         const { email, password }: LoginRequest = req.body;
         if (!email || !password) {
-            const response: LoginResponse = {
+            const response = {
                 status: 400,
                 message: 'Email and password are required',
                 token: null,
-                user: null
+                user: null,
+                userOu: null
             };
             return res.status(400).json(response);
         }
@@ -48,7 +46,8 @@ export const LoginAction = async (req: Request, res: Response) => {
                 status: 400,
                 message: validationStatus.message,
                 token: null,
-                user: null
+                user: null,
+                userOu: null
             });
         }
 
@@ -58,6 +57,13 @@ export const LoginAction = async (req: Request, res: Response) => {
             username: string
         }
         const userData: UserDataResponse = validationStatus.user;
+        const userOu = await Memberships.findAll({
+            where: { user_id: userData.id },
+            include: [
+                { model: models.Organization, attributes: ['code', 'id', 'name'], required: false }
+            ]
+        });
+        console.log(userOu);
         /**
          * create access token and refresh token
          */
@@ -69,7 +75,8 @@ export const LoginAction = async (req: Request, res: Response) => {
                 status: 400,
                 message: 'Somthing went wrong could not generate access token and refresh token',
                 token: null,
-                user: null
+                user: null,
+                userOu: null
             });
         }
 
@@ -85,14 +92,16 @@ export const LoginAction = async (req: Request, res: Response) => {
             status: 200,
             message: 'Login SuccessFully',
             token: accessToken.token,
-            user: userData
+            user: userData,
+            userOu: userOu
         });
     } catch (error) {
         return res.status(200).json({
             status: 200,
             message: ErrorHandler.getMessage(error),
             token: null,
-            user: null
+            user: null,
+            userOu: null
         });
     }
 
@@ -175,19 +184,14 @@ export const PageReloadAction = async (req: Request, res: Response) => {
     /**
      * user has been logged out need to login again
      */
-    interface PageReloadResponse {
-        status: number | 400;
-        message: string | 'Invalid request';
-        token: string | null;
-        user: object | null;
-    }
 
     if (!refreshToken) {
         return res.status(401).json({
             status: 401,
             message: 'Not Authenticated',
             token: null,
-            user: null
+            user: null,
+            userOu: null
         })
     }
 
@@ -200,7 +204,8 @@ export const PageReloadAction = async (req: Request, res: Response) => {
             status: 200,
             message: 'Refresh token has been expired login again ',
             token: null,
-            user: null
+            user: null,
+            userOu: null
         })
     }
     const UserDetail = await User.getUserDetailsById(validateRefreshToken.user_id);
@@ -209,9 +214,16 @@ export const PageReloadAction = async (req: Request, res: Response) => {
             status: 404,
             message: 'User not found',
             token: null,
-            user: null
+            user: null,
+            userOu: null
         })
     }
+    const userOu = await Memberships.findAll({
+        where: { user_id: UserDetail.id },
+        include: [
+            { model: models.Organization, attributes: ['code', 'id', 'name'], required: false }
+        ]
+    });
     /**
      * generate new access token
      */
@@ -221,15 +233,17 @@ export const PageReloadAction = async (req: Request, res: Response) => {
             status: 500,
             message: 'Something went wrong could not generate access token',
             token: null,
-            user: null
+            user: null,
+            userOu: null
         })
     }
 
-    const response: PageReloadResponse = {
+    const response = {
         status: 200,
         message: 'access token generated ',
         token: newAccessToken.token,
-        user: UserDetail
+        user: UserDetail,
+        userOu: userOu
     }
 
     return res.status(200).json(response);

@@ -9,11 +9,23 @@ class Memberships extends Model {
     public role!: string;
     public created_at!: Date
     public updated_at!: Date
+
+    public static associate(Model: any) {
+        Memberships.belongsTo(Model.Organization, {
+            foreignKey: 'organization_id',
+            targetKey: 'id',
+        });
+        Memberships.belongsTo(Model.User, {
+            foreignKey: 'user_id',
+            targetKey: 'id'
+        });
+    }
 }
 
 Memberships.init({
     id: {
         type: DataTypes.NUMBER,
+        primaryKey: true,
         allowNull: false,
         autoIncrement: true,
         unique: true,

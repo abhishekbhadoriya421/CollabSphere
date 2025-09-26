@@ -29,7 +29,7 @@ const SettingsSidebar = ({ isOpen, onClose }: SideBarProps) => {
         </div>
 
         <ul className="space-y-4">
-          <li className="text-gray-700">Profile Management</li>
+          <li className="text-gray-700">Organization Management</li>
           <li className="text-gray-700">Notification Preferences</li>
           <li className="text-gray-700">Theme Selector (Light/Dark)</li>
         </ul>

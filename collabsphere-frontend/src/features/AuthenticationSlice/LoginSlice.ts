@@ -14,7 +14,8 @@ interface LoginState {
     user: UserObject | null,
     loading: boolean,
     status: 'idle' | 'success' | 'error',
-    message: string
+    message: string,
+    userOu: Array<unknown> | null
 }
 
 
@@ -23,7 +24,8 @@ const initialState: LoginState = {
     user: null,
     loading: false,
     status: 'idle',
-    message: ''
+    message: '',
+    userOu: null
 }
 
 /**
@@ -41,7 +43,8 @@ interface LoginResponse {
     accessToken: string | null,
     user: UserObject | null,
     status: 'idle' | 'success' | 'error',
-    message: string
+    message: string,
+    userOu: Array<unknown> | null
 }
 
 /* 
@@ -56,7 +59,8 @@ interface APIResponse {
     token: string | null,
     user: UserObject | null,
     status: number,
-    message: string
+    message: string,
+    userOu: Array<unknown> | null
 }
 
 /**
@@ -89,6 +93,7 @@ export const LoginThunk = createAsyncThunk<LoginResponse, LoginRequest, { reject
                     user: null,
                     message: apiResponsedata.message,
                     status: 'error',
+                    userOu: null
                 }
                 return response;
             }
@@ -98,6 +103,7 @@ export const LoginThunk = createAsyncThunk<LoginResponse, LoginRequest, { reject
                 user: apiResponsedata.user,
                 message: apiResponsedata.message,
                 status: 'success',
+                userOu: apiResponsedata.userOu
             }
             return response;
         } catch (error: unknown) {
@@ -106,6 +112,7 @@ export const LoginThunk = createAsyncThunk<LoginResponse, LoginRequest, { reject
                 user: null,
                 message: (error instanceof Error ? error.message : 'An unknown error occurred'),
                 status: 'error',
+                userOu: null
             }
             return rejectWithValue(response);
         }
@@ -139,6 +146,7 @@ export const RefreshPageThunk = createAsyncThunk<LoginResponse, void, { rejectVa
                     user: null,
                     message: apiResponsedata.message,
                     status: 'error',
+                    userOu: null
                 }
                 return response;
             }
@@ -148,6 +156,7 @@ export const RefreshPageThunk = createAsyncThunk<LoginResponse, void, { rejectVa
                 user: apiResponsedata.user,
                 message: apiResponsedata.message,
                 status: 'success',
+                userOu: apiResponsedata.userOu
             }
             return response;
         } catch (error: unknown) {
@@ -157,6 +166,7 @@ export const RefreshPageThunk = createAsyncThunk<LoginResponse, void, { rejectVa
                     user: null,
                     message: (error instanceof Error ? error.message : 'An unknown error occurred'),
                     status: 'error',
+                    userOu: null
                 }
             );
         }
@@ -223,12 +233,14 @@ const LoginSlice = createSlice({
                 state.status = action.payload.status;
                 state.user = action.payload.user;
                 state.message = action.payload.message;
+                state.userOu = action.payload.userOu;
             } else {
                 state.loading = false
                 state.accessToken = '';
                 state.status = action.payload.status;
                 state.user = null;
                 state.message = action.payload.message;
+                state.userOu = null;
             }
         })
             .addCase(LoginThunk.pending, (state) => {
@@ -239,6 +251,7 @@ const LoginSlice = createSlice({
                 state.status = 'error';
                 state.accessToken = '';
                 state.user = null;
+                state.userOu = null;
                 if (action.payload) {
                     state.message = action.payload.message
                 } else {
@@ -255,12 +268,14 @@ const LoginSlice = createSlice({
                     state.status = action.payload.status;
                     state.user = action.payload.user;
                     state.message = '';
+                    state.userOu = action.payload.userOu;
                 } else {
                     state.loading = false
                     state.accessToken = '';
                     state.status = action.payload.status;
                     state.user = null;
                     state.message = '';
+                    state.userOu = null;
                 }
             })
             .addCase(RefreshPageThunk.pending, (state) => {
@@ -271,6 +286,7 @@ const LoginSlice = createSlice({
                 state.status = 'error';
                 state.accessToken = '';
                 state.user = null;
+                state.userOu = null;
                 if (action.payload) {
                     state.message = action.payload.message
                 } else {
@@ -286,7 +302,8 @@ const LoginSlice = createSlice({
                     state.loading = false;
                     state.message = '';
                     state.status = 'idle';
-                    state.user = null
+                    state.user = null;
+                    state.userOu = null;
                     toast.success(action.payload.message);
                 } else {
                     toast.error(`Couldn't logged due to : ${action.payload.message}`);

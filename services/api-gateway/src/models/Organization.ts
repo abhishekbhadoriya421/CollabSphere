@@ -16,6 +16,7 @@ Organization.init({
     id: {
         type: DataTypes.NUMBER,
         allowNull: false,
+        primaryKey: true,
         autoIncrement: true,
         unique: true,
         validate: {
