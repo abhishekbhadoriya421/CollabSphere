@@ -1,7 +1,14 @@
 import sequelize from "../config/sqldb";
 import { DataTypes, Model } from "sequelize";
+import Organization from "./Organization";
+import ErrorHandler from "../utils/ErrorHandler";
 
-
+interface CreateNewOuResponse {
+    status: boolean,
+    message: string,
+    organization: Organization | null,
+    membership: Memberships | null
+}
 class Memberships extends Model {
     public id!: number;
     public user_id!: number;
@@ -19,6 +26,50 @@ class Memberships extends Model {
             foreignKey: 'user_id',
             targetKey: 'id'
         });
+    }
+    /**
+     * create new organization call create method
+     */
+
+    public static async createNewOrganization(user_id: number, description: string, name: string, code: string): Promise<CreateNewOuResponse> {
+        const transactionObject = await sequelize.transaction();
+        try {
+            const organization = await Organization.create({
+                name: name,
+                code: code,
+                description: description
+            },
+                {
+                    transaction: transactionObject
+                }
+            );
+
+            const membership = await this.create({
+                user_id: user_id,
+                organization_id: organization.id,
+                role: 'Admin'
+            },
+                {
+                    transaction: transactionObject
+                });
+            await transactionObject.commit();
+            return {
+                status: true,
+                message: 'Successfully created new organization',
+                organization: organization,
+                membership: membership
+            }
+
+        } catch (error) {
+            await transactionObject.rollback();
+            const errorMessage = ErrorHandler.getMessage(error);
+            return {
+                status: false,
+                message: errorMessage,
+                organization: null,
+                membership: null
+            }
+        }
     }
 }
 
