@@ -1,8 +1,10 @@
 // src/pages/OrganizationManagement.tsx
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-
+import useAccessToken from '../customHooks/getAccessToken';
+import { OrganizationCreateThunk } from '../../features/OrganizationSlice/OrganizationSlice';
+import { useAppDispatch, useAppSelector } from '../customHooks/reduxCustomHook';
 // Assuming you have the Organization interface defined
 interface Organization {
     code: string;
@@ -11,6 +13,9 @@ interface Organization {
 }
 
 const OrganizationManagement: React.FC = () => {
+    const { accessToken, user } = useAccessToken();
+    const { status, message, loading } = useAppSelector((state) => state.OrganizationReducer);
+    const dispatch = useAppDispatch();
     const [formData, setFormData] = useState<Organization>({
         code: '',
         name: '',
@@ -31,8 +36,26 @@ const OrganizationManagement: React.FC = () => {
             toast.error('code and name required');
             return;
         }
-
+        if (user && accessToken) {
+            dispatch(OrganizationCreateThunk({
+                user_id: user.id,
+                accessToken: accessToken,
+                code: formData.code,
+                name: formData.name,
+                description: formData.description
+            }))
+        }
     };
+
+    useEffect(() => {
+        if (!loading && message && status != 'idle') {
+            if (status == 'error') {
+                toast.error(message);
+            } else {
+                toast.success(message);
+            }
+        }
+    }, [loading, message, status])
 
     return (
         <div className="p-8 bg-gray-50 h-full">
@@ -89,7 +112,12 @@ const OrganizationManagement: React.FC = () => {
                         type="submit"
                         className="w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
-                        Save Organization
+                        {loading ?
+                            <i className="fas fa-spinner fa-spin"></i>
+                            :
+                            <span>  Save Organization </span>
+                        }
+
                     </button>
                 </form>
             </div>

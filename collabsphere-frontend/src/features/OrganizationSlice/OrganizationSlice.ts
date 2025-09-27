@@ -67,12 +67,12 @@ export const OrganizationCreateThunk = createAsyncThunk<ResponseCreateOu, Reques
             const resData: CreateOuResponseApi = await apiResponse.json();
 
             if (!apiResponse.ok) {
-                return {
+                return rejectWithValue({
                     status: 'error',
                     message: resData.message,
                     id: resData.id,
                     form: null
-                }
+                });
             }
 
             return {
