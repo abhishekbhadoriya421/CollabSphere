@@ -63,7 +63,6 @@ export const LoginAction = async (req: Request, res: Response) => {
                 { model: models.Organization, attributes: ['code', 'id', 'name'], required: false }
             ]
         });
-        console.log(userOu);
         /**
          * create access token and refresh token
          */
@@ -149,10 +148,10 @@ export const RegisterAction = async (req: Request, res: Response) => {
 
         if (isUserExist) {
             const response: RegisterResponse = {
-                status: 400,
+                status: 409,
                 message: 'Account exist please login'
             };
-            return res.status(400).json(response);
+            return res.status(409).json(response);
         }
         const result: CreateUserResponse = await User.createUser(username, email, password, confirmPassword) as CreateUserResponse;
 

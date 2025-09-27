@@ -37,7 +37,8 @@ class Memberships extends Model {
             const organization = await Organization.create({
                 name: name,
                 code: code,
-                description: description
+                description: description,
+                created_by: user_id
             },
                 {
                     transaction: transactionObject
@@ -47,7 +48,8 @@ class Memberships extends Model {
             const membership = await this.create({
                 user_id: user_id,
                 organization_id: organization.id,
-                role: 'Admin'
+                role: 'Admin',
+                created_by: user_id
             },
                 {
                     transaction: transactionObject
