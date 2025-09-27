@@ -4,6 +4,7 @@ import ServiceMenuHeader from "./ServiceMenuHeader";
 import { ActivityItemThunk, ChangeActivity } from "../../features/ServicesSlice/ActivityItemSlice";
 import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook";
 import { toast } from "react-toastify";
+import useAccessToken from "../customHooks/getAccessToken";
 
 interface Activity {
     id: number,
@@ -18,7 +19,7 @@ interface ServiceMenuProp {
 }
 export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuProp) {
     const { loading, status, activities, message } = useAppSelector((state) => state.ActivityItemReducer);
-    const { accessToken } = useAppSelector((state) => state.LoginReducer);
+    const { accessToken } = useAccessToken();
     const dispatch = useAppDispatch();
     useEffect(() => {
         if (accessToken) {
