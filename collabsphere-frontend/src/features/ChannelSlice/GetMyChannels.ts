@@ -61,7 +61,6 @@ export const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetCha
                     loading: false
                 })
             } else {
-                console.log(responseData.channel)
                 return {
                     status: 'success',
                     message: responseData.message,
@@ -94,14 +93,12 @@ const GetMyChannelSlice = createSlice({
     initialState: initialState,
     reducers: {
         addChannel: (state, channelData: PayloadAction<AddChannelPayload>) => {
-            console.log('add channel')
             const newItem: channels = {
                 channel_name: channelData.payload.channel_name,
                 id: channelData.payload.channel_id,
                 channel_type: channelData.payload.channel_type,
                 created_by: channelData.payload.created_by
             };
-            console.log(newItem);
             state.channels.push(newItem);
         }
     },

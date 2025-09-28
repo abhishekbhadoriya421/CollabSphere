@@ -109,7 +109,6 @@ const ActivityItemSlice = createSlice({
                 state.loading = true
             })
             .addCase(ActivityItemThunk.rejected, (state, action) => {
-                console.log(action.payload)
                 state.loading = false;
                 state.activities = [];
                 if (action.error.message) {
