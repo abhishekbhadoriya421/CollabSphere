@@ -9,18 +9,41 @@ interface OrganizationObject {
     created_by: number | '';
 }
 
+interface MembershipObject {
+    user_id: number | null;
+    organization_id: number | null;
+    role: 'Admin' | 'Member' | 'Guest';
+}
+
+interface ChannelObejct {
+    ou_id: number | null,
+    name: string | "",
+    type: 'channel' | 'group' | 'dm' | 'none'
+}
+
+interface ChannelMembershipObject {
+    channel_id: number | null,
+    user_id: number | null,
+}
+
 interface InitailState {
-    userOrganization: OrganizationObject[];
+    userOrganization: OrganizationObject | null;
     message: string | '';
     status: 'idle' | 'error' | 'success';
     loading: boolean;
+    userMembership: MembershipObject | null;
+    userChannel: ChannelObejct | null;
+    userChannelMembership: ChannelMembershipObject | null;
 }
 
 const initailState: InitailState = {
-    userOrganization: [],
+    userOrganization: null,
     message: '',
     status: 'idle',
-    loading: false
+    loading: false,
+    userMembership: null,
+    userChannel: null,
+    userChannelMembership: null,
 }
 
 interface RequestCreateOu {
@@ -34,14 +57,19 @@ interface RequestCreateOu {
 interface ResponseCreateOu {
     status: 'idle' | 'error' | 'success'
     message: string;
-    id: number | null
-    form: RequestCreateOu | null
+    organization: OrganizationObject | null;
+    membership: MembershipObject | null;
+    channel: ChannelObejct | null;
+    channelMembership: ChannelMembershipObject | null;
 }
 
 interface CreateOuResponseApi {
     status: number;
     message: string;
-    id: number | null;
+    organization: OrganizationObject | null;
+    membership: MembershipObject | null;
+    channel: ChannelObejct | null;
+    channelMembership: ChannelMembershipObject | null;
 }
 /**
  * 
@@ -70,23 +98,29 @@ export const OrganizationCreateThunk = createAsyncThunk<ResponseCreateOu, Reques
                 return rejectWithValue({
                     status: 'error',
                     message: resData.message,
-                    id: resData.id,
-                    form: null
+                    organization: null,
+                    membership: null,
+                    channel: null,
+                    channelMembership: null
                 });
             }
 
             return {
                 status: 'success',
                 message: resData.message,
-                id: resData.id,
-                form: form
+                organization: resData.organization,
+                membership: resData.membership,
+                channel: resData.channel,
+                channelMembership: resData.channelMembership
             }
         } catch (error: unknown) {
             return rejectWithValue({
                 status: 'error',
                 message: (error instanceof Error ? error.message : 'An unknown error occurred'),
-                id: null,
-                form: null
+                organization: null,
+                membership: null,
+                channel: null,
+                channelMembership: null
             });
         }
     }
@@ -100,19 +134,42 @@ const OrganizationSlice = createSlice({
     extraReducers: (builder) => {
         builder.addCase(OrganizationCreateThunk.fulfilled, (state, action) => {
             if (action.payload.status === 'success') {
-                const newItem: OrganizationObject = {
-                    id: action.payload.id,
-                    name: action.payload.form?.name || '',
-                    code: action.payload.form?.code || '',
-                    description: action.payload.form?.description || '',
-                    created_by: action.payload.form?.user_id || ''
+                const channelMembershipItem: ChannelMembershipObject = {
+                    user_id: action.payload.channelMembership?.user_id || null,
+                    channel_id: action.payload.channelMembership?.channel_id || null,
                 }
-                state.userOrganization.push(newItem);
+                const membershipItem: MembershipObject = {
+                    user_id: action.payload.membership?.user_id || null,
+                    organization_id: action.payload.membership?.organization_id || null,
+                    role: action.payload.membership?.role || 'Guest',
+                }
+                const channelItem: ChannelObejct = {
+                    ou_id: action.payload.channel?.ou_id || null,
+                    name: action.payload.channel?.name || '',
+                    type: action.payload.channel?.type || 'none',
+
+                }
+
+                const organizationItem: OrganizationObject = {
+                    name: action.payload.organization?.name || '',
+                    code: action.payload.organization?.code || '',
+                    id: action.payload.organization?.id || null,
+                    description: action.payload.organization?.description || '',
+                    created_by: action.payload.organization?.created_by || ''
+                }
+                state.userChannelMembership = channelMembershipItem;
+                state.userMembership = membershipItem;
+                state.userChannel = channelItem;
+                state.userOrganization = organizationItem;
                 state.message = action.payload.message;
                 state.status = action.payload.status;
             } else {
                 state.status = 'error';
                 state.message = action.payload.message;
+                state.userChannelMembership = null;
+                state.userMembership = null;
+                state.userChannel = null;
+                state.userOrganization = null;
             }
             state.loading = false;
         }).addCase(OrganizationCreateThunk.pending, (state) => {
@@ -121,6 +178,10 @@ const OrganizationSlice = createSlice({
             state.loading = false;
             state.message = action.payload?.message || 'unexpected error';
             state.status = 'error';
+            state.userChannelMembership = null;
+            state.userMembership = null;
+            state.userChannel = null;
+            state.userOrganization = null;
         })
     }
 

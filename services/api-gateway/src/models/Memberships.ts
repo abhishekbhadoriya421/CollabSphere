@@ -31,7 +31,6 @@ class Memberships extends Model {
     public static async createNewOrganization(models: any, user_id: number, description: string, name: string, code: string) {
         const transactionObject = await sequelize.transaction();
         try {
-            console.log(UserLoginDetail.getUserId())
             const organization = await models.Organization.create({
                 name: name,
                 code: code,
@@ -59,7 +58,7 @@ class Memberships extends Model {
                 transaction: transactionObject
             });
 
-            await models.ChannelMember.create({
+            const channelMembership = await models.ChannelMember.create({
                 channel_id: channel.id,
                 user_id: user_id
             }, {
@@ -71,7 +70,9 @@ class Memberships extends Model {
                 status: true,
                 message: 'Successfully created new organization',
                 organization: organization,
-                membership: membership
+                membership: membership,
+                channel: channel,
+                channelMembership: channelMembership
             }
 
         } catch (error) {
@@ -81,7 +82,9 @@ class Memberships extends Model {
                 status: false,
                 message: errorMessage,
                 organization: null,
-                membership: null
+                membership: null,
+                channel: null,
+                channelMembership: null
             }
         }
     }

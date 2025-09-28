@@ -28,7 +28,7 @@ const initialState: InitailStateResponse = {
 }
 
 interface GetChannelApiResponse {
-    channels: Array<channels> | [],
+    channel: Array<channels> | [],
     status: number,
     message: ''
 }
@@ -53,19 +53,19 @@ export const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetCha
             });
 
             const responseData: GetChannelApiResponse = await apiResponse.json();
-
             if (!apiResponse.ok) {
                 return rejectWithValue({
                     status: 'error',
                     message: responseData.message,
-                    channels: responseData.channels,
+                    channels: [],
                     loading: false
                 })
             } else {
+                console.log(responseData.channel)
                 return {
                     status: 'success',
                     message: responseData.message,
-                    channels: [],
+                    channels: responseData.channel,
                     loading: false
                 }
             }
