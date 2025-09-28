@@ -2,6 +2,7 @@ import sequelize from "../config/sqldb";
 import { DataTypes, Model } from "sequelize";
 import Organization from "./Organization";
 import ErrorHandler from "../utils/ErrorHandler";
+import UserLoginDetail from "../service/UserLoginDetail";
 
 interface CreateNewOuResponse {
     status: boolean,
@@ -14,8 +15,10 @@ class Memberships extends Model {
     public user_id!: number;
     public organization_id!: number;
     public role!: string;
-    public created_at!: Date
-    public updated_at!: Date
+    public created_at!: Date;
+    public updated_at!: Date;
+    public created_by!: number | null;
+    public updated_by!: number | null;
 
     public static associate(Model: any) {
         Memberships.belongsTo(Model.Organization, {
@@ -28,7 +31,7 @@ class Memberships extends Model {
         });
     }
     /**
-     * create new organization call create method
+     * create new organization call create method and also first channel
      */
 
     public static async createNewOrganization(user_id: number, description: string, name: string, code: string): Promise<CreateNewOuResponse> {
@@ -38,7 +41,6 @@ class Memberships extends Model {
                 name: name,
                 code: code,
                 description: description,
-                created_by: user_id
             },
                 {
                     transaction: transactionObject
@@ -49,7 +51,6 @@ class Memberships extends Model {
                 user_id: user_id,
                 organization_id: organization.id,
                 role: 'Admin',
-                created_by: user_id
             },
                 {
                     transaction: transactionObject
@@ -116,6 +117,16 @@ Memberships.init({
         type: DataTypes.DATE,
         allowNull: true,
         defaultValue: DataTypes.NOW
+    },
+    created_by: {
+        type: DataTypes.NUMBER,
+        allowNull: false,
+        defaultValue: UserLoginDetail.getUserId()
+    },
+    updated_by: {
+        type: DataTypes.NUMBER,
+        allowNull: false,
+        defaultValue: UserLoginDetail.getUserId()
     }
 }, {
     sequelize,
@@ -127,9 +138,11 @@ Memberships.init({
         beforeCreate: (memberships: Memberships) => {
             memberships.created_at = new Date();
             memberships.updated_at = new Date();
+            memberships.created_by = UserLoginDetail.getUserId();
         },
         beforeUpdate: (memberships: Memberships) => {
             memberships.updated_at = new Date();
+            memberships.updated_by = UserLoginDetail.getUserId();
         }
     }
 });

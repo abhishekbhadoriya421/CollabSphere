@@ -141,7 +141,6 @@ export const RefreshPageThunk = createAsyncThunk<LoginResponse, void, { rejectVa
              * If status code is 400 
              */
             if (!apiResponse.ok) {
-                console.log('not pass')
                 const response: LoginResponse = {
                     accessToken: '',
                     user: null,

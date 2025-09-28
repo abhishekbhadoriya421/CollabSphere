@@ -2,6 +2,7 @@ import sequelize from "../config/sqldb";
 import { DataTypes, Model } from "sequelize";
 import bcrypt from 'bcrypt';
 import { ValidationError } from "sequelize";
+import UserLoginDetail from "../service/UserLoginDetail";
 
 interface CreateUserResponse {
     status: boolean;
@@ -151,6 +152,10 @@ class User extends Model {
             const isValidPassword: boolean = await this.comparePassword(user.password_hash, password);
             if (isValidPassword) {
                 const plainUser = user.toJSON();
+                /**
+                 * set user details in user detail 
+                 */
+                UserLoginDetail.setUserDetails(user.id, user.username, user.email);
                 const { password_hash, ...safeUser } = plainUser;
                 return {
                     status: true,

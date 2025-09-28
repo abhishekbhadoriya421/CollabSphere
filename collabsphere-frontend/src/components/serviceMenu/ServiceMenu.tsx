@@ -3,7 +3,6 @@ import ActivityMenu from "./ActivityMenu";
 import ServiceMenuHeader from "./ServiceMenuHeader";
 import { ActivityItemThunk, ChangeActivity } from "../../features/ServicesSlice/ActivityItemSlice";
 import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook";
-import { toast } from "react-toastify";
 import useAccessToken from "../customHooks/getAccessToken";
 
 interface Activity {
@@ -18,30 +17,19 @@ interface ServiceMenuProp {
     loadingChannel: boolean;
 }
 export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuProp) {
-    const { loading, status, activities, message } = useAppSelector((state) => state.ActivityItemReducer);
+    const { loading, activities } = useAppSelector((state) => state.ActivityItemReducer);
     const { accessToken } = useAccessToken();
     const dispatch = useAppDispatch();
     useEffect(() => {
         if (accessToken) {
             dispatch(ActivityItemThunk(accessToken));
         }
-    }, [dispatch, accessToken]);
-
-    useEffect(() => {
-
-        if (status == 'error') {
-            toast.error(message);
-        } else if (status == 'success') {
-            if (!activities) {
-                toast.success('No Active service Available')
-            }
-        }
-    }, [dispatch, loading, status, activities, message]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dispatch]);
 
     /**
      * handle is active
      */
-
     const handleActiveActivity = (index: number): void => {
         dispatch(ChangeActivity(index));
     }

@@ -1,5 +1,6 @@
 import sequelize from "../config/sqldb";
 import { DataTypes, Model } from "sequelize";
+import UserLoginDetail from "../service/UserLoginDetail";
 
 
 class Organization extends Model {
@@ -9,6 +10,8 @@ class Organization extends Model {
     public name!: string;
     public created_at!: Date
     public updated_at!: Date
+    public created_by!: number | null;
+    public updated_by!: number | null;
 }
 
 
@@ -51,6 +54,16 @@ Organization.init({
         type: DataTypes.DATE,
         allowNull: true,
         defaultValue: DataTypes.NOW
+    },
+    created_by: {
+        type: DataTypes.NUMBER,
+        allowNull: false,
+        defaultValue: UserLoginDetail.getUserId()
+    },
+    updated_by: {
+        type: DataTypes.NUMBER,
+        allowNull: false,
+        defaultValue: UserLoginDetail.getUserId()
     }
 }, {
     sequelize,
@@ -62,9 +75,11 @@ Organization.init({
         beforeCreate: (organization: Organization) => {
             organization.created_at = new Date();
             organization.updated_at = new Date();
+            organization.created_by = UserLoginDetail.getUserId();
         },
         beforeUpdate: (organization: Organization) => {
             organization.updated_at = new Date();
+            organization.updated_by = UserLoginDetail.getUserId();
         }
     }
 });
