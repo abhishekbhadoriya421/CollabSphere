@@ -18,16 +18,6 @@ const LoginPage = () => {
     /**
  * Redirect to dashboard page if user has logged in 
  */
-    useEffect(() => {
-        if (accessToken) {
-            setFormData({
-                email: '',
-                password: '',
-            });
-            navigate("/dashboard");
-        }
-    }, [accessToken, navigate]);
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -58,7 +48,6 @@ const LoginPage = () => {
         if (accessToken && user && user.username) {
             if (firstTimeLogin) {
                 setFirstTimeLogin(false);
-                toast.success(`${user.username} logged in successfully`)
             }
             navigate('/dashboard');
         }

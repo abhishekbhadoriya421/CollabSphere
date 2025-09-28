@@ -292,6 +292,7 @@ const LoginSlice = createSlice({
                 state.user = action.payload.user;
                 state.message = action.payload.message;
                 state.userOu = action.payload.userOu;
+                toast.success(`${action.payload.user?.username} logged in successfully`);
             } else {
                 state.loading = false
                 state.accessToken = '';
@@ -299,6 +300,7 @@ const LoginSlice = createSlice({
                 state.user = null;
                 state.message = action.payload.message;
                 state.userOu = [];
+                toast.error(action.payload.message);
             }
         })
             .addCase(LoginThunk.pending, (state) => {
@@ -316,6 +318,7 @@ const LoginSlice = createSlice({
                 } else {
                     state.message = (action.error.message) ? action.error.message : 'Request Fail'
                 }
+                toast.error(state.message);
             })
             /**
              * Refresh Page Api Response Status handle
