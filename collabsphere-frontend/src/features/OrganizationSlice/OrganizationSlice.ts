@@ -16,6 +16,7 @@ interface MembershipObject {
 }
 
 interface ChannelObejct {
+    id: number | null
     ou_id: number | null,
     name: string | "",
     type: 'channel' | 'group' | 'dm' | 'none'
@@ -144,6 +145,7 @@ const OrganizationSlice = createSlice({
                     role: action.payload.membership?.role || 'Guest',
                 }
                 const channelItem: ChannelObejct = {
+                    id: action.payload.channel?.id || null,
                     ou_id: action.payload.channel?.ou_id || null,
                     name: action.payload.channel?.name || '',
                     type: action.payload.channel?.type || 'none',

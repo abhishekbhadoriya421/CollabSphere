@@ -7,16 +7,16 @@ import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/tool
  * created_by   =>  Who created the channel
  */
 interface channels {
-    id: number,
-    channel_type: 'dm' | 'group' | 'channel',
-    channel_name: string,
-    created_by: string
+    id: number | null,
+    channel_type: 'dm' | 'group' | 'channel' | 'none',
+    channel_name: string | '',
+    created_by: number | null
 }
 interface InitailStateResponse {
     loading: boolean | false
     message: string,
     status: 'error' | 'success' | 'idel',
-    channels: Array<channels> | []
+    channels: channels[]
 }
 
 
@@ -82,14 +82,27 @@ export const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetCha
 )
 
 
-
+interface AddChannelPayload {
+    channel_id: number | null;
+    channel_name: string | '';
+    channel_type: 'dm' | 'group' | 'channel' | 'none';
+    created_by: number | null;
+}
 
 const GetMyChannelSlice = createSlice({
     name: 'getChannel',
     initialState: initialState,
     reducers: {
-        addChannel: (state, payload: PayloadAction<unknown>) => {
-
+        addChannel: (state, channelData: PayloadAction<AddChannelPayload>) => {
+            console.log('add channel')
+            const newItem: channels = {
+                channel_name: channelData.payload.channel_name,
+                id: channelData.payload.channel_id,
+                channel_type: channelData.payload.channel_type,
+                created_by: channelData.payload.created_by
+            };
+            console.log(newItem);
+            state.channels.push(newItem);
         }
     },
     extraReducers: (builder) => {
@@ -119,5 +132,5 @@ const GetMyChannelSlice = createSlice({
             })
     }
 });
-
+export const { addChannel } = GetMyChannelSlice.actions;
 export default GetMyChannelSlice.reducer;

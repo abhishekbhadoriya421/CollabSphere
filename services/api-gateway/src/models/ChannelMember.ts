@@ -32,7 +32,6 @@ class ChannelMember extends Model {
                 }
             ]
         })
-        console.log(channelData);
         if (!channelData) {
             return null;
         } else {

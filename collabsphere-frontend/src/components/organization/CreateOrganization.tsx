@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import useAccessToken from '../customHooks/getAccessToken';
 import { OrganizationCreateThunk } from '../../features/OrganizationSlice/OrganizationSlice';
 import { useAppDispatch, useAppSelector } from '../customHooks/reduxCustomHook';
+import { addChannel } from '../../features/ChannelSlice/GetMyChannels';
 // Assuming you have the Organization interface defined
 interface Organization {
     code: string;
@@ -14,7 +15,7 @@ interface Organization {
 
 const OrganizationManagement: React.FC = () => {
     const { accessToken, user } = useAccessToken();
-    const { status, message, loading } = useAppSelector((state) => state.OrganizationReducer);
+    const { status, message, loading, userChannel } = useAppSelector((state) => state.OrganizationReducer);
     const dispatch = useAppDispatch();
     const [formData, setFormData] = useState<Organization>({
         code: '',
@@ -52,10 +53,19 @@ const OrganizationManagement: React.FC = () => {
             if (status == 'error') {
                 toast.error(message);
             } else {
+                if (userChannel) {
+                    dispatch(addChannel({
+                        channel_id: userChannel.id,
+                        channel_name: userChannel.name,
+                        channel_type: userChannel.type,
+                        created_by: user?.id || null
+                    }))
+                }
                 toast.success(message);
             }
         }
-    }, [loading, message, status])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loading, message, status, userChannel, dispatch, addChannel])
 
     return (
         <div className="p-8 bg-gray-50 h-full">
