@@ -12,6 +12,13 @@ class Organization extends Model {
     public updated_at!: Date
     public created_by!: number | null;
     public updated_by!: number | null;
+
+    public static associate(Model: any) {
+        Organization.hasMany(Model.Memberships, {
+            foreignKey: 'organization_id',
+            sourceKey: 'id',
+        });
+    }
 }
 
 
@@ -57,12 +64,12 @@ Organization.init({
     },
     created_by: {
         type: DataTypes.NUMBER,
-        allowNull: false,
+        allowNull: true,
         defaultValue: UserLoginDetail.getUserId()
     },
     updated_by: {
         type: DataTypes.NUMBER,
-        allowNull: false,
+        allowNull: true,
         defaultValue: UserLoginDetail.getUserId()
     }
 }, {
@@ -76,6 +83,7 @@ Organization.init({
             organization.created_at = new Date();
             organization.updated_at = new Date();
             organization.created_by = UserLoginDetail.getUserId();
+            organization.updated_by = UserLoginDetail.getUserId();
         },
         beforeUpdate: (organization: Organization) => {
             organization.updated_at = new Date();

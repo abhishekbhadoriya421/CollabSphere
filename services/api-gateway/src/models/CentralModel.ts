@@ -16,7 +16,6 @@ const models = {
     Organization
 }
 
-
 Object.values(models).forEach(model => {
     if ('associate' in model) {
         model.associate(models);

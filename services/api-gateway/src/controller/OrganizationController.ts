@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Memberships from "../models/Memberships";
 import Organization from "../models/Organization";
+import models from "../models/CentralModel";
 export const createOrganizationAction = async (req: Request, res: Response) => {
     try {
         const { user_id, description, name, code } = req.body;
@@ -28,7 +29,7 @@ export const createOrganizationAction = async (req: Request, res: Response) => {
             organization: Organization | null,
             membership: Memberships | null
         }
-        const response: CreateNewOuResponse = await Memberships.createNewOrganization(user_id, description, name, code);
+        const response: CreateNewOuResponse = await Memberships.createNewOrganization(models, user_id, description, name, code);
 
         if (!response.status) {
             return res.status(404).json({

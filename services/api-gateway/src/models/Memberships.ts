@@ -1,15 +1,9 @@
 import sequelize from "../config/sqldb";
 import { DataTypes, Model } from "sequelize";
-import Organization from "./Organization";
 import ErrorHandler from "../utils/ErrorHandler";
 import UserLoginDetail from "../service/UserLoginDetail";
 
-interface CreateNewOuResponse {
-    status: boolean,
-    message: string,
-    organization: Organization | null,
-    membership: Memberships | null
-}
+
 class Memberships extends Model {
     public id!: number;
     public user_id!: number;
@@ -34,10 +28,11 @@ class Memberships extends Model {
      * create new organization call create method and also first channel
      */
 
-    public static async createNewOrganization(user_id: number, description: string, name: string, code: string): Promise<CreateNewOuResponse> {
+    public static async createNewOrganization(models: any, user_id: number, description: string, name: string, code: string) {
         const transactionObject = await sequelize.transaction();
         try {
-            const organization = await Organization.create({
+            console.log(UserLoginDetail.getUserId())
+            const organization = await models.Organization.create({
                 name: name,
                 code: code,
                 description: description,
@@ -55,6 +50,22 @@ class Memberships extends Model {
                 {
                     transaction: transactionObject
                 });
+
+            const channel = await models.Channel.create({
+                org_id: organization.id,
+                name: organization.name + '_public',
+                type: 'channel'
+            }, {
+                transaction: transactionObject
+            });
+
+            await models.ChannelMember.create({
+                channel_id: channel.id,
+                user_id: user_id
+            }, {
+                transaction: transactionObject
+            });
+
             await transactionObject.commit();
             return {
                 status: true,
@@ -120,12 +131,12 @@ Memberships.init({
     },
     created_by: {
         type: DataTypes.NUMBER,
-        allowNull: false,
+        allowNull: true,
         defaultValue: UserLoginDetail.getUserId()
     },
     updated_by: {
         type: DataTypes.NUMBER,
-        allowNull: false,
+        allowNull: true,
         defaultValue: UserLoginDetail.getUserId()
     }
 }, {
@@ -139,6 +150,7 @@ Memberships.init({
             memberships.created_at = new Date();
             memberships.updated_at = new Date();
             memberships.created_by = UserLoginDetail.getUserId();
+            memberships.updated_by = UserLoginDetail.getUserId();
         },
         beforeUpdate: (memberships: Memberships) => {
             memberships.updated_at = new Date();

@@ -1,6 +1,5 @@
 import sequelize from "../config/sqldb";
 import { DataTypes, Model, } from "sequelize";
-import { ValidationError } from "sequelize";
 import models from './CentralModel';
 
 class ChannelMember extends Model {
@@ -21,7 +20,9 @@ class ChannelMember extends Model {
             targetKey: 'id',
         });
     }
-
+    /**
+     * return channels created by user
+     */
     public static async getChannelByUserId(user_id: number) {
         const channelData = await ChannelMember.findAll({
             where: { user_id: user_id },
@@ -62,7 +63,7 @@ ChannelMember.init({
     },
     joined_at: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     created_at: {
         type: DataTypes.DATE,

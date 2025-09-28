@@ -1,13 +1,14 @@
 import sequelize from "../config/sqldb";
 import { DataTypes, Model, } from "sequelize";
 import { ValidationError } from "sequelize";
+import UserLoginDetail from "../service/UserLoginDetail";
 
 class Channel extends Model {
     public id!: number;
     public org_id!: string;
     public name!: string;
     public type!: 'channel' | 'dm' | 'group';
-    public created_by!: number;
+    public created_by!: number | null;
     public created_at!: Date;
     public updated_at!: Date;
 }
@@ -34,7 +35,8 @@ Channel.init({
     },
     created_by: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: UserLoginDetail.getUserId()
     },
     created_at: {
         type: DataTypes.DATE,
@@ -56,6 +58,7 @@ Channel.init({
         beforeCreate: (channel: Channel) => {
             channel.created_at = new Date();
             channel.updated_at = new Date();
+            channel.created_by = UserLoginDetail.getUserId()
         },
         beforeUpdate: (channel: Channel) => {
             channel.updated_at = new Date();
