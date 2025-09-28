@@ -13,7 +13,7 @@ const models = {
     ChannelMember,
     Activities,
     Memberships,
-    Organization
+    Organization,
 }
 
 Object.values(models).forEach(model => {

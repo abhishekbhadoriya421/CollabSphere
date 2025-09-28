@@ -11,6 +11,13 @@ class Channel extends Model {
     public created_by!: number | null;
     public created_at!: Date;
     public updated_at!: Date;
+
+    public static associate(Model: any) {
+        Channel.hasMany(Model.ChannelMember, {
+            foreignKey: 'channel_id',
+            sourceKey: 'id'
+        })
+    }
 }
 
 Channel.init({

@@ -24,19 +24,15 @@ class ChannelMember extends Model {
      * return channels created by user
      */
     public static async getChannelByUserId(user_id: number) {
-        const channelData = await ChannelMember.findAll({
-            where: { user_id: user_id },
+        const channelData = await models.Channel.findAll({
+            attributes: ['name', 'id', 'type'],
             include: [
                 {
-                    model: models.User, attributes: ['id', 'username', 'email'], required: false
-                },
-                {
-                    model: models.Channel, attributes: ['org_id', 'name', 'type', 'created_by', 'created_at'], required: false
+                    model: models.ChannelMember, where: { user_id: user_id }, attributes: []
                 }
-            ],
-            attributes: ['user_id', 'joined_at', 'id']
-        });
-
+            ]
+        })
+        console.log(channelData);
         if (!channelData) {
             return null;
         } else {

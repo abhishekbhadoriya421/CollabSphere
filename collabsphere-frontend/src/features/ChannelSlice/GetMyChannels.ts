@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit"
 
 /**
  * id           =>  is a unique channel name between to user
@@ -83,10 +83,15 @@ export const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetCha
 
 
 
+
 const GetMyChannelSlice = createSlice({
     name: 'getChannel',
     initialState: initialState,
-    reducers: {},
+    reducers: {
+        addChannel: (state, payload: PayloadAction<unknown>) => {
+
+        }
+    },
     extraReducers: (builder) => {
         builder.addCase(GetAllChannelThunks.fulfilled, (state, action) => {
             state.loading = false;
