@@ -13,7 +13,7 @@ interface LoginState {
     accessToken: string | null,
     user: UserObject | null,
     loading: boolean,
-    status: 'idle' | 'success' | 'error',
+    status: 'checking' | 'loading' | 'authenticated' | 'unauthenticated',
     message: string,
     userOu: Array<unknown>
 }
@@ -23,7 +23,7 @@ const initialState: LoginState = {
     accessToken: '',
     user: null,
     loading: false,
-    status: 'idle',
+    status: 'checking',
     message: '',
     userOu: []
 }
@@ -141,6 +141,66 @@ export const RefreshPageThunk = createAsyncThunk<LoginResponse, void, { rejectVa
              * If status code is 400 
              */
             if (!apiResponse.ok) {
+                console.log('not pass')
+                const response: LoginResponse = {
+                    accessToken: '',
+                    user: null,
+                    message: apiResponsedata.message,
+                    status: 'error',
+                    userOu: []
+                }
+                return response;
+            }
+            if (apiResponsedata.token) {
+                const response: LoginResponse = {
+                    accessToken: apiResponsedata.token,
+                    user: apiResponsedata.user,
+                    message: apiResponsedata.message,
+                    status: 'success',
+                    userOu: apiResponsedata.userOu
+                }
+                return response;
+            } else {
+                return rejectWithValue(
+                    {
+                        accessToken: '',
+                        user: null,
+                        message: apiResponsedata.message,
+                        status: 'error',
+                        userOu: []
+                    }
+                );
+            }
+        } catch (error: unknown) {
+            return rejectWithValue(
+                {
+                    accessToken: '',
+                    user: null,
+                    message: (error instanceof Error ? error.message : 'An unknown error occurred'),
+                    status: 'error',
+                    userOu: []
+                }
+            );
+        }
+
+    }
+)
+
+
+export const GetValidTokenThunk = createAsyncThunk<LoginResponse, void, { rejectValue: LoginResponse }>(
+    'user/get-valid-token',
+    async (_, { rejectWithValue }) => {
+        try {
+            const apiResponse: Response = await fetch('/api/auth/refresh', {
+                method: 'POST',
+                credentials: "include"
+            });
+
+            const apiResponsedata: APIResponse = await apiResponse.json();
+            /**
+             * If status code is 400 
+             */
+            if (!apiResponse.ok) {
                 const response: LoginResponse = {
                     accessToken: '',
                     user: null,
@@ -173,7 +233,6 @@ export const RefreshPageThunk = createAsyncThunk<LoginResponse, void, { rejectVa
 
     }
 )
-
 interface LogoutResponse {
     status: 'idle' | 'success' | 'error',
     message: string
@@ -230,14 +289,14 @@ const LoginSlice = createSlice({
             if (action.payload.status === 'success') {
                 state.loading = false;
                 state.accessToken = action.payload.accessToken;
-                state.status = action.payload.status;
+                state.status = 'authenticated';
                 state.user = action.payload.user;
                 state.message = action.payload.message;
                 state.userOu = action.payload.userOu;
             } else {
                 state.loading = false
                 state.accessToken = '';
-                state.status = action.payload.status;
+                state.status = 'unauthenticated';
                 state.user = null;
                 state.message = action.payload.message;
                 state.userOu = [];
@@ -245,10 +304,11 @@ const LoginSlice = createSlice({
         })
             .addCase(LoginThunk.pending, (state) => {
                 state.loading = true;
+                state.status = 'loading';
             })
             .addCase(LoginThunk.rejected, (state, action) => {
                 state.loading = false;
-                state.status = 'error';
+                state.status = 'unauthenticated';
                 state.accessToken = '';
                 state.user = null;
                 state.userOu = [];
@@ -265,14 +325,14 @@ const LoginSlice = createSlice({
                 if (action.payload.status === 'success') {
                     state.loading = false;
                     state.accessToken = action.payload.accessToken;
-                    state.status = action.payload.status;
+                    state.status = 'authenticated';
                     state.user = action.payload.user;
                     state.message = '';
                     state.userOu = action.payload.userOu;
                 } else {
                     state.loading = false
                     state.accessToken = '';
-                    state.status = action.payload.status;
+                    state.status = 'unauthenticated';
                     state.user = null;
                     state.message = '';
                     state.userOu = [];
@@ -280,10 +340,11 @@ const LoginSlice = createSlice({
             })
             .addCase(RefreshPageThunk.pending, (state) => {
                 state.loading = true;
+                state.status = 'loading';
             })
             .addCase(RefreshPageThunk.rejected, (state, action) => {
                 state.loading = false;
-                state.status = 'error';
+                state.status = 'unauthenticated';
                 state.accessToken = '';
                 state.user = null;
                 state.userOu = [];
@@ -301,7 +362,7 @@ const LoginSlice = createSlice({
                     state.accessToken = null;
                     state.loading = false;
                     state.message = '';
-                    state.status = 'idle';
+                    state.status = 'unauthenticated';
                     state.user = null;
                     state.userOu = [];
                     toast.success(action.payload.message);
@@ -310,10 +371,41 @@ const LoginSlice = createSlice({
                 }
             }).addCase(LogoutThunk.pending, (state) => {
                 state.loading = true;
+                state.status = 'loading';
             }).addCase(LogoutThunk.rejected, (state, action) => {
                 state.loading = false;
+                state.status = 'authenticated';
                 toast.error(action.error.message);
-            });
+            })
+            .addCase(GetValidTokenThunk.fulfilled, (state, action) => {
+                if (action.payload.status === 'success') {
+                    state.loading = false;
+                    state.accessToken = action.payload.accessToken;
+                    state.status = 'authenticated';
+                    state.user = action.payload.user;
+                    state.message = '';
+                    state.userOu = action.payload.userOu;
+                } else {
+                    state.loading = false
+                    state.accessToken = '';
+                    state.status = 'unauthenticated';
+                    state.user = null;
+                    state.message = '';
+                    state.userOu = [];
+                }
+            })
+            .addCase(GetValidTokenThunk.rejected, (state, action) => {
+                state.loading = false;
+                state.status = 'unauthenticated';
+                state.accessToken = '';
+                state.user = null;
+                state.userOu = [];
+                if (action.payload) {
+                    state.message = action.payload.message
+                } else {
+                    state.message = (action.error.message) ? action.error.message : 'Request Fail'
+                }
+            })
     },
 });
 
