@@ -34,7 +34,7 @@ export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuPro
         dispatch(ChangeActivity(index));
     }
     return (
-        <div className="w-[100%] h-screen text-white">
+        <div className="w-full h-screen flex flex-col text-white">
             <div className="h-1/8">
                 <ServiceMenuHeader />
             </div>
@@ -55,7 +55,23 @@ export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuPro
             </div>
             <hr />
             {!loadingChannel && channels.length > 0 ?
-                <h1>Found</h1>
+                <div className="p-3 overflow-y-auto">
+                    <div className="flex justify-between h-12">
+                        <h1 className="text-2xl font-bold">Channels</h1>
+                        <p className="text-3xl font-bold cursor-pointer" title="Add Channel">+</p>
+                    </div>
+                    <div className="space-y-2 p-4 bg-[#1f2937] rounded-2xl hover:bg-[#32435b]">
+                        <div className="flex items-center rounded-lg">
+                            <div className="w-12 h-13 rounded-full overflow-hidden">
+                                <img className="w-full h-full object-cover" src="https://img.freepik.com/free-vector/woman-with-braided-hair-illustration_1308-174675.jpg?semt=ais_hybrid&w=740&q=80" alt="profile" />
+                            </div>
+                            <div className="ml-3">
+                                <span className="block text-white font-semibold">Aditi Sharma</span>
+                                <span className="text-gray-500 text-sm">Hey! How are you?</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 :
                 loading ? <i className="fas fa-spinner fa-spin"></i> : <h1><i className="fas fa-exclamation-triangle"></i> Channels Not Found</h1>
             }
