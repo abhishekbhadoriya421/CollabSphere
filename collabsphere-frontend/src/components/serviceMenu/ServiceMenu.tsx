@@ -4,6 +4,7 @@ import ServiceMenuHeader from "./ServiceMenuHeader";
 import { ActivityItemThunk, ChangeActivity } from "../../features/ServicesSlice/ActivityItemSlice";
 import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook";
 import useAccessToken from "../customHooks/getAccessToken";
+import ChannelItem from "./ChannelItem";
 
 interface Activity {
     id: number,
@@ -11,9 +12,14 @@ interface Activity {
     content: string,
     is_active: 'ACTIVE' | 'IN-ACTIVE'
 }
-
+interface channels {
+    id: number | null,
+    type: 'dm' | 'group' | 'channel' | 'none',
+    name: string | '',
+    created_by: number | null
+}
 interface ServiceMenuProp {
-    channels: Array<object>;
+    channels: Array<channels>;
     loadingChannel: boolean;
 }
 export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuProp) {
@@ -61,15 +67,10 @@ export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuPro
                         <p className="text-3xl font-bold cursor-pointer" title="Add Channel">+</p>
                     </div>
                     <div className="space-y-2 p-4 bg-[#1f2937] rounded-2xl hover:bg-[#32435b]">
-                        <div className="flex items-center rounded-lg">
-                            <div className="w-12 h-13 rounded-full overflow-hidden">
-                                <img className="w-full h-full object-cover" src="https://img.freepik.com/free-vector/woman-with-braided-hair-illustration_1308-174675.jpg?semt=ais_hybrid&w=740&q=80" alt="profile" />
-                            </div>
-                            <div className="ml-3">
-                                <span className="block text-white font-semibold">Aditi Sharma</span>
-                                <span className="text-gray-500 text-sm">Hey! How are you?</span>
-                            </div>
-                        </div>
+                        {channels.map(channel => {
+                            return <ChannelItem key={channel.id ?? Math.random()} name={channel.name} type={channel.type} id={channel.id} />
+                        })}
+
                     </div>
                 </div>
                 :

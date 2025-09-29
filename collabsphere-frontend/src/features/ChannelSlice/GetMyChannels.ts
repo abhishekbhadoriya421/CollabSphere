@@ -8,15 +8,15 @@ import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/tool
  */
 interface channels {
     id: number | null,
-    channel_type: 'dm' | 'group' | 'channel' | 'none',
-    channel_name: string | '',
+    type: 'dm' | 'group' | 'channel' | 'none',
+    name: string | '',
     created_by: number | null
 }
 interface InitailStateResponse {
     loading: boolean | false
     message: string,
     status: 'error' | 'success' | 'idel',
-    channels: channels[]
+    channels: Array<channels>
 }
 
 
@@ -94,9 +94,9 @@ const GetMyChannelSlice = createSlice({
     reducers: {
         addChannel: (state, channelData: PayloadAction<AddChannelPayload>) => {
             const newItem: channels = {
-                channel_name: channelData.payload.channel_name,
+                name: channelData.payload.channel_name,
                 id: channelData.payload.channel_id,
-                channel_type: channelData.payload.channel_type,
+                type: channelData.payload.channel_type,
                 created_by: channelData.payload.created_by
             };
             state.channels.push(newItem);
