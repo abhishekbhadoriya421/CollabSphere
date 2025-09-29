@@ -23,7 +23,7 @@ interface ServiceMenuProp {
     loadingChannel: boolean;
 }
 export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuProp) {
-    const { loading, activities } = useAppSelector((state) => state.ActivityItemReducer);
+    const { activities } = useAppSelector((state) => state.ActivityItemReducer);
     const { accessToken } = useAccessToken();
     const dispatch = useAppDispatch();
     useEffect(() => {
@@ -38,6 +38,10 @@ export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuPro
      */
     const handleActiveActivity = (index: number): void => {
         dispatch(ChangeActivity(index));
+    }
+
+    const handleChannelOnClick = (id: number | null) => {
+        console.log(id)
     }
     return (
         <div className="w-full h-screen flex flex-col text-white">
@@ -68,13 +72,13 @@ export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuPro
                     </div>
                     <div className="space-y-2 p-4 bg-[#1f2937] rounded-2xl hover:bg-[#32435b]">
                         {channels.map(channel => {
-                            return <ChannelItem key={channel.id ?? Math.random()} name={channel.name} type={channel.type} id={channel.id} />
+                            return <ChannelItem key={channel.id ?? Math.random()} name={channel.name} type={channel.type} id={channel.id} handleChannelOnClick={handleChannelOnClick} />
                         })}
 
                     </div>
                 </div>
                 :
-                loading ? <i className="fas fa-spinner fa-spin"></i> : <h1><i className="fas fa-exclamation-triangle"></i> Channels Not Found</h1>
+                loadingChannel ? <i className="fas fa-spinner fa-spin"></i> : <h1><i className="fas fa-exclamation-triangle"></i> Channels Not Found</h1>
             }
         </div>
     );
