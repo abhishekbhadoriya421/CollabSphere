@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook"
 import OrganizationManagement from "./CreateOrganization";
 import { toast } from 'react-toastify';
 import useAccessToken from '../customHooks/getAccessToken';
-import { OrganizationCreateThunk } from '../../features/OrganizationSlice/OrganizationSlice';
+import { GetOrganizationThunk, OrganizationCreateThunk } from '../../features/OrganizationSlice/OrganizationSlice';
 import { addChannel } from '../../features/ChannelSlice/GetMyChannels';
 interface Organization {
     code: string;
@@ -66,6 +66,12 @@ export default function OuDashboard() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loading, message, status, userChannel, dispatch, addChannel])
 
+    useEffect(() => {
+        if (accessToken && !userOrganization) {
+            dispatch(GetOrganizationThunk({ accessToken }))
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [GetOrganizationThunk, dispatch])
     return (<div>
         {(userOrganization) ?
             <p>Ou Details</p>
