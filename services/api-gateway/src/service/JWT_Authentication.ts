@@ -1,4 +1,6 @@
 import Jwt, { JwtPayload } from "jsonwebtoken";
+import User from "../models/User";
+import { setCache } from "./Cache";
 
 interface ResponseAccessToken {
     token: string | null,
@@ -26,7 +28,7 @@ export class Authentication {
         return Authentication.instance;
     }
 
-    public Generate_Access_Token(user_id: number): ResponseAccessToken {
+    public async Generate_Access_Token(user_id: number): Promise<ResponseAccessToken> {
         if (!user_id) {
             const response: ResponseAccessToken = {
                 token: null,
@@ -43,7 +45,6 @@ export class Authentication {
             }
             return response
         }
-
         const response: ResponseAccessToken = {
             token: accessToken,
             message: 'successfully generated'
@@ -53,7 +54,7 @@ export class Authentication {
 
 
 
-    public Generate_Refresh_Token(user_id: number): ResponseRefreshToken {
+    public async Generate_Refresh_Token(user_id: number): Promise<ResponseRefreshToken> {
         if (!user_id) {
             const response: ResponseRefreshToken = {
                 refreshToken: null,
@@ -70,7 +71,15 @@ export class Authentication {
             }
             return response
         }
-
+        try {
+            await User.update({ refresh_token: refreshToken }, {
+                where: { id: user_id }
+            });
+            console.log('refresh token saved')
+        } catch (err: any) {
+            console.log(err);
+            console.log("Error While Saving Refresh cache");
+        }
         const response: ResponseRefreshToken = {
             refreshToken: refreshToken,
             message: 'successfully generated'

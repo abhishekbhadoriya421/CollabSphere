@@ -26,3 +26,14 @@ export async function getCache<T>(key: string): Promise<T | null> {
         return null;
     }
 }
+
+
+export async function deleteCache(key: string) {
+    try {
+        const redis = await connectRedis();
+        const result = await redis.del(key);
+        console.log(`Deleted ${result} key(s)`);
+    } catch (err) {
+        console.error("Error deleting cache:", err);
+    }
+}

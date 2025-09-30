@@ -4,6 +4,8 @@ import Organization from "../models/Organization";
 import models from "../models/CentralModel";
 import Channel from "../models/Channel";
 import ChannelMember from "../models/ChannelMember";
+import UserLoginDetail from "../service/UserLoginDetail";
+
 export const createOrganizationAction = async (req: Request, res: Response) => {
     try {
         const { user_id, description, name, code } = req.body;
@@ -65,4 +67,9 @@ export const createOrganizationAction = async (req: Request, res: Response) => {
             channelMembership: null
         });
     }
+}
+
+export const getOrganizationAction = async (req: Request, res: Response) => {
+    console.log('get Ou')
+    console.log(UserLoginDetail.getUserId());
 }

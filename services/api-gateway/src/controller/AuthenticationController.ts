@@ -4,6 +4,8 @@ import { Authentication } from "../service/JWT_Authentication";
 import ErrorHandler from "../utils/ErrorHandler";
 import Memberships from "../models/Memberships";
 import models from "../models/CentralModel";
+import { deleteCache, getCache, setCache } from "../service/Cache";
+import { getUserId } from "../utils/GetUserDetails";
 /**
  * Validate User email and password if validation is passed return access token and set refresh token in cookie 
  *  return {
@@ -67,8 +69,8 @@ export const LoginAction = async (req: Request, res: Response) => {
          * create access token and refresh token
          */
         const authenticationObject: Authentication = Authentication.getInstance();
-        const accessToken = authenticationObject.Generate_Access_Token(userData.id);
-        const refreshToken = authenticationObject.Generate_Refresh_Token(userData.id);
+        const accessToken = await authenticationObject.Generate_Access_Token(userData.id);
+        const refreshToken = await authenticationObject.Generate_Refresh_Token(userData.id);
         if (!accessToken.token || !refreshToken.refreshToken) {
             return res.status(400).json({
                 status: 400,
@@ -86,7 +88,10 @@ export const LoginAction = async (req: Request, res: Response) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
-
+        /**
+         * Save User Data in cache
+         */
+        await setCache(`user:${userData.id}`, (7 * 24 * 60 * 60), { user_id: userData.id, username: userData.username, email: userData.email });
         return res.status(200).json({
             status: 200,
             message: 'Login SuccessFully',
@@ -226,7 +231,7 @@ export const PageReloadAction = async (req: Request, res: Response) => {
     /**
      * generate new access token
      */
-    const newAccessToken = authenticationObject.Generate_Access_Token(validateRefreshToken.user_id);
+    const newAccessToken = await authenticationObject.Generate_Access_Token(validateRefreshToken.user_id);
     if (!newAccessToken) {
         return res.status(500).json({
             status: 500,
@@ -255,7 +260,14 @@ export const PageReloadAction = async (req: Request, res: Response) => {
 
 export const LogoutAction = async (req: Request, res: Response) => {
     try {
-        res.cookie("refreshToken", {
+        const refreshToken = req.cookies.refreshToken;
+        const authenticate = Authentication.getInstance();
+        const authData = authenticate.Verify_Refresh_Token(refreshToken);
+        if (authData) {
+            await User.update({ refresh_token: null }, { where: { id: authData.user_id } });
+            deleteCache(`user:${authData.user_id}`);
+        }
+        res.clearCookie("refreshToken", {
             httpOnly: true,
             sameSite: 'lax',
             secure: process.env.NODE_ENVIRONMENT == "PRODUCTION",

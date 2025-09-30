@@ -20,9 +20,12 @@ class User extends Model {
     public id!: number;
     public email!: string;
     public password_hash!: string
+    public gender!: 'MALE' | 'FEMALE' | 'OTHERS';
+    public profile_photo!: string;
+    public refresh_token!: string;
     public username!: string;
-    public created_at!: Date
-    public updated_at!: Date
+    public created_at!: Date;
+    public updated_at!: Date;
 
 
     public static validateEmail(email: string): boolean {
@@ -227,6 +230,17 @@ User.init({
         validate: {
             notEmpty: true
         }
+    },
+    profile_photo: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
+    gender: {
+        type: DataTypes.ENUM('MALE', 'FEMALE', 'OTHERS')
+    },
+    refresh_token: {
+        type: DataTypes.TEXT,
+        allowNull: true
     },
     created_at: {
         type: DataTypes.DATE,
