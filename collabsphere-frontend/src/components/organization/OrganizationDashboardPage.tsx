@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AddMemberModal from "./AddUserFormModal";
-
+import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook";
+import { AddUserThunk } from "../../features/OrganizationSlice/UserSlice";
+import useGetUserCredentials from "../customHooks/getUserCredentials";
+import { toast } from "react-toastify";
 interface Organization {
     name: string | '';
     code: string | '';
@@ -30,13 +33,27 @@ interface User {
 
 const OrganizationDashboard: React.FC<Props> = ({ organization, membership, user_role }) => {
     const [isOpenModal, setIsOpenModal] = useState(false);
+    const { accessToken } = useGetUserCredentials();
+    const { status, message, user } = useAppSelector((state) => state.UserReducer);
+    const dispatch = useAppDispatch();
     function onClose(): void {
         setIsOpenModal(false);
     }
 
     function handleAddUserOnSubmit(user: User) {
-        console.log(user)
+        if (accessToken) dispatch(AddUserThunk({ user, accessToken }))
     }
+
+    useEffect(() => {
+        if (status !== 'loading' && status !== 'idle') {
+            if (status === 'success') {
+                console.log(user)
+                toast.success(message);
+            } else {
+                toast.error(message);
+            }
+        }
+    }, [status, message, user])
     return (
         <div className="p-6 space-y-8">
             <div className="bg-white shadow-md rounded-2xl p-6">
@@ -96,7 +113,7 @@ const OrganizationDashboard: React.FC<Props> = ({ organization, membership, user
                 </div>
                 : null}
             {isOpenModal ?
-                <AddMemberModal onSubmit={handleAddUserOnSubmit} onClose={onClose} />
+                <AddMemberModal onSubmit={handleAddUserOnSubmit} onClose={onClose} submitStatus={status} />
                 : null}
         </div >
 

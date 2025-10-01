@@ -4,8 +4,8 @@ import Organization from "../models/Organization";
 import models from "../models/CentralModel";
 import Channel from "../models/Channel";
 import ChannelMember from "../models/ChannelMember";
-import UserLoginDetail from "../service/UserLoginDetail";
 import { getUserId } from "../utils/GetUserDetails";
+import ErrorHandler from "../utils/ErrorHandler";
 
 export const createOrganizationAction = async (req: Request, res: Response) => {
     try {
@@ -80,4 +80,82 @@ export const getOrganizationAction = async (req: Request, res: Response) => {
         membership: getOrganizarion.membership,
         user_role: getOrganizarion.role
     });
+}
+
+
+export const addUserAction = async (req: Request, res: Response) => {
+    const { email, role } = req.body;
+    const user_id = getUserId(req);
+    const validRoles = ['Admin', 'Guest', 'Member'] as const;
+    if (!validRoles.includes(role)) {
+        return res.status(404).json({
+            status: 404,
+            message: `Invalid Request`,
+            membership: null
+        });
+    }
+    const user = await models.Memberships.findOne({
+        where: { user_id: user_id }
+    });
+    if (!user) {
+        return res.status(404).json({
+            status: 404,
+            message: `Invalid Request`,
+            membership: null
+        });
+    }
+
+    if (user.role !== 'Admin') {
+        return res.status(403).json({
+            status: 403,
+            message: `You are not allowed to perform this action`,
+            membership: null
+        });
+    }
+    const targetUser = await models.User.findOne({
+        where: { email: email },
+        attributes: ['id']
+    });
+
+    if (!targetUser) {
+        return res.status(404).json({
+            status: 404,
+            message: `User login not found with ${email} email account`,
+            membership: null
+        });
+    }
+
+    const memberAlreadyExist = await models.Memberships.findOne({
+        where: { user_id: targetUser.id }
+    });
+
+    if (!memberAlreadyExist) {
+        try {
+            const model = await models.Memberships.create({
+                user_id: targetUser.id,
+                organization_id: user.organization_id,
+                role: role
+            });
+
+            return res.status(200).json({
+                status: 200,
+                message: 'User add successfully',
+                membership: model
+            });
+        } catch (err: unknown) {
+            return res.status(500).json({
+                status: 500,
+                message: ErrorHandler.getMessage(err),
+                membership: null
+            });
+        }
+    } else {
+        return res.status(409).json({
+            status: 409,
+            message: `User with email {${email}} already has membership`,
+            membership: null
+        })
+    }
+
+    console.log(targetUser)
 }

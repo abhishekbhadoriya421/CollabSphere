@@ -8,7 +8,7 @@ class Memberships extends Model {
     public id!: number;
     public user_id!: number;
     public organization_id!: number;
-    public role!: string;
+    public role!: 'Admin' | 'Guest' | 'Member';
     public created_at!: Date;
     public updated_at!: Date;
     public created_by!: number | null;
@@ -116,7 +116,7 @@ Memberships.init({
         }
     },
     role: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM('Admin', 'Guest', 'Member'),
         allowNull: false,
         validate: {
             notEmpty: true

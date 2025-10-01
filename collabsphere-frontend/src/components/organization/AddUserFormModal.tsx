@@ -3,9 +3,10 @@ import React, { useState } from "react";
 interface Props {
     onSubmit: (data: { email: string; role: string }) => void;
     onClose: () => void;
+    submitStatus: 'error' | 'success' | 'idle' | 'loading'
 }
 
-const AddMemberModal: React.FC<Props> = ({ onSubmit, onClose }) => {
+const AddMemberModal: React.FC<Props> = ({ onSubmit, onClose, submitStatus }) => {
     const [selectedEmail, setSelectedEmail] = useState("");
     const [selectedRole, setSelectedRole] = useState("Member");
 
@@ -66,7 +67,11 @@ const AddMemberModal: React.FC<Props> = ({ onSubmit, onClose }) => {
                             type="submit"
                             className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
                         >
-                            Add Member
+                            {submitStatus === 'loading' ?
+                                <i className="fas fa-spinner fa-spin"></i>
+                                :
+                                <span>  Add Member</span>
+                            }
                         </button>
                     </div>
                 </form>

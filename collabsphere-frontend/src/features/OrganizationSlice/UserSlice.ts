@@ -14,12 +14,12 @@ interface MembershipObject {
 interface InitialState {
     status: 'idle' | 'loading' | 'success' | 'error',
     message: string | ''
-    membership: MembershipObject | null
+    user: MembershipObject | null
 }
 
 const initialState: InitialState = {
     status: 'idle',
-    membership: null,
+    user: null,
     message: ''
 }
 
@@ -57,13 +57,13 @@ export const AddUserThunk = createAsyncThunk<InitialState, AddUserRequest, { rej
             if (apiResponse.ok) {
                 return {
                     status: 'success',
-                    membership: responseData.membership,
+                    user: responseData.membership,
                     message: responseData.message
                 }
             } else {
                 return rejectWithValue({
                     status: 'error',
-                    membership: null,
+                    user: null,
                     message: responseData.message
                 })
             }
@@ -71,7 +71,7 @@ export const AddUserThunk = createAsyncThunk<InitialState, AddUserRequest, { rej
             return rejectWithValue({
                 status: 'error',
                 message: (err instanceof Error ? err.message : 'An unknown error occurred'),
-                membership: null
+                user: null
             })
         }
     }
@@ -86,11 +86,11 @@ const userSlice = createSlice({
             if (action.payload.status === 'success') {
                 state.status = 'success';
                 state.message = action.payload.message;
-                state.membership = action.payload.membership;
+                state.user = action.payload.user;
             } else {
                 state.status = 'error';
                 state.message = action.payload.message;
-                state.membership = null;
+                state.user = null;
             }
         })
             .addCase(AddUserThunk.pending, (state) => {
@@ -99,7 +99,7 @@ const userSlice = createSlice({
             .addCase(AddUserThunk.rejected, (state, action) => {
                 state.status = 'error';
                 state.message = action.payload?.message || 'Unexpected error while adding user';
-                state.membership = null;
+                state.user = null;
             })
     }
 });
