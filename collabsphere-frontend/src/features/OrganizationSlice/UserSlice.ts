@@ -77,6 +77,58 @@ export const AddUserThunk = createAsyncThunk<InitialState, AddUserRequest, { rej
     }
 );
 
+interface UserDeleteRequest {
+    user_id: number,
+    accessToken: string | null
+}
+
+interface UserDeleteResponse {
+    status: 'success' | 'error',
+    message: string | ''
+}
+
+interface UserDeleteAPIResponse {
+    status: number,
+    message: string
+}
+
+
+export const DeleteUserThunk = createAsyncThunk<UserDeleteResponse, UserDeleteRequest, { rejectValue: UserDeleteResponse }>(
+    'user-delete',
+    async (req: UserDeleteRequest, { rejectWithValue }) => {
+        try {
+            const apiResponse: Response = await fetch('/api/organization/delete-user', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${req.accessToken}`,
+                },
+                body: JSON.stringify(req.user_id)
+            });
+
+            const responseData: UserDeleteAPIResponse = await apiResponse.json();
+
+            if (apiResponse.ok) {
+                return {
+                    status: 'success',
+                    message: responseData.message
+                }
+            } else {
+                return rejectWithValue({
+                    status: 'error',
+                    message: responseData.message
+                });
+            }
+        } catch (err: unknown) {
+            console.log(err)
+            return rejectWithValue({
+                status: 'error',
+                message: 'Unexpected Error Occured'
+            })
+        }
+    }
+)
 const userSlice = createSlice({
     name: 'user',
     initialState: initialState,

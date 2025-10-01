@@ -42,9 +42,19 @@ const OrganizationDashboard: React.FC<Props> = ({ organization, membership, user
     }
 
     function handleAddUserOnSubmit(user: User) {
+        if (!user.email || !user.role) {
+            toast.error('Email and role can not have empty values')
+        }
         if (accessToken) dispatch(AddUserThunk({ user, accessToken }))
     }
 
+    function onRemoveUser(user_id: number | null) {
+        if (user_id === null) {
+            toast.error("User id cannot be empty");
+        }
+
+
+    }
     useEffect(() => {
         if (status !== 'loading' && status !== 'idle') {
             if (status === 'success') {
@@ -97,7 +107,7 @@ const OrganizationDashboard: React.FC<Props> = ({ organization, membership, user
                                         </div>
                                         {user_role === 'Admin' ?
                                             <button
-                                                // onClick={() => onRemoveUser && onRemoveUser(member.user_id)}
+                                                onClick={() => onRemoveUser && onRemoveUser(member.user_id)}
                                                 className="mt-4 bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition text-sm"
                                             >
                                                 Remove User
