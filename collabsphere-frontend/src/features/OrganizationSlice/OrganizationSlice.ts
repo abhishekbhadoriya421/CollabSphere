@@ -10,9 +10,14 @@ interface OrganizationObject {
 }
 
 interface MembershipObject {
+    id: number | null;
     user_id: number | null;
     organization_id: number | null;
     role: 'Admin' | 'Member' | 'Guest';
+    created_at: Date | null;
+    updated_at: Date | null;
+    create_by: number | null;
+    updated_by: number | null
 }
 
 interface ChannelObejct {
@@ -32,7 +37,7 @@ interface InitailState {
     message: string | '';
     status: 'idle' | 'error' | 'success';
     loading: boolean;
-    userMembership: MembershipObject | null;
+    userMembership: (MembershipObject | null)[];
     userChannel: ChannelObejct | null;
     userChannelMembership: ChannelMembershipObject | null;
 }
@@ -42,7 +47,7 @@ const initailState: InitailState = {
     message: '',
     status: 'idle',
     loading: false,
-    userMembership: null,
+    userMembership: [],
     userChannel: null,
     userChannelMembership: null,
 }
@@ -59,7 +64,7 @@ interface ResponseCreateOu {
     status: 'idle' | 'error' | 'success'
     message: string;
     organization: OrganizationObject | null;
-    membership: MembershipObject | null;
+    membership: (MembershipObject | null)[];
     channel: ChannelObejct | null;
     channelMembership: ChannelMembershipObject | null;
 }
@@ -68,7 +73,7 @@ interface CreateOuResponseApi {
     status: number;
     message: string;
     organization: OrganizationObject | null;
-    membership: MembershipObject | null;
+    membership: (MembershipObject | null)[];
     channel: ChannelObejct | null;
     channelMembership: ChannelMembershipObject | null;
 }
@@ -100,7 +105,7 @@ export const OrganizationCreateThunk = createAsyncThunk<ResponseCreateOu, Reques
                     status: 'error',
                     message: resData.message,
                     organization: null,
-                    membership: null,
+                    membership: [],
                     channel: null,
                     channelMembership: null
                 });
@@ -119,7 +124,7 @@ export const OrganizationCreateThunk = createAsyncThunk<ResponseCreateOu, Reques
                 status: 'error',
                 message: (error instanceof Error ? error.message : 'An unknown error occurred'),
                 organization: null,
-                membership: null,
+                membership: [],
                 channel: null,
                 channelMembership: null
             });
@@ -135,14 +140,14 @@ interface GetOuResponseAPI {
     status: number;
     message: string;
     organization: OrganizationObject | null;
-    membership: MembershipObject | null;
+    membership: MembershipObject[];
 }
 
 interface GetOrganizationThunkResponse {
     status: 'idle' | 'error' | 'success';
     message: string;
     organization: OrganizationObject | null;
-    membership: MembershipObject | null;
+    membership: MembershipObject[];
 }
 
 export const GetOrganizationThunk = createAsyncThunk<GetOrganizationThunkResponse, RequestGetOu, { rejectValue: GetOrganizationThunkResponse }>(
@@ -164,7 +169,7 @@ export const GetOrganizationThunk = createAsyncThunk<GetOrganizationThunkRespons
                     status: 'error',
                     message: resData.message,
                     organization: null,
-                    membership: null,
+                    membership: [],
                 });
             }
 
@@ -179,7 +184,7 @@ export const GetOrganizationThunk = createAsyncThunk<GetOrganizationThunkRespons
                 status: 'error',
                 message: (error instanceof Error ? error.message : 'An unknown error occurred'),
                 organization: null,
-                membership: null,
+                membership: [],
             });
         }
     }
@@ -197,11 +202,7 @@ const OrganizationSlice = createSlice({
                     user_id: action.payload.channelMembership?.user_id || null,
                     channel_id: action.payload.channelMembership?.channel_id || null,
                 }
-                const membershipItem: MembershipObject = {
-                    user_id: action.payload.membership?.user_id || null,
-                    organization_id: action.payload.membership?.organization_id || null,
-                    role: action.payload.membership?.role || 'Guest',
-                }
+
                 const channelItem: ChannelObejct = {
                     id: action.payload.channel?.id || null,
                     ou_id: action.payload.channel?.ou_id || null,
@@ -218,7 +219,9 @@ const OrganizationSlice = createSlice({
                     created_by: action.payload.organization?.created_by || ''
                 }
                 state.userChannelMembership = channelMembershipItem;
-                state.userMembership = membershipItem;
+                state.userMembership = Array.isArray(action.payload.membership)
+                    ? action.payload.membership
+                    : [action.payload.membership];
                 state.userChannel = channelItem;
                 state.userOrganization = organizationItem;
                 state.message = action.payload.message;
@@ -227,7 +230,7 @@ const OrganizationSlice = createSlice({
                 state.status = 'error';
                 state.message = action.payload.message;
                 state.userChannelMembership = null;
-                state.userMembership = null;
+                state.userMembership = [];
                 state.userChannel = null;
                 state.userOrganization = null;
             }
@@ -239,7 +242,7 @@ const OrganizationSlice = createSlice({
             state.message = action.payload?.message || 'unexpected error';
             state.status = 'error';
             state.userChannelMembership = null;
-            state.userMembership = null;
+            state.userMembership = [];
             state.userChannel = null;
             state.userOrganization = null;
         })
@@ -248,11 +251,8 @@ const OrganizationSlice = createSlice({
              */
             .addCase(GetOrganizationThunk.fulfilled, (state, action) => {
                 if (action.payload.status === 'success') {
-                    const membershipItem: MembershipObject = {
-                        user_id: action.payload.membership?.user_id || null,
-                        organization_id: action.payload.membership?.organization_id || null,
-                        role: action.payload.membership?.role || 'Guest',
-                    }
+                    console.log(action.payload.membership)
+
 
                     const organizationItem: OrganizationObject = {
                         name: action.payload.organization?.name || '',
@@ -261,14 +261,16 @@ const OrganizationSlice = createSlice({
                         description: action.payload.organization?.description || '',
                         created_by: action.payload.organization?.created_by || ''
                     }
-                    state.userMembership = membershipItem;
+                    state.userMembership = Array.isArray(action.payload.membership)
+                        ? action.payload.membership
+                        : [action.payload.membership];
                     state.userOrganization = organizationItem;
                     state.message = action.payload.message;
                     state.status = action.payload.status;
                 } else {
                     state.status = 'error';
                     state.message = action.payload.message;
-                    state.userMembership = null;
+                    state.userMembership = [];
                     state.userOrganization = null;
                 }
                 state.loading = false;
@@ -278,7 +280,7 @@ const OrganizationSlice = createSlice({
                 state.loading = false;
                 state.message = action.payload?.message || 'unexpected error';
                 state.status = 'error';
-                state.userMembership = null;
+                state.userMembership = [];
                 state.userOrganization = null;
             })
     }

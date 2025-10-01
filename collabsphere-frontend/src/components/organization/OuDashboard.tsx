@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import useAccessToken from '../customHooks/getAccessToken';
 import { GetOrganizationThunk, OrganizationCreateThunk } from '../../features/OrganizationSlice/OrganizationSlice';
 import { addChannel } from '../../features/ChannelSlice/GetMyChannels';
+import LoadingPage from "../Loading/LoadingPage";
+import OrganizationDashboard from "./OrganizationDashboardPage";
 interface Organization {
     code: string;
     name: string;
@@ -12,9 +14,10 @@ interface Organization {
 }
 
 export default function OuDashboard() {
-    const { userOrganization } = useAppSelector((state) => state.OrganizationReducer);
     const { accessToken, user } = useAccessToken();
-    const { status, message, loading, userChannel } = useAppSelector((state) => state.OrganizationReducer);
+    const { status, message, loading, userChannel, userOrganization,
+        userMembership
+    } = useAppSelector((state) => state.OrganizationReducer);
     const dispatch = useAppDispatch();
     const [formData, setFormData] = useState<Organization>({
         code: '',
@@ -72,9 +75,12 @@ export default function OuDashboard() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [GetOrganizationThunk, dispatch])
+    if (loading === true) {
+        return <LoadingPage />
+    }
     return (<div>
         {(userOrganization) ?
-            <p>Ou Details</p>
+            <OrganizationDashboard organization={userOrganization} membership={userMembership} />
             :
             <OrganizationManagement loading={loading} formData={formData} handleChange={handleChange} handleSubmit={handleSubmit} />
         }
