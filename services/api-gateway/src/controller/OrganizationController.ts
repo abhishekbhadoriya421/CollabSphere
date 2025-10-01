@@ -77,6 +77,7 @@ export const getOrganizationAction = async (req: Request, res: Response) => {
         status: 200,
         message: 'Successfully Fetch',
         organization: getOrganizarion.ourganization,
-        membership: getOrganizarion.membership
+        membership: getOrganizarion.membership,
+        user_role: getOrganizarion.role
     });
 }

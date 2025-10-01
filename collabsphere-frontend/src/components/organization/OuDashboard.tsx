@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook"
 import OrganizationManagement from "./CreateOrganization";
 import { toast } from 'react-toastify';
-import useAccessToken from '../customHooks/getAccessToken';
+import useGetUserCredentials from '../customHooks/getUserCredentials';
 import { GetOrganizationThunk, OrganizationCreateThunk } from '../../features/OrganizationSlice/OrganizationSlice';
 import { addChannel } from '../../features/ChannelSlice/GetMyChannels';
 import LoadingPage from "../Loading/LoadingPage";
@@ -14,9 +14,9 @@ interface Organization {
 }
 
 export default function OuDashboard() {
-    const { accessToken, user } = useAccessToken();
+    const { accessToken, user } = useGetUserCredentials();
     const { status, message, loading, userChannel, userOrganization,
-        userMembership
+        userMembership, userRole
     } = useAppSelector((state) => state.OrganizationReducer);
     const dispatch = useAppDispatch();
     const [formData, setFormData] = useState<Organization>({
@@ -80,7 +80,7 @@ export default function OuDashboard() {
     }
     return (<div>
         {(userOrganization) ?
-            <OrganizationDashboard organization={userOrganization} membership={userMembership} />
+            <OrganizationDashboard organization={userOrganization} membership={userMembership} user_role={userRole} />
             :
             <OrganizationManagement loading={loading} formData={formData} handleChange={handleChange} handleSubmit={handleSubmit} />
         }

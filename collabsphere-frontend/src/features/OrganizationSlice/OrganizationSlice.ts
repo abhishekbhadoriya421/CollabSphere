@@ -40,6 +40,7 @@ interface InitailState {
     userMembership: (MembershipObject | null)[];
     userChannel: ChannelObejct | null;
     userChannelMembership: ChannelMembershipObject | null;
+    userRole: 'Admin' | 'Member' | 'Guest';
 }
 
 const initailState: InitailState = {
@@ -50,6 +51,7 @@ const initailState: InitailState = {
     userMembership: [],
     userChannel: null,
     userChannelMembership: null,
+    userRole: 'Guest'
 }
 
 interface RequestCreateOu {
@@ -141,6 +143,7 @@ interface GetOuResponseAPI {
     message: string;
     organization: OrganizationObject | null;
     membership: MembershipObject[];
+    user_role: 'Admin' | 'Member' | 'Guest';
 }
 
 interface GetOrganizationThunkResponse {
@@ -148,6 +151,7 @@ interface GetOrganizationThunkResponse {
     message: string;
     organization: OrganizationObject | null;
     membership: MembershipObject[];
+    user_role: 'Admin' | 'Member' | 'Guest';
 }
 
 export const GetOrganizationThunk = createAsyncThunk<GetOrganizationThunkResponse, RequestGetOu, { rejectValue: GetOrganizationThunkResponse }>(
@@ -170,6 +174,7 @@ export const GetOrganizationThunk = createAsyncThunk<GetOrganizationThunkRespons
                     message: resData.message,
                     organization: null,
                     membership: [],
+                    user_role: 'Guest'
                 });
             }
 
@@ -178,6 +183,7 @@ export const GetOrganizationThunk = createAsyncThunk<GetOrganizationThunkRespons
                 message: resData.message,
                 organization: resData.organization,
                 membership: resData.membership,
+                user_role: resData.user_role
             }
         } catch (error: unknown) {
             return rejectWithValue({
@@ -185,6 +191,7 @@ export const GetOrganizationThunk = createAsyncThunk<GetOrganizationThunkRespons
                 message: (error instanceof Error ? error.message : 'An unknown error occurred'),
                 organization: null,
                 membership: [],
+                user_role: 'Guest'
             });
         }
     }
@@ -226,6 +233,7 @@ const OrganizationSlice = createSlice({
                 state.userOrganization = organizationItem;
                 state.message = action.payload.message;
                 state.status = action.payload.status;
+                state.userRole = 'Admin';
             } else {
                 state.status = 'error';
                 state.message = action.payload.message;
@@ -274,6 +282,7 @@ const OrganizationSlice = createSlice({
                     state.userOrganization = null;
                 }
                 state.loading = false;
+                state.userRole = action.payload.user_role;
             }).addCase(GetOrganizationThunk.pending, (state) => {
                 state.loading = true;
             }).addCase(GetOrganizationThunk.rejected, (state, action) => {

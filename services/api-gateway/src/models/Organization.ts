@@ -33,8 +33,9 @@ class Organization extends Model {
             if (!membershipModel) {
                 return {
                     status: false,
-                    ourganization: null,
-                    membership: null
+                    ourganization: [],
+                    membership: [],
+                    role: 'Guest'
                 };
 
             }
@@ -45,13 +46,15 @@ class Organization extends Model {
                 return {
                     status: true,
                     ourganization: (membershipModel as any).Organization,
-                    membership: allMembershipModel
+                    membership: allMembershipModel,
+                    role: membershipModel.role
                 }
             } else {
                 return {
                     status: true,
                     ourganization: (membershipModel as any).Organization,
-                    membership: membershipModel
+                    membership: membershipModel,
+                    role: membershipModel.role
                 }
             }
         } catch (err: any) {
@@ -59,8 +62,9 @@ class Organization extends Model {
             console.log(errorStr);
             return {
                 status: false,
-                ourganization: null,
-                membership: null
+                ourganization: [],
+                membership: [],
+                role: 'Guest'
             }
         }
 

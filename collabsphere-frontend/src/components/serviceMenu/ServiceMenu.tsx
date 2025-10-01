@@ -3,7 +3,7 @@ import ActivityMenu from "./ActivityMenu";
 import ServiceMenuHeader from "./ServiceMenuHeader";
 import { ActivityItemThunk, ChangeActivity } from "../../features/ServicesSlice/ActivityItemSlice";
 import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook";
-import useAccessToken from "../customHooks/getAccessToken";
+import useGetUserCredentials from "../customHooks/getUserCredentials";
 import ChannelItem from "./ChannelItem";
 
 interface Activity {
@@ -24,7 +24,7 @@ interface ServiceMenuProp {
 }
 export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuProp) {
     const { activities } = useAppSelector((state) => state.ActivityItemReducer);
-    const { accessToken } = useAccessToken();
+    const { accessToken } = useGetUserCredentials();
     const dispatch = useAppDispatch();
     useEffect(() => {
         if (accessToken) {
