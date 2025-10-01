@@ -204,6 +204,11 @@ const OrganizationSlice = createSlice({
     reducers: {
         addUser: (state, action) => {
             state.userMembership.push(action.payload);
+        },
+        deleteUser: (state, action) => {
+            if (action.payload) {
+                state.userMembership = state.userMembership.filter(member => member?.user_id != action.payload);
+            }
         }
     },
     extraReducers: (builder) => {
@@ -297,5 +302,5 @@ const OrganizationSlice = createSlice({
 
 });
 
-export const { addUser } = OrganizationSlice.actions;
+export const { addUser, deleteUser } = OrganizationSlice.actions;
 export default OrganizationSlice.reducer;

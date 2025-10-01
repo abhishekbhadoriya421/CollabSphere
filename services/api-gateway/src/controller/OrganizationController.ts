@@ -156,6 +156,45 @@ export const addUserAction = async (req: Request, res: Response) => {
             membership: null
         })
     }
+}
 
-    console.log(targetUser)
+
+export const deleteUserAction = async (req: Request, res: Response) => {
+    const { user_id } = req.params;
+    try {
+        const admin_user_id = getUserId(req);
+
+        const user = await models.Memberships.findOne({
+            where: { user_id: admin_user_id }
+        });
+        if (!user) {
+            return res.status(404).json({
+                status: 404,
+                message: `Invalid Request`,
+                membership: null
+            });
+        }
+
+        if (user.role !== 'Admin') {
+            return res.status(403).json({
+                status: 403,
+                message: `You are not allowed to perform this action`,
+                membership: null
+            });
+        }
+
+        await models.Memberships.destroy({
+            where: { user_id: user_id }
+        });
+        return res.status(200).json({
+            status: 200,
+            message: 'Successfully deleted the user'
+        })
+    } catch (err: any) {
+        return res.status(500).json({
+            status: 500,
+            message: ErrorHandler.getMessage(err)
+        })
+    }
+
 }

@@ -97,14 +97,14 @@ export const DeleteUserThunk = createAsyncThunk<UserDeleteResponse, UserDeleteRe
     'user-delete',
     async (req: UserDeleteRequest, { rejectWithValue }) => {
         try {
-            const apiResponse: Response = await fetch('/api/organization/delete-user', {
-                method: 'POST',
+            const apiResponse: Response = await fetch(`/api/organization/delete-user/${req.user_id}`, {
+                method: 'DELETE',
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${req.accessToken}`,
                 },
-                body: JSON.stringify(req.user_id)
+
             });
 
             const responseData: UserDeleteAPIResponse = await apiResponse.json();

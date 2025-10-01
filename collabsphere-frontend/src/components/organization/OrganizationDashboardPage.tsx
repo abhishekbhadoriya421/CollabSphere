@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import AddMemberModal from "./AddUserFormModal";
 import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook";
-import { AddUserThunk } from "../../features/OrganizationSlice/UserSlice";
+import { AddUserThunk, DeleteUserThunk } from "../../features/OrganizationSlice/UserSlice";
 import useGetUserCredentials from "../customHooks/getUserCredentials";
 import { toast } from "react-toastify";
-import { addUser } from "../../features/OrganizationSlice/OrganizationSlice";
+import { addUser, deleteUser } from "../../features/OrganizationSlice/OrganizationSlice";
 interface Organization {
     name: string | '';
     code: string | '';
@@ -51,9 +51,10 @@ const OrganizationDashboard: React.FC<Props> = ({ organization, membership, user
     function onRemoveUser(user_id: number | null) {
         if (user_id === null) {
             toast.error("User id cannot be empty");
+        } else {
+            dispatch(DeleteUserThunk({ user_id, accessToken }));
+            dispatch(deleteUser(user_id));
         }
-
-
     }
     useEffect(() => {
         if (status !== 'loading' && status !== 'idle') {
