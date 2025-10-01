@@ -5,6 +5,7 @@ import models from "../models/CentralModel";
 import Channel from "../models/Channel";
 import ChannelMember from "../models/ChannelMember";
 import UserLoginDetail from "../service/UserLoginDetail";
+import { getUserId } from "../utils/GetUserDetails";
 
 export const createOrganizationAction = async (req: Request, res: Response) => {
     try {
@@ -70,6 +71,12 @@ export const createOrganizationAction = async (req: Request, res: Response) => {
 }
 
 export const getOrganizationAction = async (req: Request, res: Response) => {
-    console.log('get Ou')
-    console.log(UserLoginDetail.getUserId());
+    const userId = getUserId(req);
+    const getOrganizarion = await Organization.getOrganizationDetailByUserId(userId);
+    return res.status(200).json({
+        status: 200,
+        message: 'Successfully Fetch',
+        organization: getOrganizarion.ourganization,
+        membership: getOrganizarion.membership
+    });
 }
