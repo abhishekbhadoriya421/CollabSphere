@@ -259,9 +259,6 @@ const OrganizationSlice = createSlice({
              */
             .addCase(GetOrganizationThunk.fulfilled, (state, action) => {
                 if (action.payload.status === 'success') {
-                    console.log(action.payload.membership)
-
-
                     const organizationItem: OrganizationObject = {
                         name: action.payload.organization?.name || '',
                         code: action.payload.organization?.code || '',

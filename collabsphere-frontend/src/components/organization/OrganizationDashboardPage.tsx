@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import AddMemberModal from "./AddUserFormModal";
 
 interface Organization {
     name: string | '';
@@ -21,7 +22,21 @@ interface Props {
     user_role: 'Admin' | 'Member' | 'Guest';
 }
 
+interface User {
+    role: string;
+    email: string;
+}
+
+
 const OrganizationDashboard: React.FC<Props> = ({ organization, membership, user_role }) => {
+    const [isOpenModal, setIsOpenModal] = useState(false);
+    function onClose(): void {
+        setIsOpenModal(false);
+    }
+
+    function handleAddUserOnSubmit(user: User) {
+        console.log(user)
+    }
     return (
         <div className="p-6 space-y-8">
             <div className="bg-white shadow-md rounded-2xl p-6">
@@ -38,7 +53,7 @@ const OrganizationDashboard: React.FC<Props> = ({ organization, membership, user
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-2xl font-bold text-gray-800">👥 Members</h2>
                         <button
-                            // onClick={onAddUser}
+                            onClick={() => setIsOpenModal(true)}
                             className="bg-blue-600 text-white px-4 py-2 rounded-xl shadow hover:bg-blue-700 transition"
                         >
                             + Add User
@@ -79,6 +94,9 @@ const OrganizationDashboard: React.FC<Props> = ({ organization, membership, user
                         <p className="text-gray-500 text-sm">No members found.</p>
                     )}
                 </div>
+                : null}
+            {isOpenModal ?
+                <AddMemberModal onSubmit={handleAddUserOnSubmit} onClose={onClose} />
                 : null}
         </div >
 
