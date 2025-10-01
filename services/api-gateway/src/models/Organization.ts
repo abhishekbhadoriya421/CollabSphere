@@ -1,7 +1,8 @@
 import sequelize from "../config/sqldb";
 import { DataTypes, Model } from "sequelize";
 import UserLoginDetail from "../service/UserLoginDetail";
-
+import models from './CentralModel'
+import ErrorHandler from "../utils/ErrorHandler";
 
 class Organization extends Model {
     public id!: number;
@@ -18,6 +19,51 @@ class Organization extends Model {
             foreignKey: 'organization_id',
             sourceKey: 'id',
         });
+    }
+
+    public static async getOrganizationDetailByUserId(user_id: number) {
+        try {
+            const membershipModel = await models.Memberships.findOne({
+                where: { user_id: user_id },
+                include: [
+                    { model: models.Organization }
+                ]
+            });
+
+            if (!membershipModel) {
+                return {
+                    status: false,
+                    ourganization: null,
+                    membership: null
+                };
+
+            }
+            if (membershipModel.role == 'Admin') {
+                const allMembershipModel = await models.Memberships.findAll({
+                    where: { organization_id: membershipModel.organization_id }
+                });
+                return {
+                    status: true,
+                    ourganization: (membershipModel as any).Organization,
+                    membership: allMembershipModel
+                }
+            } else {
+                return {
+                    status: true,
+                    ourganization: (membershipModel as any).Organization,
+                    membership: membershipModel
+                }
+            }
+        } catch (err: any) {
+            const errorStr = ErrorHandler.getMessage(err);
+            console.log(errorStr);
+            return {
+                status: false,
+                ourganization: null,
+                membership: null
+            }
+        }
+
     }
 }
 

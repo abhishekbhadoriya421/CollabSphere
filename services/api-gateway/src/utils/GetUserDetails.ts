@@ -8,5 +8,11 @@ export function getUserId(req: Request) {
         return false;
     }
     const authenticate = Authentication.getInstance();
-    return authenticate.Verify_Access_Token(accessToken);
+    const userAuth = authenticate.Verify_Access_Token(accessToken);
+    if (!userAuth) {
+        const refreshToken = req.cookies.refreshToken;
+        const userAuth = authenticate.Verify_Refresh_Token(refreshToken);
+        return userAuth ? userAuth.user_id : false;
+    }
+    return userAuth.user_id;
 }
