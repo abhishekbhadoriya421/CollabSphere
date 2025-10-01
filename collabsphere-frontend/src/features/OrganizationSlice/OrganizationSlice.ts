@@ -201,7 +201,11 @@ export const GetOrganizationThunk = createAsyncThunk<GetOrganizationThunkRespons
 const OrganizationSlice = createSlice({
     name: 'create-ou',
     initialState: initailState,
-    reducers: {},
+    reducers: {
+        addUser: (state, action) => {
+            state.userMembership.push(action.payload);
+        }
+    },
     extraReducers: (builder) => {
         builder.addCase(OrganizationCreateThunk.fulfilled, (state, action) => {
             if (action.payload.status === 'success') {
@@ -293,5 +297,5 @@ const OrganizationSlice = createSlice({
 
 });
 
-
+export const { addUser } = OrganizationSlice.actions;
 export default OrganizationSlice.reducer;

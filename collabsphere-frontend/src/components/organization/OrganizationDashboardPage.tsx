@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook";
 import { AddUserThunk } from "../../features/OrganizationSlice/UserSlice";
 import useGetUserCredentials from "../customHooks/getUserCredentials";
 import { toast } from "react-toastify";
+import { addUser } from "../../features/OrganizationSlice/OrganizationSlice";
 interface Organization {
     name: string | '';
     code: string | '';
@@ -47,13 +48,15 @@ const OrganizationDashboard: React.FC<Props> = ({ organization, membership, user
     useEffect(() => {
         if (status !== 'loading' && status !== 'idle') {
             if (status === 'success') {
-                console.log(user)
                 toast.success(message);
+                dispatch(addUser(user));
             } else {
                 toast.error(message);
             }
+
+            setIsOpenModal(false);
         }
-    }, [status, message, user])
+    }, [status, message, user, dispatch])
     return (
         <div className="p-6 space-y-8">
             <div className="bg-white shadow-md rounded-2xl p-6">
