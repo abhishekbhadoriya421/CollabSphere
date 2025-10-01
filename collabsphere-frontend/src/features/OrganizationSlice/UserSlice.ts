@@ -153,6 +153,17 @@ const userSlice = createSlice({
                 state.message = action.payload?.message || 'Unexpected error while adding user';
                 state.user = null;
             })
+            .addCase(DeleteUserThunk.fulfilled, (state, action) => {
+                state.status = 'success';
+                state.message = action.payload.message;
+            })
+            .addCase(DeleteUserThunk.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(DeleteUserThunk.rejected, (state, action) => {
+                state.status = 'error';
+                state.message = action.payload?.message || 'Unexpected error while adding user';
+            })
     }
 });
 
