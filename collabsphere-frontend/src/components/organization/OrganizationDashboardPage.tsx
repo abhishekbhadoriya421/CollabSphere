@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AddMemberModal from "./AddUserFormModal";
 import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook";
-import { AddUserThunk, DeleteUserThunk } from "../../features/OrganizationSlice/UserSlice";
+import { AddUserThunk, DeleteUserThunk } from "../../features/OrganizationSlice/MembershipSlice";
 import useGetUserCredentials from "../customHooks/getUserCredentials";
 import { toast } from "react-toastify";
 import { addUser, deleteUser } from "../../features/OrganizationSlice/OrganizationSlice";

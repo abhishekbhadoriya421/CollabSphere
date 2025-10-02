@@ -4,7 +4,7 @@ import LoginReducer from '../features/AuthenticationSlice/LoginSlice';
 import ActivityItemReducer from '../features/ServicesSlice/ActivityItemSlice';
 import GetMyChannelReducer from '../features/ChannelSlice/GetMyChannels';
 import OrganizationReducer from '../features/OrganizationSlice/OrganizationSlice';
-import UserReducer from '../features/OrganizationSlice/UserSlice';
+import UserReducer from '../features/OrganizationSlice/MembershipSlice';
 
 export const store = configureStore({
     reducer: {
