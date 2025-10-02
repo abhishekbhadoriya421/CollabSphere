@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Memberships from "../models/Memberships";
 import Organization from "../models/Organization";
-import models from "../models/CentralModel";
+import models, { sequelize } from "../models/CentralModel";
 import Channel from "../models/Channel";
 import ChannelMember from "../models/ChannelMember";
 import { getUserId } from "../utils/GetUserDetails";
@@ -130,19 +130,44 @@ export const addUserAction = async (req: Request, res: Response) => {
     });
 
     if (!memberAlreadyExist) {
+        const transactionObject = await sequelize.transaction();
         try {
+            /**
+             * Get Public Channel
+             */
+
+            const channel = await models.ChannelMember.findOne({
+                where: {
+                    user_id: user_id
+                },
+                include: [
+                    { model: models.Channel, where: { type: 'channel' } }
+                ],
+                attributes: ['channel_id']
+            });
+            if (channel) {
+                await models.ChannelMember.create({
+                    user_id: targetUser.id,
+                    channel_id: channel.channel_id
+                }, {
+                    transaction: transactionObject
+                })
+            }
             const model = await models.Memberships.create({
                 user_id: targetUser.id,
                 organization_id: user.organization_id,
                 role: role
+            }, {
+                transaction: transactionObject
             });
-
+            await transactionObject.commit();
             return res.status(200).json({
                 status: 200,
                 message: 'User add successfully',
                 membership: model
             });
         } catch (err: unknown) {
+            transactionObject.rollback();
             return res.status(500).json({
                 status: 500,
                 message: ErrorHandler.getMessage(err),

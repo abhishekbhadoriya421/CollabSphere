@@ -18,6 +18,7 @@ export default function OuDashboard() {
     const { status, message, loading, userChannel, userOrganization,
         userMembership, userRole
     } = useAppSelector((state) => state.OrganizationReducer);
+
     const dispatch = useAppDispatch();
     const [formData, setFormData] = useState<Organization>({
         code: '',
@@ -79,7 +80,7 @@ export default function OuDashboard() {
         return <LoadingPage />
     }
     return (<div>
-        {(userOrganization) ?
+        {(userOrganization && userOrganization.id) ?
             <OrganizationDashboard organization={userOrganization} membership={userMembership} user_role={userRole} />
             :
             <OrganizationManagement loading={loading} formData={formData} handleChange={handleChange} handleSubmit={handleSubmit} />
