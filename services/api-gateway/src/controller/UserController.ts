@@ -30,7 +30,6 @@ export const SearchUserAction = async (req: Request, res: Response) => {
         ],
         raw: true,
     });
-
     return res.status(200).json({
         userList: Users,
         status: 200,
