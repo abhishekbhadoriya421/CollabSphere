@@ -2,37 +2,24 @@ import { useState } from "react";
 import { useAppSelector, useAppDispatch } from "../customHooks/reduxCustomHook";
 import { LogoutThunk } from "../../features/AuthenticationSlice/LoginSlice";
 import SettingsSidebar from "./SettingsSidebar";
+import { SearchUserThunk } from "../../features/SearchUserSlice/SearchUserSlice";
+import useGetUserCredentials from "../customHooks/getUserCredentials";
 
-interface User {
-    id: number;
-    name: string;
-}
-
-const users: User[] = [
-    { id: 1, name: "Alice Johnson" },
-    { id: 2, name: "Bob Smith" },
-    { id: 3, name: "Charlie Adams" },
-    { id: 4, name: "David Wilson" },
-    { id: 5, name: "Eva Brown" },
-];
 
 const Navigation = () => {
     const { user } = useAppSelector((state) => state.LoginReducer);
+    const { accessToken, userOu } = useGetUserCredentials();
+    const { userList } = useAppSelector((state) => state.SearchUserReducer);
     const [OpenSetting, setSetting] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const [query, setQuery] = useState("");
-    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
 
-    const handleSearch = (value: string) => {
-        setQuery(value);
-        if (value.trim() === "") {
-            setFilteredUsers([]);
-        } else {
-            const results = users.filter(user =>
-                user.name.toLowerCase().includes(value.toLowerCase())
-            );
-            setFilteredUsers(results);
+
+    const handleSearch = (searchValue: string) => {
+        setQuery(searchValue);
+        if (accessToken && userOu) {
+            dispatch(SearchUserThunk({ accessToken: accessToken, searchKey: searchValue, ou_id: userOu.organization_id }))
         }
     };
 
@@ -49,6 +36,10 @@ const Navigation = () => {
     const handleCloseSettingsSidebar = () => {
         setIsSidebarOpen(false);
     };
+
+    const handleOnClickUser = (userId: number) => {
+        console.log(userId)
+    }
     return (
         <div className="">
             <div className="w-[100%] h-18 bg-white flex justify-between px-4 items-center" id="navigation-bar">
@@ -66,18 +57,19 @@ const Navigation = () => {
                             onChange={(e) => handleSearch(e.target.value)}
                         />
                     </div>
-                    {filteredUsers.length > 0 && (
+                    {userList.length > 0 && (
                         <ul className="absolute top-12 w-full bg-white border rounded-lg shadow-md max-h-48 overflow-y-auto z-10">
-                            {filteredUsers.map((user) => (
+                            {userList.map((user) => (
+                                user &&
                                 <li
-                                    key={user.id}
+                                    key={user.user_id}
                                     className="p-2 hover:bg-gray-100 cursor-pointer"
                                     onClick={() => {
-                                        setQuery(user.name);
-                                        setFilteredUsers([]);
+                                        setQuery("");
+                                        handleOnClickUser(user.user_id);
                                     }}
                                 >
-                                    {user.name}
+                                    {user.username}
                                 </li>
                             ))}
                         </ul>

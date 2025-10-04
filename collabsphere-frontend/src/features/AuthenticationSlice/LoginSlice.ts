@@ -4,18 +4,38 @@ import { toast } from "react-toastify";
 /**
  * Hold Intial State
  */
+
 interface UserObject {
     email: string,
     id: number,
     username: string
 }
+
+interface Organization {
+    id: number;
+    code: string;
+    name: string;
+}
+
+interface Membership {
+    id: number;
+    user_id: number;
+    organization_id: number;
+    role: 'Member' | 'Admin' | 'Owner' | string; // adjust roles as needed
+    created_at: string;  // ISO date string
+    updated_at: string;
+    created_by: number | null;
+    updated_by: number | null;
+    Organization: Organization;
+}
+
 interface LoginState {
     accessToken: string | null,
     user: UserObject | null,
     loading: boolean,
     status: 'checking' | 'loading' | 'authenticated' | 'unauthenticated',
     message: string,
-    userOu: Array<unknown>
+    userOu: Membership | null
 }
 
 
@@ -25,7 +45,7 @@ const initialState: LoginState = {
     loading: false,
     status: 'checking',
     message: '',
-    userOu: []
+    userOu: null
 }
 
 /**
@@ -44,7 +64,7 @@ interface LoginResponse {
     user: UserObject | null,
     status: 'idle' | 'success' | 'error',
     message: string,
-    userOu: Array<unknown>
+    userOu: Membership | null
 }
 
 /* 
@@ -60,7 +80,7 @@ interface APIResponse {
     user: UserObject | null,
     status: number,
     message: string,
-    userOu: Array<unknown>
+    userOu: Membership | null
 }
 
 /**
@@ -93,7 +113,7 @@ export const LoginThunk = createAsyncThunk<LoginResponse, LoginRequest, { reject
                     user: null,
                     message: apiResponsedata.message,
                     status: 'error',
-                    userOu: []
+                    userOu: null
                 }
                 return response;
             }
@@ -112,7 +132,7 @@ export const LoginThunk = createAsyncThunk<LoginResponse, LoginRequest, { reject
                 user: null,
                 message: (error instanceof Error ? error.message : 'An unknown error occurred'),
                 status: 'error',
-                userOu: []
+                userOu: null
             }
             return rejectWithValue(response);
         }
@@ -146,7 +166,7 @@ export const RefreshPageThunk = createAsyncThunk<LoginResponse, void, { rejectVa
                     user: null,
                     message: apiResponsedata.message,
                     status: 'error',
-                    userOu: []
+                    userOu: null
                 }
                 return response;
             }
@@ -166,7 +186,7 @@ export const RefreshPageThunk = createAsyncThunk<LoginResponse, void, { rejectVa
                         user: null,
                         message: apiResponsedata.message,
                         status: 'error',
-                        userOu: []
+                        userOu: null
                     }
                 );
             }
@@ -177,7 +197,7 @@ export const RefreshPageThunk = createAsyncThunk<LoginResponse, void, { rejectVa
                     user: null,
                     message: (error instanceof Error ? error.message : 'An unknown error occurred'),
                     status: 'error',
-                    userOu: []
+                    userOu: null
                 }
             );
         }
@@ -205,7 +225,7 @@ export const GetValidTokenThunk = createAsyncThunk<LoginResponse, void, { reject
                     user: null,
                     message: apiResponsedata.message,
                     status: 'error',
-                    userOu: []
+                    userOu: null
                 }
                 return response;
             }
@@ -225,7 +245,7 @@ export const GetValidTokenThunk = createAsyncThunk<LoginResponse, void, { reject
                     user: null,
                     message: (error instanceof Error ? error.message : 'An unknown error occurred'),
                     status: 'error',
-                    userOu: []
+                    userOu: null
                 }
             );
         }
@@ -299,7 +319,7 @@ const LoginSlice = createSlice({
                 state.status = 'unauthenticated';
                 state.user = null;
                 state.message = action.payload.message;
-                state.userOu = [];
+                state.userOu = null;
                 toast.error(action.payload.message);
             }
         })
@@ -312,7 +332,7 @@ const LoginSlice = createSlice({
                 state.status = 'unauthenticated';
                 state.accessToken = '';
                 state.user = null;
-                state.userOu = [];
+                state.userOu = null;
                 if (action.payload) {
                     state.message = action.payload.message
                 } else {
@@ -337,7 +357,7 @@ const LoginSlice = createSlice({
                     state.status = 'unauthenticated';
                     state.user = null;
                     state.message = '';
-                    state.userOu = [];
+                    state.userOu = null;
                 }
             })
             .addCase(RefreshPageThunk.pending, (state) => {
@@ -349,7 +369,7 @@ const LoginSlice = createSlice({
                 state.status = 'unauthenticated';
                 state.accessToken = '';
                 state.user = null;
-                state.userOu = [];
+                state.userOu = null;
                 if (action.payload) {
                     state.message = action.payload.message
                 } else {
@@ -366,7 +386,7 @@ const LoginSlice = createSlice({
                     state.message = '';
                     state.status = 'unauthenticated';
                     state.user = null;
-                    state.userOu = [];
+                    state.userOu = null;
                     toast.success(action.payload.message);
                 } else {
                     toast.error(`Couldn't logged due to : ${action.payload.message}`);
@@ -393,7 +413,7 @@ const LoginSlice = createSlice({
                     state.status = 'unauthenticated';
                     state.user = null;
                     state.message = '';
-                    state.userOu = [];
+                    state.userOu = null;
                 }
             })
             .addCase(GetValidTokenThunk.rejected, (state, action) => {
@@ -401,7 +421,7 @@ const LoginSlice = createSlice({
                 state.status = 'unauthenticated';
                 state.accessToken = '';
                 state.user = null;
-                state.userOu = [];
+                state.userOu = null;
                 if (action.payload) {
                     state.message = action.payload.message
                 } else {

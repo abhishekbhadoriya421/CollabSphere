@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 interface UserList {
-    user_id: number | null;
-    username: string | '';
-    email: string | '';
+    user_id: number;
+    username: string;
+    email: string;
 }
 interface InitialState {
     userList: (UserList | null)[];
@@ -19,6 +19,7 @@ const initialState: InitialState = {
 interface GetUserRequest {
     accessToken: string | null,
     searchKey: string | ''
+    ou_id: number | null
 }
 
 interface GetUserResponse {
@@ -32,12 +33,12 @@ interface GetUserAPIResponse {
     status: number | null;
     message: string | ''
 }
-const SearchUserThunk = createAsyncThunk<GetUserResponse, GetUserRequest, { rejectValue: GetUserResponse }>
+export const SearchUserThunk = createAsyncThunk<GetUserResponse, GetUserRequest, { rejectValue: GetUserResponse }>
     (
         'get-user-list',
         async (req: GetUserRequest, { rejectWithValue }) => {
             try {
-                const apiResponse: Response = await fetch(`/api/user/search-user?search=${req.searchKey}`, {
+                const apiResponse: Response = await fetch(`/api/user/search-user?search=${req.searchKey}&ou_id=${req.ou_id}`, {
                     method: 'get',
                     headers: {
                         'Content-Type': 'application/json',

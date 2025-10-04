@@ -59,7 +59,7 @@ export const LoginAction = async (req: Request, res: Response) => {
             username: string
         }
         const userData: UserDataResponse = validationStatus.user;
-        const userOu = await Memberships.findAll({
+        const userOu = await Memberships.findOne({
             where: { user_id: userData.id },
             include: [
                 { model: models.Organization, attributes: ['code', 'id', 'name'], required: false }
@@ -222,7 +222,7 @@ export const PageReloadAction = async (req: Request, res: Response) => {
             userOu: null
         })
     }
-    const userOu = await Memberships.findAll({
+    const userOu = await Memberships.findOne({
         where: { user_id: UserDetail.id },
         include: [
             { model: models.Organization, attributes: ['code', 'id', 'name'], required: false }

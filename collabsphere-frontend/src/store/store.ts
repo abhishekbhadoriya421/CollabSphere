@@ -5,6 +5,7 @@ import ActivityItemReducer from '../features/ServicesSlice/ActivityItemSlice';
 import GetMyChannelReducer from '../features/ChannelSlice/GetMyChannels';
 import OrganizationReducer from '../features/OrganizationSlice/OrganizationSlice';
 import UserReducer from '../features/OrganizationSlice/MembershipSlice';
+import SearchUserReducer from '../features/SearchUserSlice/SearchUserSlice';
 
 export const store = configureStore({
     reducer: {
@@ -13,7 +14,8 @@ export const store = configureStore({
         ActivityItemReducer: ActivityItemReducer,
         GetMyChannelReducer: GetMyChannelReducer,
         OrganizationReducer: OrganizationReducer,
-        UserReducer: UserReducer
+        UserReducer: UserReducer,
+        SearchUserReducer: SearchUserReducer
     },
 });
 
