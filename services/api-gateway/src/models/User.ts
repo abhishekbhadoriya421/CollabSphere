@@ -197,6 +197,12 @@ class User extends Model {
             return user.toJSON();
         }
     }
+    public static associate(Model: any) {
+        User.hasOne(Model.Memberships, {
+            foreignKey: 'user_id',
+            sourceKey: 'id'
+        })
+    }
 }
 
 User.init({
