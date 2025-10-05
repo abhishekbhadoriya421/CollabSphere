@@ -31,8 +31,8 @@ class ChannelMember extends Model {
                 d.channel_name,
                 d.channel_type,
                 d.created_by,
-                cm.user_id AS member_user_id,
-                u.username AS member_username
+                GROUP_CONCAT(cm.user_id) AS member_user_id,
+                GROUP_CONCAT(u.username) AS member_username
             FROM (
                 SELECT 
                     c.id AS channel_id,
@@ -48,7 +48,13 @@ class ChannelMember extends Model {
                 ON cm.channel_id = d.channel_id
             INNER JOIN users u 
                 ON u.id = cm.user_id
-            WHERE cm.user_id <> $userId;
+            WHERE cm.user_id <> $userId
+            GROUP BY 
+              d.channel_id,
+                d.channel_name,
+                d.channel_type,
+                d.created_by
+            ;
             `, {
             bind: { userId: user_id },
             type: QueryTypes.SELECT,

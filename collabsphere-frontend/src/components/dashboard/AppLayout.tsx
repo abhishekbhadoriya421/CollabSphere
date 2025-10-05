@@ -1,25 +1,12 @@
-import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook"
-import { Outlet, useNavigate } from "react-router-dom";
+
+import { Outlet } from "react-router-dom";
 import Navigation from "../header/Navigation";
 import ServiceMenu from "../serviceMenu/ServiceMenu";
-import { GetAllChannelThunks } from "../../features/ChannelSlice/GetMyChannelsSlice";
 export default function AppLayout() {
-    const navigate = useNavigate();
-    const { accessToken, user } = useAppSelector((state) => state.LoginReducer);
-    const { status, channels } = useAppSelector((state) => state.GetMyChannelReducer);
-    const dispatch = useAppDispatch();
-
-    useEffect(() => {
-        if (accessToken && user) {
-            dispatch(GetAllChannelThunks({ accessToken: accessToken, user_id: user?.id }));
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [navigate, dispatch]);
     return (
         <div className="flex w-full h-full bg-[#ebecef]">
             <div className="w-[25%] h-screen bg-[#1f2937] text-white">
-                <ServiceMenu channels={channels} loadingChannel={status === 'loading'} />
+                <ServiceMenu />
             </div>
             <div className="w-[75%] h-full flex flex-col">
                 <Navigation />

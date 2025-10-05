@@ -5,6 +5,8 @@ import { ActivityItemThunk, ChangeActivity } from "../../features/ServicesSlice/
 import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook";
 import useGetUserCredentials from "../customHooks/getUserCredentials";
 import ChannelItem from "./ChannelItem";
+import { GetAllChannelThunks } from "../../features/ChannelSlice/GetMyChannelsSlice";
+
 
 interface Activity {
     id: number,
@@ -12,19 +14,12 @@ interface Activity {
     content: string,
     is_active: 'ACTIVE' | 'IN-ACTIVE'
 }
-interface channels {
-    id: number | null,
-    type: 'dm' | 'group' | 'channel' | 'none',
-    name: string | '',
-    created_by: number | null
-}
-interface ServiceMenuProp {
-    channels: Array<channels>;
-    loadingChannel: boolean;
-}
-export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuProp) {
+
+export default function ServiceMenu() {
     const { activities } = useAppSelector((state) => state.ActivityItemReducer);
-    const { accessToken } = useGetUserCredentials();
+    const { status, channels } = useAppSelector((state) => state.GetMyChannelReducer);
+
+    const { accessToken, user } = useGetUserCredentials();
     const dispatch = useAppDispatch();
     useEffect(() => {
         if (accessToken) {
@@ -32,7 +27,12 @@ export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuPro
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch]);
-
+    useEffect(() => {
+        if (accessToken && user) {
+            dispatch(GetAllChannelThunks({ accessToken: accessToken, user_id: user?.id }));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dispatch]);
     /**
      * handle is active
      */
@@ -64,18 +64,26 @@ export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuPro
 
             </div>
             <hr />
-            {!loadingChannel && channels.length > 0 ?
+            {status !== 'loading' && channels.length > 0 ?
                 <div className="p-3 overflow-y-auto">
                     <div className="flex justify-between h-12">
                         <h1 className="text-2xl font-bold">Channels</h1>
                         <p className="text-3xl font-bold cursor-pointer" title="Add Channel">+</p>
                     </div>
-                    {channels.map(channel => {
-                        return <ChannelItem key={channel.id ?? Math.random()} name={channel.name} type={channel.type} id={channel.id} handleChannelOnClick={handleChannelOnClick} />
+                    {channels.map((channel, index) => {
+                        return <ChannelItem
+                            key={index ?? Math.random()}
+                            name={
+                                (channel.channel_type !== 'dm') ? channel.channel_name : channel.member_username
+                            }
+                            type={channel.channel_type}
+                            id={channel.channel_id}
+                            handleChannelOnClick={handleChannelOnClick} />
                     })}
+
                 </div>
                 :
-                loadingChannel ? <i className="fas fa-spinner fa-spin"></i> : <h1><i className="fas fa-exclamation-triangle"></i> Channels Not Found</h1>
+                status === 'loading' ? <i className="fas fa-spinner fa-spin"></i> : <h1><i className="fas fa-exclamation-triangle"></i> Channels Not Found</h1>
             }
         </div>
     );
