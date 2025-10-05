@@ -34,7 +34,6 @@ export const GetChannelsByIdAction = async (req: Request, res: Response) => {
         })
 
     } catch (error) {
-        console.log(error)
         const errorMessage = ErrorHandler.getMessage(error);
         return res.status(500).json({
             message: errorMessage,
@@ -73,7 +72,6 @@ export const GetDmChannel = async (req: Request, res: Response) => {
     }
     let errorMessage = '';
     const response = await models.Channel.getDmChannel(user_id, target, targetUserObject);
-    console.log(response);
     if (response.status) {
         if (response.channel) {
             return res.status(200).json({

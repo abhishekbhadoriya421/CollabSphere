@@ -1,9 +1,11 @@
 import { Request, Response } from "express"
 import { Op, Sequelize } from "sequelize";
 import models from "../models/CentralModel";
+import { getUserId } from "../utils/GetUserDetails";
 
 export const SearchUserAction = async (req: Request, res: Response) => {
     const { search, ou_id } = req.query;
+    const user_id = getUserId(req);
     if (!search || !ou_id) {
         return res.status(200).json({
             userList: [],
@@ -17,10 +19,15 @@ export const SearchUserAction = async (req: Request, res: Response) => {
             'email',
             ['id', 'user_id']
         ],
-        where: Sequelize.where(
-            Sequelize.fn('LOWER', Sequelize.col('username')),
-            { [Op.like]: `%${search}%` }
-        ),
+        where: {
+            [Op.and]: [
+                Sequelize.where(
+                    Sequelize.fn('LOWER', Sequelize.col('username')),
+                    { [Op.like]: `%${search}%` }
+                ),
+                { id: { [Op.ne]: user_id } }
+            ]
+        },
         include: [
             {
                 model: models.Memberships,
