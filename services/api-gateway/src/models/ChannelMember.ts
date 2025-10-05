@@ -6,7 +6,7 @@ class ChannelMember extends Model {
     public id!: number;
     public channel_id!: number;
     public user_id!: number;
-    public joined_at!: number;
+    public joined_at!: Date;
     public created_at!: Date;
     public updated_at!: Date;
 
@@ -57,7 +57,7 @@ ChannelMember.init({
         allowNull: false,
     },
     joined_at: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DATE,
         allowNull: true,
     },
     created_at: {

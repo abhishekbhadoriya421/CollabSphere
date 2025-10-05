@@ -14,6 +14,5 @@ export function getUserId(req: Request) {
         const userAuth = authenticate.Verify_Refresh_Token(refreshToken);
         return userAuth ? userAuth.user_id : false;
     }
-    console.log(userAuth);
     return userAuth.user_id;
 }

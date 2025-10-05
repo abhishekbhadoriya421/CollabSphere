@@ -2,7 +2,7 @@ import ErrorHandler from "../utils/ErrorHandler"
 import { Request, Response } from "express";
 import User from '../models/User';
 import models from "../models/CentralModel";
-
+import { getUserId } from '../utils/GetUserDetails';
 
 
 
@@ -42,4 +42,60 @@ export const GetChannelsByIdAction = async (req: Request, res: Response) => {
             channel: []
         })
     }
+}
+
+
+export const GetDmChannel = async (req: Request, res: Response) => {
+    const { target_user_id } = req.params;
+    if (!target_user_id) {
+        return res.status(404).json({
+            message: 'Target user id not found',
+            id: null,
+            type: 'none',
+            name: '',
+            created_by: null
+        });
+    }
+    const target = Number(target_user_id);
+    const user_id = getUserId(req);
+    const targetUserObject = await models.User.findOne({
+        where: { id: target }
+    });
+
+    if (!targetUserObject) {
+        return res.status(404).json({
+            message: 'Target user account not found',
+            id: null,
+            type: 'none',
+            name: '',
+            created_by: null
+        });
+    }
+    let errorMessage = '';
+    const response = await models.Channel.getDmChannel(user_id, target, targetUserObject);
+    console.log(response);
+    if (response.status) {
+        if (response.channel) {
+            return res.status(200).json({
+                message: 'Channel Created Successfully',
+                id: response.channel.id,
+                type: models.Channel.DM_CHANNEL,
+                name: response.channel.name,
+                created_by: response.channel.created_by
+            });
+        } else {
+            errorMessage = 'Something went wrong channel couldn\'t be created'
+        }
+
+    } else {
+        errorMessage = response.message
+    }
+    return res.status(404).json({
+        message: errorMessage,
+        id: null,
+        type: 'none',
+        name: '',
+        created_by: null
+    });
+
 }
