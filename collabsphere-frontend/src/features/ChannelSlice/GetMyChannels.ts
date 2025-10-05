@@ -6,29 +6,27 @@ import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/tool
  * channel_name =>  its depends on type of channel if its personal dm the user name if group the group name
  * created_by   =>  Who created the channel
  */
-interface channels {
+interface Channels {
     id: number | null,
     type: 'dm' | 'group' | 'channel' | 'none',
     name: string | '',
     created_by: number | null
 }
 interface InitailStateResponse {
-    loading: boolean | false
     message: string,
-    status: 'error' | 'success' | 'idel',
-    channels: Array<channels>
+    status: 'error' | 'success' | 'idel' | 'loading',
+    channels: Array<Channels>
 }
 
 
 const initialState: InitailStateResponse = {
-    loading: false,
     message: '',
     status: 'idel',
     channels: []
 }
 
 interface GetChannelApiResponse {
-    channel: Array<channels> | [],
+    channel: Array<Channels> | [],
     status: number,
     message: ''
 }
@@ -58,7 +56,6 @@ export const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetCha
                     status: 'error',
                     message: responseData.message,
                     channels: [],
-                    loading: false
                 })
             } else {
                 return {
@@ -71,7 +68,6 @@ export const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetCha
 
         } catch (error: unknown) {
             return rejectWithValue({
-                loading: false,
                 message: (error instanceof Error ? error.message : 'An unknown error occurred'),
                 status: 'error',
                 channels: []
@@ -80,9 +76,52 @@ export const GetAllChannelThunks = createAsyncThunk<InitailStateResponse, GetCha
     }
 )
 
+/**
+ * Make Get Target User Dm Channel  
+ */
+interface GetChannelByUserIdRequest {
+    accessToken: string | null;
+    target_user_id: number | null
+}
 
+interface GetChannelByUserResponse extends Channels {
+    message: string;
+}
+export const GetChannelByUserThunk = createAsyncThunk<GetChannelByUserResponse, GetChannelByUserIdRequest, { rejectValue: { message: string } }>(
+    'get-channel-by-userid',
+    async (req: GetChannelByUserIdRequest, { rejectWithValue }) => {
+        try {
+            const apiResponse: Response = await fetch(`/api/channel/get-dm-channel/${req.target_user_id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${req.accessToken}`
+                }
+            });
 
+            const responseData: GetChannelByUserResponse = await apiResponse.json();
 
+            if (apiResponse.ok) {
+                return {
+                    message: 'successfully fetch',
+                    created_by: responseData.created_by,
+                    id: responseData.id,
+                    name: responseData.name,
+                    type: responseData.type
+                }
+            } else {
+                return rejectWithValue({
+                    message: responseData.message
+                })
+            }
+
+        } catch (err: unknown) {
+            return rejectWithValue({
+                message: (err instanceof Error ? err.message : 'Unexpected Error')
+            })
+        }
+    }
+)
 
 interface AddChannelPayload {
     channel_id: number | null;
@@ -96,7 +135,7 @@ const GetMyChannelSlice = createSlice({
     initialState: initialState,
     reducers: {
         addChannel: (state, channelData: PayloadAction<AddChannelPayload>) => {
-            const newItem: channels = {
+            const newItem: Channels = {
                 name: channelData.payload.channel_name,
                 id: channelData.payload.channel_id,
                 type: channelData.payload.channel_type,
@@ -107,7 +146,6 @@ const GetMyChannelSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(GetAllChannelThunks.fulfilled, (state, action) => {
-            state.loading = false;
             state.message = action.payload.message;
             if (action.payload.status === 'success') {
                 state.status = 'success';
@@ -118,10 +156,9 @@ const GetMyChannelSlice = createSlice({
             }
         })
             .addCase(GetAllChannelThunks.pending, (state) => {
-                state.loading = true;
+                state.status = 'loading';
             })
             .addCase(GetAllChannelThunks.rejected, (state, action) => {
-                state.loading = false;
                 state.channels = [];
                 state.status = 'error';
                 if (action.payload?.message) {
@@ -129,6 +166,25 @@ const GetMyChannelSlice = createSlice({
                 } else {
                     state.message = 'Unexpected Error Occured'
                 }
+            })
+            .addCase(GetChannelByUserThunk.fulfilled, (state, action) => {
+                state.status = 'success';
+                state.message = action.payload.message;
+                if (action.payload) {
+                    state.channels.push({
+                        id: action.payload.id,
+                        name: action.payload.name,
+                        created_by: action.payload.created_by,
+                        type: action.payload.type
+                    })
+                }
+            })
+            .addCase(GetChannelByUserThunk.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(GetChannelByUserThunk.rejected, (state, action) => {
+                state.status = 'error';
+                state.message = action.payload?.message || 'Unexpected Error Occured';
             })
     }
 });
