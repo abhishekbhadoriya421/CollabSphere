@@ -53,7 +53,8 @@ class Memberships extends Model {
             const channel = await models.Channel.create({
                 org_id: organization.id,
                 name: organization.name + '_public',
-                type: 'channel'
+                type: 'channel',
+                created_by: user_id
             }, {
                 transaction: transactionObject
             });
