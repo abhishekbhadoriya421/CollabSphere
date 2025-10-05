@@ -1,6 +1,6 @@
 import RegistrationPage from "./components/auth/RegistrationPage";
 import LoginPage from "./components/auth/LoginPage";
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useEffect } from "react";
 import { RefreshPageThunk, GetValidTokenThunk } from "./features/AuthenticationSlice/LoginSlice";
 import { useAppDispatch, useAppSelector } from "./components/customHooks/reduxCustomHook";
@@ -38,7 +38,8 @@ function App() {
           <Route path="/auth/site/create" element={<RegistrationPage />} />
           <Route path="/auth/site/login" element={<LoginPage />} />
           <Route path="/" element={<ProtectedRoute />} >
-            <Route index path="dashboard" element={<Dashboard />} />
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="organization/dashboard/index" element={<OuDashboard />} />
           </Route>
         </Routes>

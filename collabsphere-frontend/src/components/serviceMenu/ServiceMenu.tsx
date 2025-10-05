@@ -70,12 +70,9 @@ export default function ServiceMenu({ channels, loadingChannel }: ServiceMenuPro
                         <h1 className="text-2xl font-bold">Channels</h1>
                         <p className="text-3xl font-bold cursor-pointer" title="Add Channel">+</p>
                     </div>
-                    <div className="space-y-2 p-4 bg-[#1f2937] rounded-2xl hover:bg-[#32435b]">
-                        {channels.map(channel => {
-                            return <ChannelItem key={channel.id ?? Math.random()} name={channel.name} type={channel.type} id={channel.id} handleChannelOnClick={handleChannelOnClick} />
-                        })}
-
-                    </div>
+                    {channels.map(channel => {
+                        return <ChannelItem key={channel.id ?? Math.random()} name={channel.name} type={channel.type} id={channel.id} handleChannelOnClick={handleChannelOnClick} />
+                    })}
                 </div>
                 :
                 loadingChannel ? <i className="fas fa-spinner fa-spin"></i> : <h1><i className="fas fa-exclamation-triangle"></i> Channels Not Found</h1>

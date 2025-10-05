@@ -7,10 +7,12 @@ import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/tool
  * created_by   =>  Who created the channel
  */
 interface Channels {
-    id: number | null,
-    type: 'dm' | 'group' | 'channel' | 'none',
-    name: string | '',
-    created_by: number | null
+    channel_id: number | null,
+    channel_type: 'dm' | 'group' | 'channel' | 'none',
+    channel_name: string | '',
+    channel_created_by: number | null,
+    member_user_id: number | null,
+    member_username: string | ''
 }
 interface InitailStateResponse {
     message: string,
@@ -100,14 +102,15 @@ export const GetChannelByUserThunk = createAsyncThunk<GetChannelByUserResponse, 
             });
 
             const responseData: GetChannelByUserResponse = await apiResponse.json();
-
             if (apiResponse.ok) {
                 return {
                     message: 'successfully fetch',
-                    created_by: responseData.created_by,
-                    id: responseData.id,
-                    name: responseData.name,
-                    type: responseData.type
+                    channel_created_by: responseData.channel_created_by,
+                    channel_id: responseData.channel_id,
+                    channel_name: responseData.channel_name,
+                    channel_type: responseData.channel_type,
+                    member_user_id: responseData.member_user_id,
+                    member_username: responseData.member_username
                 }
             } else {
                 return rejectWithValue({
@@ -136,10 +139,12 @@ const GetMyChannelSlice = createSlice({
     reducers: {
         addChannel: (state, channelData: PayloadAction<AddChannelPayload>) => {
             const newItem: Channels = {
-                name: channelData.payload.channel_name,
-                id: channelData.payload.channel_id,
-                type: channelData.payload.channel_type,
-                created_by: channelData.payload.created_by
+                channel_name: channelData.payload.channel_name,
+                channel_id: channelData.payload.channel_id,
+                channel_type: channelData.payload.channel_type,
+                channel_created_by: channelData.payload.created_by,
+                member_user_id: null,
+                member_username: ''
             };
             state.channels.push(newItem);
         }
@@ -172,10 +177,12 @@ const GetMyChannelSlice = createSlice({
                 state.message = action.payload.message;
                 if (action.payload) {
                     state.channels.push({
-                        id: action.payload.id,
-                        name: action.payload.name,
-                        created_by: action.payload.created_by,
-                        type: action.payload.type
+                        channel_id: action.payload.channel_id,
+                        channel_name: action.payload.channel_name,
+                        channel_created_by: action.payload.channel_created_by,
+                        channel_type: action.payload.channel_type,
+                        member_user_id: action.payload.member_user_id,
+                        member_username: action.payload.member_username
                     })
                 }
             })

@@ -27,6 +27,7 @@ export const GetChannelsByIdAction = async (req: Request, res: Response) => {
         }
 
         const channel = await models.ChannelMember.getChannelByUserId(user_id);
+        console.log(channel)
         return res.status(200).json({
             message: 'successfully fetch all channels',
             status: 200,

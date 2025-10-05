@@ -1,6 +1,7 @@
 import sequelize from "../config/sqldb";
-import { DataTypes, Model, } from "sequelize";
+import { DataTypes, Model, QueryTypes, } from "sequelize";
 import models from './CentralModel';
+import { Query } from "mysql2/typings/mysql/lib/protocol/sequences/Query";
 
 class ChannelMember extends Model {
     public id!: number;
@@ -24,14 +25,34 @@ class ChannelMember extends Model {
      * return channels created by user
      */
     public static async getChannelByUserId(user_id: number) {
-        const channelData = await models.Channel.findAll({
-            attributes: ['name', 'id', 'type'],
-            include: [
-                {
-                    model: models.ChannelMember, where: { user_id: user_id }, attributes: []
-                }
-            ]
-        })
+        const channelData = await sequelize.query(
+            `SELECT 
+                d.channel_id,
+                d.channel_name,
+                d.channel_type,
+                d.created_by,
+                cm.user_id AS member_user_id,
+                u.username AS member_username
+            FROM (
+                SELECT 
+                    c.id AS channel_id,
+                    c.name AS channel_name,
+                    c.type AS channel_type,
+                    c.created_by
+                FROM channels c
+                INNER JOIN channel_members cm 
+                    ON cm.channel_id = c.id
+                WHERE cm.user_id = $userId
+            ) AS d
+            INNER JOIN channel_members cm 
+                ON cm.channel_id = d.channel_id
+            INNER JOIN users u 
+                ON u.id = cm.user_id
+            WHERE cm.user_id <> $userId;
+            `, {
+            bind: { userId: user_id },
+            type: QueryTypes.SELECT,
+        });
         if (!channelData) {
             return null;
         } else {
