@@ -79,7 +79,11 @@ export const SearchUserThunk = createAsyncThunk<GetUserResponse, GetUserRequest,
 const SearchUserSlice = createSlice({
     name: 'search-user',
     initialState: initialState,
-    reducers: {},
+    reducers: {
+        setUserList: (state, action) => {
+            state.userList = action.payload
+        }
+    },
     extraReducers: (builder) => {
         builder.addCase(SearchUserThunk.fulfilled, (state, action) => {
             if (action.payload.status === 'success') {
@@ -103,5 +107,5 @@ const SearchUserSlice = createSlice({
     }
 })
 
-
+export const { setUserList } = SearchUserSlice.actions;
 export default SearchUserSlice.reducer;

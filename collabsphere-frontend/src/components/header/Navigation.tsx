@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAppSelector, useAppDispatch } from "../customHooks/reduxCustomHook";
 import { LogoutThunk } from "../../features/AuthenticationSlice/LoginSlice";
 import SettingsSidebar from "./SettingsSidebar";
-import { SearchUserThunk } from "../../features/SearchUserSlice/SearchUserSlice";
+import { SearchUserThunk, setUserList } from "../../features/SearchUserSlice/SearchUserSlice";
 import { GetChannelByUserThunk } from "../../features/ChannelSlice/GetMyChannelsSlice";
 import useGetUserCredentials from "../customHooks/getUserCredentials";
 
@@ -40,6 +40,7 @@ const Navigation = () => {
 
     const handleOnClickUser = (userId: number) => {
         dispatch(GetChannelByUserThunk({ accessToken: accessToken, target_user_id: userId }));
+        dispatch(setUserList([]));
     }
     return (
         <div className="">
