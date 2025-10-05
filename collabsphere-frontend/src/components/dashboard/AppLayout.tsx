@@ -3,11 +3,11 @@ import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook"
 import { Outlet, useNavigate } from "react-router-dom";
 import Navigation from "../header/Navigation";
 import ServiceMenu from "../serviceMenu/ServiceMenu";
-import { GetAllChannelThunks } from "../../features/ChannelSlice/GetMyChannels";
+import { GetAllChannelThunks } from "../../features/ChannelSlice/GetMyChannelsSlice";
 export default function AppLayout() {
     const navigate = useNavigate();
     const { accessToken, user } = useAppSelector((state) => state.LoginReducer);
-    const { loading, channels } = useAppSelector((state) => state.GetMyChannelReducer);
+    const { status, channels } = useAppSelector((state) => state.GetMyChannelReducer);
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -19,7 +19,7 @@ export default function AppLayout() {
     return (
         <div className="flex w-full h-full bg-[#ebecef]">
             <div className="w-[25%] h-screen bg-[#1f2937] text-white">
-                <ServiceMenu channels={channels} loadingChannel={loading} />
+                <ServiceMenu channels={channels} loadingChannel={status === 'loading'} />
             </div>
             <div className="w-[75%] h-full flex flex-col">
                 <Navigation />

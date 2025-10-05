@@ -4,7 +4,7 @@ import OrganizationManagement from "./CreateOrganization";
 import { toast } from 'react-toastify';
 import useGetUserCredentials from '../customHooks/getUserCredentials';
 import { GetOrganizationThunk, OrganizationCreateThunk } from '../../features/OrganizationSlice/OrganizationSlice';
-import { addChannel } from '../../features/ChannelSlice/GetMyChannels';
+import { addChannel } from '../../features/ChannelSlice/GetMyChannelsSlice';
 import LoadingPage from "../Loading/LoadingPage";
 import OrganizationDashboard from "./OrganizationDashboardPage";
 interface Organization {

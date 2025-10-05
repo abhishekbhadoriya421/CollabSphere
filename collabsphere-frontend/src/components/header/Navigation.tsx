@@ -3,6 +3,7 @@ import { useAppSelector, useAppDispatch } from "../customHooks/reduxCustomHook";
 import { LogoutThunk } from "../../features/AuthenticationSlice/LoginSlice";
 import SettingsSidebar from "./SettingsSidebar";
 import { SearchUserThunk } from "../../features/SearchUserSlice/SearchUserSlice";
+import { GetChannelByUserThunk } from "../../features/ChannelSlice/GetMyChannelsSlice";
 import useGetUserCredentials from "../customHooks/getUserCredentials";
 
 
@@ -38,7 +39,7 @@ const Navigation = () => {
     };
 
     const handleOnClickUser = (userId: number) => {
-        console.log(userId)
+        dispatch(GetChannelByUserThunk({ accessToken: accessToken, target_user_id: userId }));
     }
     return (
         <div className="">
