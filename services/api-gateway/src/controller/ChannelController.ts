@@ -76,10 +76,12 @@ export const GetDmChannel = async (req: Request, res: Response) => {
         if (response.channel) {
             return res.status(200).json({
                 message: 'Channel Created Successfully',
-                id: response.channel.id,
-                type: models.Channel.DM_CHANNEL,
-                name: response.channel.name,
-                created_by: response.channel.created_by
+                channel_id: response.channel.id,
+                channel_type: models.Channel.DM_CHANNEL,
+                channel_name: response.channel.name,
+                channel_created_by: response.channel.created_by,
+                member_user_id: targetUserObject.id,
+                member_username: targetUserObject.username
             });
         } else {
             errorMessage = 'Something went wrong channel couldn\'t be created'
