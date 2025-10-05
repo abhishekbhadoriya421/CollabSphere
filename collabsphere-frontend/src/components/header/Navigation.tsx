@@ -63,7 +63,6 @@ const Navigation = () => {
                         <ul className="absolute top-12 w-full bg-white border rounded-lg shadow-lg max-h-64 overflow-y-auto z-10 animate-fadeIn">
                             {status === "loading" ? (
                                 <li className="flex justify-center p-4">
-                                    {/* Prettier loading animation */}
                                     <div className="flex flex-col items-center">
                                         <svg
                                             className="animate-spin h-8 w-8 text-blue-500"
@@ -99,7 +98,6 @@ const Navigation = () => {
                                                 handleOnClickUser(user.user_id);
                                             }}
                                         >
-                                            {/* User Image */}
                                             <img
                                                 src={`https://img.freepik.com/free-vector/woman-with-braided-hair-illustration_1308-174675.jpg?semt=ais_hybrid&w=740&q=80`}
                                                 alt={user.username}
