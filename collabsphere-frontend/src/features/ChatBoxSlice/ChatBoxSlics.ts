@@ -24,3 +24,4 @@ const ChatBoxSlice = createSlice({
 });
 
 export const { getActiveChannel } = ChatBoxSlice.actions;
+export default ChatBoxSlice.reducer;

@@ -6,6 +6,7 @@ import GetMyChannelReducer from '../features/ChannelSlice/GetMyChannelsSlice';
 import OrganizationReducer from '../features/OrganizationSlice/OrganizationSlice';
 import UserReducer from '../features/OrganizationSlice/MembershipSlice';
 import SearchUserReducer from '../features/SearchUserSlice/SearchUserSlice';
+import ChatBoxReducer from '../features/ChatBoxSlice/ChatBoxSlics';
 
 export const store = configureStore({
     reducer: {
@@ -15,7 +16,8 @@ export const store = configureStore({
         GetMyChannelReducer: GetMyChannelReducer,
         OrganizationReducer: OrganizationReducer,
         UserReducer: UserReducer,
-        SearchUserReducer: SearchUserReducer
+        SearchUserReducer: SearchUserReducer,
+        ChatBoxReducer: ChatBoxReducer
     },
 });
 
