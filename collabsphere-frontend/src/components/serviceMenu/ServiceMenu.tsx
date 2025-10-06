@@ -6,7 +6,6 @@ import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook";
 import useGetUserCredentials from "../customHooks/getUserCredentials";
 import ChannelItem from "./ChannelItem";
 import { GetAllChannelThunks } from "../../features/ChannelSlice/GetMyChannelsSlice";
-import { useNavigate } from "react-router-dom";
 import { getActiveChannel } from "../../features/ChatBoxSlice/ChatBoxSlics";
 
 
@@ -18,7 +17,6 @@ interface Activity {
 }
 
 export default function ServiceMenu() {
-    const navigate = useNavigate();
 
     const { activities } = useAppSelector((state) => state.ActivityItemReducer);
     const { status, channels } = useAppSelector((state) => state.GetMyChannelReducer);
@@ -46,7 +44,6 @@ export default function ServiceMenu() {
 
     const handleChannelOnClick = (id: number, name: string) => {
         dispatch(getActiveChannel({ channel_id: id, channel_name: name }));
-        navigate('channel/chat');
     }
     return (
         <div className="w-full h-screen flex flex-col text-white">

@@ -8,7 +8,6 @@ import OuDashboard from "./components/organization/OuDashboard";
 import ProtectedRoute from "./components/dashboard/ProtectedRoute";
 import Dashboard from "./components/dashboard/Dashboad";
 import LoadingPage from "./components/Loading/LoadingPage";
-import ChatPage from "./components/chat/ChatWorkspace";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -42,7 +41,6 @@ function App() {
           <Route path="/" element={<ProtectedRoute />} >
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="channel/chat" element={<ChatPage />} />
             <Route path="organization/dashboard/index" element={<OuDashboard />} />
           </Route>
         </Routes>
