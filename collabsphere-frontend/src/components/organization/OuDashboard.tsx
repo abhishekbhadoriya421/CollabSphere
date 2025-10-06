@@ -7,6 +7,7 @@ import { GetOrganizationThunk, OrganizationCreateThunk } from '../../features/Or
 import { addChannel } from '../../features/ChannelSlice/GetMyChannelsSlice';
 import LoadingPage from "../Loading/LoadingPage";
 import OrganizationDashboard from "./OrganizationDashboardPage";
+import UpdateOrganizationModal from "./UpdateOrgModal";
 interface Organization {
     code: string;
     name: string;
@@ -19,6 +20,8 @@ export default function OuDashboard() {
         userMembership, userRole
     } = useAppSelector((state) => state.OrganizationReducer);
 
+    const [updateForm, setUpdateForm] = useState(false);
+
     const dispatch = useAppDispatch();
     const [formData, setFormData] = useState<Organization>({
         code: '',
@@ -30,7 +33,7 @@ export default function OuDashboard() {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: name === 'created_by' ? (value ? parseInt(value) : null) : value,
+            [name]: value,
         }));
     };
 
@@ -75,15 +78,24 @@ export default function OuDashboard() {
             dispatch(GetOrganizationThunk({ accessToken }))
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [GetOrganizationThunk, dispatch])
+    }, [GetOrganizationThunk, dispatch]);
+
+    /**
+     * Update Form If Ou Is Already Created
+     */
+    const handleUpdateOuForm = () => {
+        setUpdateForm(!updateForm)
+    }
+
     if (loading === true) {
         return <LoadingPage />
     }
     return (<div>
         {(userOrganization && userOrganization.id) ?
-            <OrganizationDashboard organization={userOrganization} membership={userMembership} user_role={userRole} />
+            <OrganizationDashboard handleUpdateOuForm={handleUpdateOuForm} organization={userOrganization} membership={userMembership} user_role={userRole} />
             :
             <OrganizationManagement loading={loading} formData={formData} handleChange={handleChange} handleSubmit={handleSubmit} />
         }
+        {updateForm ? <UpdateOrganizationModal loading={loading} formData={formData} handleChange={handleChange} handleSubmit={handleSubmit} handleUpdateOuForm={handleUpdateOuForm} /> : null}
     </div>)
 }
