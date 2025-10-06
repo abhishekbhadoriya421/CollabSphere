@@ -82,6 +82,51 @@ export const getOrganizationAction = async (req: Request, res: Response) => {
     });
 }
 
+/**
+ * Update Organization 
+ */
+export const updateOrganizationAction = async (req: Request, res: Response) => {
+    const { id, name, description } = req.body;
+    if (!id || !name) {
+        return res.status(400).json({
+            status: 400,
+            message: !id ? 'Invalid Request' : 'Name Cannot Be Empty'
+        });
+    }
+
+    /**
+     * Get Organization Object
+     */
+
+    try {
+        const OuObject = await models.Organization.findOne({
+            where: { id: id }
+        });
+
+        if (!OuObject) {
+            return res.status(404).json({
+                status: 404,
+                message: 'Desired Object not found'
+            });
+        }
+
+        await OuObject.update({
+            name: name,
+            description: description
+        });
+        return res.status(200).json({
+            status: 200,
+            message: 'Successfully Update (' + OuObject.code + ')'
+        })
+    }
+    catch (err: any) {
+        return res.status(500).json({
+            status: 404,
+            message: ErrorHandler.getMessage(err)
+        });
+    }
+}
+
 
 export const addUserAction = async (req: Request, res: Response) => {
     const { email, role } = req.body;
