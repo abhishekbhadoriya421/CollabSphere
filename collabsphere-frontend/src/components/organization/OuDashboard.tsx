@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook"
 import OrganizationManagement from "./CreateOrganization";
 import { toast } from 'react-toastify';
 import useGetUserCredentials from '../customHooks/getUserCredentials';
-import { GetOrganizationThunk, OrganizationCreateThunk } from '../../features/OrganizationSlice/OrganizationSlice';
+import { GetOrganizationThunk, OrganizationCreateThunk, UpdateOrganizationThunk } from '../../features/OrganizationSlice/OrganizationSlice';
 import { addChannel } from '../../features/ChannelSlice/GetMyChannelsSlice';
 import LoadingPage from "../Loading/LoadingPage";
 import OrganizationDashboard from "./OrganizationDashboardPage";
@@ -44,13 +44,20 @@ export default function OuDashboard() {
             return;
         }
         if (user && accessToken) {
-            dispatch(OrganizationCreateThunk({
-                user_id: user.id,
-                accessToken: accessToken,
-                code: formData.code,
-                name: formData.name,
-                description: formData.description
-            }))
+            if (!updateForm && !userOrganization) {
+
+                dispatch(OrganizationCreateThunk({
+                    user_id: user.id,
+                    accessToken: accessToken,
+                    code: formData.code,
+                    name: formData.name,
+                    description: formData.description
+                }))
+            }
+
+            if (updateForm && userOrganization) {
+                dispatch(UpdateOrganizationThunk({ id: userOrganization.id!, name: formData.name, description: formData.description, accessToken: accessToken }))
+            }
         }
     };
 
@@ -65,7 +72,7 @@ export default function OuDashboard() {
                         channel_name: userChannel.name,
                         channel_type: userChannel.type,
                         created_by: user?.id || null
-                    }))
+                    }));
                 }
                 toast.success(message);
             }
@@ -77,8 +84,15 @@ export default function OuDashboard() {
         if (accessToken && !userOrganization) {
             dispatch(GetOrganizationThunk({ accessToken }))
         }
+        if (userOrganization) {
+            setFormData({
+                code: userOrganization.code,
+                name: userOrganization.name,
+                description: userOrganization.description
+            });
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [GetOrganizationThunk, dispatch]);
+    }, [GetOrganizationThunk, dispatch, userOrganization]);
 
     /**
      * Update Form If Ou Is Already Created

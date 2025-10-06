@@ -30,6 +30,15 @@ const UpdateOrganizationModal: React.FC<UpdateOuProps> = ({ handleSubmit, handle
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
+                        <input
+                            type="hidden"
+                            name="name"
+                            id="name"
+                            value={formData.code}
+                            maxLength={195}
+                            className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                    </div>
+                    <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Name (Required)
                         </label>

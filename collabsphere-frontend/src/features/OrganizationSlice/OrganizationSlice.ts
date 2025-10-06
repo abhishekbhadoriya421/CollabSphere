@@ -134,6 +134,56 @@ export const OrganizationCreateThunk = createAsyncThunk<ResponseCreateOu, Reques
     }
 );
 
+interface ResponseUpdateOu {
+    status: 'success' | 'error',
+    message: string | ''
+}
+
+interface RequestUpdateOu {
+    id: number;
+    name: string;
+    description: string;
+    accessToken: string;
+}
+
+interface APIResponseUpdateOu {
+    status: number,
+    message: string | ''
+}
+export const UpdateOrganizationThunk = createAsyncThunk<ResponseUpdateOu, RequestUpdateOu, { rejectValue: ResponseUpdateOu }>(
+    'organization-update',
+    async (req: RequestUpdateOu, { rejectWithValue }) => {
+        try {
+            const apiResponse = await fetch('/api/organization/update-ou', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${req.accessToken}`
+                },
+                body: JSON.stringify({ id: req.id, name: req.name, description: req.description })
+            });
+
+            const responseData: APIResponseUpdateOu = await apiResponse.json();
+
+            if (apiResponse.ok) {
+                return {
+                    status: 'success',
+                    message: responseData.message
+                }
+            } else {
+                return rejectWithValue({
+                    status: 'error',
+                    message: responseData.message
+                })
+            }
+        } catch (err: unknown) {
+            return rejectWithValue({
+                status: 'error',
+                message: (err instanceof Error ? err.message : 'Unexpected Error Occured')
+            })
+        }
+    }
+);
 interface RequestGetOu {
     accessToken: string;
 }
@@ -212,6 +262,9 @@ const OrganizationSlice = createSlice({
         }
     },
     extraReducers: (builder) => {
+        /**
+         * Create Ou
+         */
         builder.addCase(OrganizationCreateThunk.fulfilled, (state, action) => {
             if (action.payload.status === 'success') {
                 const channelMembershipItem: ChannelMembershipObject = {
@@ -297,6 +350,23 @@ const OrganizationSlice = createSlice({
                 state.status = 'error';
                 state.userMembership = [];
                 state.userOrganization = null;
+            })
+
+            /**
+             * Update Ou
+             */
+            .addCase(UpdateOrganizationThunk.fulfilled, (state, action) => {
+                state.message = action.payload.message
+                state.status = action.payload.status;
+                state.loading = false;
+            })
+            .addCase(UpdateOrganizationThunk.pending, (state) => {
+                state.loading = true
+            })
+            .addCase(UpdateOrganizationThunk.rejected, (state, action) => {
+                state.loading = false;
+                state.message = action.payload?.message || 'Somthing when wrong! could not update ou';
+                state.status = 'error'
             })
     }
 
