@@ -7,7 +7,7 @@ import useGetUserCredentials from "../customHooks/getUserCredentials";
 import ChannelItem from "./ChannelItem";
 import { GetAllChannelThunks } from "../../features/ChannelSlice/GetMyChannelsSlice";
 import { useNavigate } from "react-router-dom";
-
+import { getActiveChannel } from "../../features/ChatBoxSlice/ChatBoxSlics";
 
 
 interface Activity {
@@ -44,7 +44,8 @@ export default function ServiceMenu() {
         dispatch(ChangeActivity(index));
     }
 
-    const handleChannelOnClick = (id: number | null) => {
+    const handleChannelOnClick = (id: number, name: string) => {
+        dispatch(getActiveChannel({ channel_id: id, channel_name: name }));
         navigate('channel/chat');
     }
     return (
@@ -81,7 +82,7 @@ export default function ServiceMenu() {
                                 (channel.channel_type !== 'dm') ? channel.channel_name : channel.member_username
                             }
                             type={channel.channel_type}
-                            id={channel.channel_id}
+                            id={channel.channel_id!}
                             handleChannelOnClick={handleChannelOnClick} />
                     })}
 
