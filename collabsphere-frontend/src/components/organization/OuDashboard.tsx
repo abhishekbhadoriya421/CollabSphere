@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook"
 import OrganizationManagement from "./CreateOrganization";
 import { toast } from 'react-toastify';
 import useGetUserCredentials from '../customHooks/getUserCredentials';
-import { GetOrganizationThunk, OrganizationCreateThunk, UpdateOrganizationThunk } from '../../features/OrganizationSlice/OrganizationSlice';
+import { GetOrganizationThunk, OrganizationCreateThunk, UpdateOrganizationThunk, updateOu } from '../../features/OrganizationSlice/OrganizationSlice';
 import { addChannel } from '../../features/ChannelSlice/GetMyChannelsSlice';
 import LoadingPage from "../Loading/LoadingPage";
 import OrganizationDashboard from "./OrganizationDashboardPage";
@@ -17,7 +17,7 @@ interface Organization {
 export default function OuDashboard() {
     const { accessToken, user } = useGetUserCredentials();
     const { status, message, loading, userChannel, userOrganization,
-        userMembership, userRole
+        userMembership, userRole, updateOuStatus
     } = useAppSelector((state) => state.OrganizationReducer);
 
     const [updateForm, setUpdateForm] = useState(false);
@@ -62,6 +62,22 @@ export default function OuDashboard() {
     };
 
     useEffect(() => {
+        if (updateOuStatus === 'success') {
+            dispatch(updateOu({ name: formData.name, description: formData.description }))
+            setFormData({
+                code: '',
+                name: '',
+                description: ''
+            });
+            setUpdateForm(false);
+            toast.success(message);
+        } else if (updateOuStatus === 'error') {
+            toast.error(message)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dispatch, updateOuStatus, updateOu])
+
+    useEffect(() => {
         if (!loading && message && status != 'idle') {
             if (status == 'error') {
                 toast.error(message);
@@ -73,8 +89,8 @@ export default function OuDashboard() {
                         channel_type: userChannel.type,
                         created_by: user?.id || null
                     }));
+                    toast.success(message);
                 }
-                toast.success(message);
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps

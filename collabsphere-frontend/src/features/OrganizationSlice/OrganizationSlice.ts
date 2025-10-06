@@ -41,6 +41,7 @@ interface InitailState {
     userChannel: ChannelObejct | null;
     userChannelMembership: ChannelMembershipObject | null;
     userRole: 'Admin' | 'Member' | 'Guest';
+    updateOuStatus: 'idle' | 'error' | 'success' | 'loading';
 }
 
 const initailState: InitailState = {
@@ -51,7 +52,8 @@ const initailState: InitailState = {
     userMembership: [],
     userChannel: null,
     userChannelMembership: null,
-    userRole: 'Guest'
+    userRole: 'Guest',
+    updateOuStatus: 'idle'
 }
 
 interface RequestCreateOu {
@@ -259,6 +261,12 @@ const OrganizationSlice = createSlice({
             if (action.payload) {
                 state.userMembership = state.userMembership.filter(member => member?.user_id != action.payload);
             }
+        },
+        updateOu: (state, action) => {
+            if (state.userOrganization) {
+                state.userOrganization.name = action.payload.name
+                state.userOrganization.description = action.payload.description
+            }
         }
     },
     extraReducers: (builder) => {
@@ -357,20 +365,18 @@ const OrganizationSlice = createSlice({
              */
             .addCase(UpdateOrganizationThunk.fulfilled, (state, action) => {
                 state.message = action.payload.message
-                state.status = action.payload.status;
-                state.loading = false;
+                state.updateOuStatus = 'success';
             })
             .addCase(UpdateOrganizationThunk.pending, (state) => {
-                state.loading = true
+                state.updateOuStatus = 'loading';
             })
             .addCase(UpdateOrganizationThunk.rejected, (state, action) => {
-                state.loading = false;
                 state.message = action.payload?.message || 'Somthing when wrong! could not update ou';
-                state.status = 'error'
+                state.updateOuStatus = 'error';
             })
     }
 
 });
 
-export const { addUser, deleteUser } = OrganizationSlice.actions;
+export const { addUser, deleteUser, updateOu } = OrganizationSlice.actions;
 export default OrganizationSlice.reducer;
