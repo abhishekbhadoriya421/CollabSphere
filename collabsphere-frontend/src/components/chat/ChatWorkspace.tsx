@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { Message as MessageType } from './types';
 import Message from './Message';
+import { connectSocket, disconnectSocket } from '../../features/ChatBoxSlice/SocketConnect';
+import { useAppDispatch } from '../customHooks/reduxCustomHook';
 
 const ChatWorkspace: React.FC = () => {
+    const dispatch = useAppDispatch();
     const [messages, setMessages] = useState<MessageType[]>([
         {
             id: '1',
@@ -41,10 +44,20 @@ const ChatWorkspace: React.FC = () => {
             isCurrentUser: false
         }
     ]);
-
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        /**
+         * Connect When Mount
+         */
+        dispatch(connectSocket());
+        /**
+         * Clean up side effect when unmount
+         */
+        return () => { dispatch(disconnectSocket()); }
+    }, [dispatch])
 
     // scroll to bottom when messages change
     const scrollToBottom = () => {

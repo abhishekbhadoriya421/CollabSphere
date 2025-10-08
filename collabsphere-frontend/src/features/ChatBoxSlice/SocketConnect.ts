@@ -15,10 +15,12 @@ const SocketConnectSlice = createSlice({
     initialState: initialState,
     reducers: {
         connectSocket: (state) => {
+            console.log('Connect Call');
             if (!state.isConnected) {
                 socket.connect();
                 state.isConnected = true;
             }
+            console.log(state.isConnected + " Connnected State");
         },
         disconnectSocket: (state) => {
             if (state.isConnected) {
