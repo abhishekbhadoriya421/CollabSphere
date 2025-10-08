@@ -7,7 +7,7 @@ import OrganizationReducer from '../features/OrganizationSlice/OrganizationSlice
 import UserReducer from '../features/OrganizationSlice/MembershipSlice';
 import SearchUserReducer from '../features/SearchUserSlice/SearchUserSlice';
 import ChatBoxReducer from '../features/ChatBoxSlice/ChatBoxSlics';
-
+import SocketConnectReducer from '../features/ChatBoxSlice/SocketConnect';
 export const store = configureStore({
     reducer: {
         RegistrationReducer: RegistrationReducer,
@@ -17,7 +17,8 @@ export const store = configureStore({
         OrganizationReducer: OrganizationReducer,
         UserReducer: UserReducer,
         SearchUserReducer: SearchUserReducer,
-        ChatBoxReducer: ChatBoxReducer
+        ChatBoxReducer: ChatBoxReducer,
+        SocketConnectReducer: SocketConnectReducer
     },
 });
 
