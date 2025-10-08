@@ -9,7 +9,7 @@ COPY . .
 
 RUN npm run build
 
-EXPOSE 5000
+EXPOSE 4000
 
-ENV PORT = 5000
+ENV PORT = 4000
 CMD ["npm", "start"]
