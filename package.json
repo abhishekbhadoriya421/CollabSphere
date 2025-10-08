@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/abhishekbhadoriya421/CollabSphere/issues"
   },
-  "homepage": "https://github.com/abhishekbhadoriya421/CollabSphere#readme"
+  "homepage": "https://github.com/abhishekbhadoriya421/CollabSphere#readme",
+  "devDependencies": {
+    "dotenv": "^17.2.3"
+  }
 }

@@ -4,7 +4,7 @@ import Message from './Message';
 import { connectSocket, disconnectSocket } from '../../features/ChatBoxSlice/SocketConnect';
 import { useAppDispatch } from '../customHooks/reduxCustomHook';
 import useGetUserCredentials from '../customHooks/getUserCredentials';
-import { getSocket } from '../../utils/socket';
+// import { getSocket } from '../../utils/socket';
 const ChatWorkspace: React.FC = () => {
     const dispatch = useAppDispatch();
     const [messages, setMessages] = useState<MessageType[]>([

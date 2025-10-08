@@ -31,6 +31,23 @@ const createSocket = (accessToken: string) => {
         }
     });
 
+
+    socket.on('connect_error', (error) => {
+        console.error('Connection error:', error.message);
+
+        if (error.message.includes('Authentication error')) {
+            // Token is invalid
+            console.error('Authentication failed - redirecting to login');
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
+    });
+
+    socket.on('connect', () => {
+        console.log('✅ Successfully authenticated with socket server');
+    });
+
+
     return socket;
 }
 
