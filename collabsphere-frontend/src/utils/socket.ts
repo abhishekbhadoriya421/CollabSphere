@@ -22,12 +22,7 @@ interface ClientToServerEvent {
 }
 
 let socket: Socket<ServerToClientEvent, ClientToServerEvent> | null = null;
-// export const socket: Socket<ServerToClientEvent, ClientToServerEvent> = io('http://localhost:4000', {
-//     autoConnect: false,
-//     transports: ["websocket"],
-// });
-
-export const createSocket = (accessToken: string) => {
+const createSocket = (accessToken: string) => {
     socket = io('http://localhost:4000', {
         autoConnect: false,
         transports: ['websocket'],
@@ -36,6 +31,14 @@ export const createSocket = (accessToken: string) => {
         }
     });
 
+    return socket;
+}
+
+export const createConnectSocket = (accessToken: string) => {
+    if (!socket) {
+        socket = createSocket(accessToken);
+    }
+    socket.connect();
     return socket;
 }
 

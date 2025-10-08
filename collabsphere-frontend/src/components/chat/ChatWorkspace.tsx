@@ -4,6 +4,7 @@ import Message from './Message';
 import { connectSocket, disconnectSocket } from '../../features/ChatBoxSlice/SocketConnect';
 import { useAppDispatch } from '../customHooks/reduxCustomHook';
 import useGetUserCredentials from '../customHooks/getUserCredentials';
+import { getSocket } from '../../utils/socket';
 const ChatWorkspace: React.FC = () => {
     const dispatch = useAppDispatch();
     const [messages, setMessages] = useState<MessageType[]>([
@@ -57,6 +58,7 @@ const ChatWorkspace: React.FC = () => {
          * Clean up side effect when unmount
          */
         return () => { dispatch(disconnectSocket()); }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch])
 
     // scroll to bottom when messages change
