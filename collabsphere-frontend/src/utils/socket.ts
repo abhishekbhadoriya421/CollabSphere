@@ -21,8 +21,23 @@ interface ClientToServerEvent {
     send_message: (data: UserReceiveMessage) => void
 }
 
+let socket: Socket<ServerToClientEvent, ClientToServerEvent> | null = null;
+// export const socket: Socket<ServerToClientEvent, ClientToServerEvent> = io('http://localhost:4000', {
+//     autoConnect: false,
+//     transports: ["websocket"],
+// });
 
-export const socket: Socket<ServerToClientEvent, ClientToServerEvent> = io('http://localhost:4000', {
-    autoConnect: false,
-    transports: ["websocket"],
-});
+export const createSocket = (accessToken: string) => {
+    socket = io('http://localhost:4000', {
+        autoConnect: false,
+        transports: ['websocket'],
+        auth: {
+            accessToken
+        }
+    });
+
+    return socket;
+}
+
+
+export const getSocket = (): Socket<ServerToClientEvent, ClientToServerEvent> | null => socket;

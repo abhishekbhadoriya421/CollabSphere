@@ -3,7 +3,7 @@ import type { Message as MessageType } from './types';
 import Message from './Message';
 import { connectSocket, disconnectSocket } from '../../features/ChatBoxSlice/SocketConnect';
 import { useAppDispatch } from '../customHooks/reduxCustomHook';
-
+import useGetUserCredentials from '../customHooks/getUserCredentials';
 const ChatWorkspace: React.FC = () => {
     const dispatch = useAppDispatch();
     const [messages, setMessages] = useState<MessageType[]>([
@@ -47,12 +47,12 @@ const ChatWorkspace: React.FC = () => {
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
-
+    const { accessToken } = useGetUserCredentials();
     useEffect(() => {
         /**
          * Connect When Mount
          */
-        dispatch(connectSocket());
+        dispatch(connectSocket({ accessToken: accessToken }));
         /**
          * Clean up side effect when unmount
          */
