@@ -1,41 +1,25 @@
+import path = require('path');
+import dotenv from 'dotenv';
+dotenv.config({ path: path.join(__dirname + '../../../../.env') });
 import { createServer } from "http";
 import { Server } from "socket.io";
 const httpServer = createServer();
 const io = new Server(httpServer, {
     cleanupEmptyChildNamespaces: true,
     cors: {
-        origin: ["http://localhost:5173"],
-        // allowedHeaders: ["authorization"],
-        // credentials: true,
+        origin: [process.env.SOCKET_CROS_ORIGIN!],
+        allowedHeaders: ["authorization"],
+        credentials: true,
     },
 
 });
-
-
-// io.use((socket, next) => {
-//   const token = socket.handshake.auth?.token;
-//   if (!token) {
-//     console.log("❌ No token provided");
-//     return next(new Error("Authentication error"));
-//   }
-
-//   try {
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-//     socket.data.user = decoded;
-//     console.log("✅ Authenticated user:", decoded.user_id);
-//     next();
-//   } catch (err) {
-//     console.log("❌ Invalid token");
-//     next(new Error("Authentication error"));
-//   }
-// });
 
 
 io.on('connection', (socket) => {
     console.log('Connect to socket id: ' + socket.handshake.auth.accessToken);
 
     socket.on('join_channel', (data) => {
-        console.log('This is Joind')
+        console.log('This is Joined')
         console.log(data);
     })
 
@@ -47,7 +31,7 @@ io.on('connection', (socket) => {
     });
 })
 
-const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
+const PORT = process.env.SOCKET_PORT ? Number(process.env.SOCKET_PORT) : 4000;
 
 httpServer.listen(PORT, () => {
     console.log(`Scoket Gateway is running on http://localhost:${PORT}`);
