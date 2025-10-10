@@ -1,90 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { Message as MessageType } from './types';
 import Message from './Message';
-import { connectSocket, disconnectSocket } from '../../features/ChatBoxSlice/SocketConnect';
-import { useAppDispatch } from '../customHooks/reduxCustomHook';
-import useGetUserCredentials from '../customHooks/getUserCredentials';
-// import { getSocket } from '../../utils/socket';
 const ChatWorkspace: React.FC = () => {
-    const dispatch = useAppDispatch();
-    const [messages, setMessages] = useState<MessageType[]>([
-        {
-            id: '1',
-            userInitials: 'SW',
-            userName: 'Sarah Wilson',
-            content: 'Hey team! Welcome to our new Collaborers workspace. Let\'s introduce ourselves!',
-            timestamp: '10:24 AM',
-            time: '10:24 AM',
-            isCurrentUser: false
-        },
-        {
-            id: '2',
-            userInitials: 'MC',
-            userName: 'Michael Chen',
-            content: 'Hi everyone! I\'m Michael, the lead developer on the project. Excited to be working with you all!',
-            timestamp: '10:26 AM',
-            time: '10:26 AM',
-            isCurrentUser: false
-        },
-        {
-            id: '3',
-            userInitials: 'JR',
-            userName: 'John Rodriguez',
-            content: 'Hello! I\'m John, the product manager. Looking forward to collaborating with everyone here!',
-            timestamp: '10:28 AM',
-            time: '10:28 AM',
-            isCurrentUser: false
-        },
-        {
-            id: '4',
-            userInitials: 'ER',
-            userName: 'Emma Rodriguez',
-            content: 'Hi team! I\'m Emma, the UX designer. I\'ve added some initial mockups to the design channel for feedback.',
-            timestamp: '10:30 AM',
-            time: '10:30 AM',
-            isCurrentUser: false
-        }
-    ]);
+    const [messages, setMessages] = useState<MessageType[]>() || []
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
-    const { accessToken } = useGetUserCredentials();
-    useEffect(() => {
-        /**
-         * Connect When Mount
-         */
-        dispatch(connectSocket({ accessToken: accessToken }));
-        /**
-         * Clean up side effect when unmount
-         */
-        return () => { dispatch(disconnectSocket()); }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dispatch])
 
-    // scroll to bottom when messages change
-    const scrollToBottom = () => {
+    const scrollToBottom = () => {    // scroll to bottom when messages change
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    useEffect(() => {
+    useEffect(() => { // scroll to bottom when messages change
         scrollToBottom();
     }, [messages]);
 
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
-        if (newMessage.trim()) {
-            const newMsg: MessageType = {
-                id: Date.now().toString(),
-                userInitials: 'ME',
-                userName: 'You',
-                content: newMessage,
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                isCurrentUser: true
-            };
-            setMessages([...messages, newMsg]);
-            setNewMessage('');
-        }
+        setMessages([]);
     };
 
     return (
@@ -144,7 +77,7 @@ const ChatWorkspace: React.FC = () => {
                     className="flex-1 overflow-y-auto p-6"
                 >
                     <div className="max-w-4xl mx-auto">
-                        {messages.map((message) => (
+                        {messages && messages.map((message) => (
                             <Message key={message.id} message={message} />
                         ))}
                         <div ref={messagesEndRef} />

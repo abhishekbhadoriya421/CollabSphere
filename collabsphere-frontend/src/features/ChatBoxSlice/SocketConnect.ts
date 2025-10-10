@@ -16,12 +16,19 @@ const SocketConnectSlice = createSlice({
     name: 'socket/connect',
     initialState: initialState,
     reducers: {
-        connectSocket: (_, action: PayloadAction<PayloadData>) => {
+        connectSocket: (state, action: PayloadAction<PayloadData>) => {
+            if (state.isConnected) {
+                console.log('Socket is already connected');
+                return;
+            }
+            console.log('Connecting to socket...');
             if (action.payload.accessToken) {
                 createConnectSocket(action.payload.accessToken);
             }
+            state.isConnected = true;
         },
         disconnectSocket: (state) => {
+            console.log('Disconnecting socket...');
             if (state.isConnected) {
                 const socket = getSocket();
                 if (socket) {
