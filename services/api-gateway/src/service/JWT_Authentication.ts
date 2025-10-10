@@ -17,8 +17,8 @@ export class Authentication {
     private static instance: Authentication;
 
     private constructor() {
-        this.accessTokenSecret = process.env.JWT_SECRET || '45dfg34fguhefgyheftreq@#$%@w#$@edzsab&4#%^%$@';
-        this.refreshTokenSecret = process.env.JWT_REFRESH_SECRET || '47#EDCGT#Wsdfgndsjfcgj@#$%@w#$@edzsab&4#%^%$@';
+        this.accessTokenSecret = process.env.JWT_SECRET!;
+        this.refreshTokenSecret = process.env.JWT_REFRESH_SECRET!;
     }
 
     public static getInstance(): Authentication {

@@ -284,3 +284,39 @@ export const LogoutAction = async (req: Request, res: Response) => {
     }
 
 }
+
+
+export const ValidateAccessTokenAction = async (req: Request, res: Response) => {
+    try {
+        const { accessToken } = req.body;
+        if (!accessToken) {
+            return res.status(400).json({
+                status: 400,
+                message: 'Access token is required',
+                user_id: null
+            });
+        }
+
+        const authenticate = Authentication.getInstance();
+        const authData = authenticate.Verify_Access_Token(accessToken);
+        if (!authData) {
+            return res.status(401).json({
+                status: 401,
+                message: 'Invalid or expired access token',
+                user_id: null
+            });
+        }
+        return res.status(200).json({
+            status: 200,
+            message: 'Access token is valid',
+            user_id: authData.user_id
+        });
+    }
+    catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: ErrorHandler.getMessage(error),
+            user_id: null
+        })
+    }
+}

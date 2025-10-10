@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { Message as MessageType } from './types';
 import Message from './Message';
+// import { getSocket  } from '../../utils/socket';
+// import { useAppSelector } from '../customHooks/reduxCustomHook';
 const ChatWorkspace: React.FC = () => {
     const [messages, setMessages] = useState<MessageType[]>() || []
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
+    // const { channel_id } = useAppSelector(state => state.ChatBoxReducer);
 
     const scrollToBottom = () => {    // scroll to bottom when messages change
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

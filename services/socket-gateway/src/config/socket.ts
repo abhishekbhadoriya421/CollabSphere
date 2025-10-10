@@ -1,6 +1,8 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
-export const httpServer = createServer();
+import express from "express";
+const app = express();
+const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
     cleanupEmptyChildNamespaces: true,
@@ -11,5 +13,5 @@ const io = new Server(httpServer, {
     },
 
 });
-
+export { app, httpServer };
 export default io;
