@@ -1,11 +1,14 @@
+import path = require('path');
 import dotenv from 'dotenv';
+dotenv.config({ path: path.join(__dirname + '../../../../.env') });
 import express from 'express';
 import cors from 'cors';
 import router from './router/index';
 import db from './config/mongodb';
 import cookieParser from "cookie-parser";
-import path = require('path');
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+
+
+// join root env file
 
 const app = express();
 /**
