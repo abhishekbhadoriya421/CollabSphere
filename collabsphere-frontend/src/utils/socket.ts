@@ -14,7 +14,7 @@ interface UserReceiveMessage {
 interface ServerToClientEvent {
     receive_message: (data: UserReceiveMessage) => void;
     user_typing: (data: UserTyping) => void;
-    user_joined: (data: { userId: string, channel_id: number }) => void;
+    user_joined: (data: { user_Id: number }) => void;
 }
 
 interface ClientToServerEvent {

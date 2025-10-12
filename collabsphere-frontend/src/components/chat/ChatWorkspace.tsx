@@ -15,7 +15,7 @@ const ChatWorkspace: React.FC = () => {
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const { accessToken, user } = useGetUserCredentials();
     const { channel_id, status, messagesBox, channel_name, channel_type } = useAppSelector(state => state.ChatBoxReducer);
-
+    const socket = getSocket();
     const scrollToBottom = () => {    // scroll to bottom when messages change
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -25,11 +25,13 @@ const ChatWorkspace: React.FC = () => {
     }, [messagesBox]);
 
     useEffect(() => {
-        const socket = getSocket();
         if (socket) {
             socket.emit('join_channel', { channel_id: channel_id! });
+            socket.on('user_joined', (data) => {
+                console.log(data);
+            });
         }
-    }, [channel_id])
+    }, [channel_id, socket])
 
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();

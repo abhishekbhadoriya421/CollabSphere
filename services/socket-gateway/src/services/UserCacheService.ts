@@ -1,6 +1,4 @@
 import redisClient, { connectRedis } from "@shared/redis-config/redisconfig";
-import { stringify } from "querystring";
-import { json } from "stream/consumers";
 
 interface CachedUser { // User data format will be cached
     userId: number;
@@ -14,8 +12,8 @@ interface CachedUser { // User data format will be cached
  */
 export default class UserCacheService {
     private readonly USER_PREFIX = 'user:';
-    private readonly CHANNEL_PREFIX = 'channel:';
     private readonly ONLINE_USERS_KEY = 'online_users';
+    protected redisClientObject = redisClient;
     /**
      * Cache user data when user connection stablished
      */
@@ -26,7 +24,6 @@ export default class UserCacheService {
     }
 
     async cacheUser(user_id: number, socket_id: string, joined_at: number): Promise<void> {
-        console.log(joined_at + " Joined at")
         const userKey = `${this.USER_PREFIX}${user_id}`;
 
         const userCache: CachedUser = {
@@ -37,7 +34,6 @@ export default class UserCacheService {
         }
         redisClient.setEx(userKey, 24 * 60 * 60, JSON.stringify(userCache));
         redisClient.sAdd(this.ONLINE_USERS_KEY, user_id.toString());
-
         console.log('User Cache Saved');
     }
 
