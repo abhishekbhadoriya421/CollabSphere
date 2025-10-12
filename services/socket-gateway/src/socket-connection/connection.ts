@@ -1,7 +1,6 @@
 import io from '../config/socket';
 import axios from 'axios';
 import Jwt, { JwtPayload } from "jsonwebtoken";
-import { joinChannel } from '../event-handler/chat/chat-event-handler';
 
 /**
  * Middleware to authenticate and authorize socket connections using JWT.
@@ -16,7 +15,7 @@ io.use(async (socket, next) => {
         return next(new Error("Authentication error: Access token is required"));
     }
     try {
-        const decoded = Jwt.verify(accessToken, 'abhi' as string) as JwtPayload;
+        const decoded = Jwt.verify(accessToken, process.env.JWT_SECRET as string) as JwtPayload;
         socket.data.user_id = decoded.user_id;
         return next();
     } catch (jwtError) {
@@ -38,9 +37,6 @@ io.use(async (socket, next) => {
 
 io.on('connection', (socket) => {
     console.log('Connect to socket id: ' + socket.handshake.auth.accessToken);
-    socket.on('join_channel', (data) => {
-        joinChannel(socket, data.channel_id);
-    })
 
     socket.on("close", (reason) => {
         console.log("❌ Connection closed:", socket.id, "Reason:", reason);
