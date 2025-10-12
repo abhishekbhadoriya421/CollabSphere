@@ -1,4 +1,5 @@
 {
+    "extends": "../../tsconfig.json",
     "compilerOptions": {
         "target": "ES2021", // JS version to output
         "module": "commonjs", // Node.js module system
@@ -7,5 +8,13 @@
         "strict": true, // Enable strict type checking
         "esModuleInterop": true, // Allows `import express from 'express'`
         "skipLibCheck": true // Skip checking type definitions of dependencies
-    }
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "references": [
+        {
+            "path": "../../shared-services"
+        }
+    ]
 }

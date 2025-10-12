@@ -6,7 +6,6 @@ import cors from 'cors';
 import router from './router/index';
 import db from './config/mongodb';
 import cookieParser from "cookie-parser";
-import { or } from 'sequelize';
 
 
 // join root env file

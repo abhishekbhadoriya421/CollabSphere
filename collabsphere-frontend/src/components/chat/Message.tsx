@@ -3,31 +3,34 @@ import type { Message as MessageType } from './types';
 
 interface MessageProps {
     message: MessageType;
+    current_user_id: number;
+    channel_type: 'dm' | 'group' | 'channel' | 'none' | undefined;
 }
 
-const Message: React.FC<MessageProps> = ({ message }) => {
-    const isCurrentUser = message.isCurrentUser;
+const Message: React.FC<MessageProps> = ({ message, current_user_id, channel_type }) => {
+    const isCurrentUser = (message.senderId === current_user_id);
 
     return (
         <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-6`}>
             <div className={`flex ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'} max-w-2xl w-full`}>
                 {/* User Avatar */}
-                <div className={`flex-shrink-0 ${isCurrentUser ? 'ml-4' : 'mr-4'}`}>
+                {channel_type !== 'dm' && <div className={`flex-shrink-0 ${isCurrentUser ? 'ml-4' : 'mr-4'}`}>
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm ${isCurrentUser ? 'bg-green-500' : 'bg-purple-500'
                         }`}>
-                        {message.userInitials}
+                        this
                     </div>
                 </div>
+                }
 
                 {/* Message Content */}
                 <div className="flex-1">
                     <div className={`flex items-baseline ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-1`}>
-                        {!isCurrentUser && (
-                            <span className="font-semibold text-gray-900 mr-2">{message.userName}</span>
+                        {channel_type !== 'dm' && !isCurrentUser && (
+                            <span className="font-semibold text-gray-900 mr-2">Abhishek</span>
                         )}
-                        <span className="text-xs text-gray-500">{message.timestamp}</span>
-                        {isCurrentUser && (
-                            <span className="font-semibold text-gray-900 ml-2">{message.userName}</span>
+                        <span className="text-xs text-gray-500">{message.createdAt?.toDateString()}</span>
+                        {channel_type !== 'dm' && isCurrentUser && (
+                            <span className="font-semibold text-gray-900 ml-2">KA</span>
                         )}
                     </div>
 
@@ -36,7 +39,7 @@ const Message: React.FC<MessageProps> = ({ message }) => {
                             ? 'bg-purple-600 text-white'
                             : 'bg-gray-100 text-gray-800'
                             }`}>
-                            {message.content}
+                            {message.text}
                         </p>
                     </div>
                 </div>

@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { Message as MessageType } from './types';
+
 import Message from './Message';
 import TeamWorkspace from './TeamWorkspace';
-// import { getSocket  } from '../../utils/socket';
+import { getSocket } from '../../utils/socket';
 import { useAppSelector, useAppDispatch } from '../customHooks/reduxCustomHook';
 import LoadingPage from '../Loading/LoadingPage';
 import useGetUserCredentials from '../customHooks/getUserCredentials';
@@ -10,11 +10,10 @@ import { getAllMessagesByChannelId } from '../../features/ChatBoxSlice/ChatBoxSl
 
 const ChatWorkspace: React.FC = () => {
     const dispatch = useAppDispatch();
-    const [messages, setMessages] = useState<MessageType[]>() || []
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
-    const { accessToken } = useGetUserCredentials();
+    const { accessToken, user } = useGetUserCredentials();
     const { channel_id, status, messagesBox, channel_name, channel_type } = useAppSelector(state => state.ChatBoxReducer);
 
     const scrollToBottom = () => {    // scroll to bottom when messages change
@@ -23,11 +22,24 @@ const ChatWorkspace: React.FC = () => {
 
     useEffect(() => { // scroll to bottom when messages change
         scrollToBottom();
-    }, [messages]);
+    }, [messagesBox]);
+
+    useEffect(() => {
+        const socket = getSocket();
+        if (socket) {
+            socket.emit('join_channel', { channel_id: channel_id! });
+        }
+    }, [channel_id])
 
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
-        setMessages([]);
+        const socket = getSocket();
+        if (socket && user) { // User has no probability of having null value
+            socket.emit('send_message', { channel_id: channel_id!, content: newMessage, sender_id: user.id!, temp_id: Math.random() + Date.now() as number }); // generate temporary message id to store
+            socket.on('receive_message', (data) => {
+                console.log(data)
+            })
+        }
     };
 
     useEffect(() => {
@@ -37,14 +49,13 @@ const ChatWorkspace: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [status, channel_id])
 
-    if (status === 'loading') {
+    if (status === 'loading' && user) {
         return (<LoadingPage />)
     } else if (status === 'error') {
         return (<div className="h-[calc(100vh-4.8rem)] flex items-center justify-center">
             <h1 className="text-2xl font-bold text-red-600">Error loading messages. Please try again later.</h1>
         </div>)
     } else {
-        <h1>This sis </h1>
         return (
             <div className="flex h-[calc(100vh-4.8rem)] bg-white">
                 {
@@ -55,15 +66,15 @@ const ChatWorkspace: React.FC = () => {
                 <div className="flex-1 flex flex-col">
                     <div className="border-b border-gray-200 px-6 py-4">
                         <h2 className="text-lg font-semibold text-gray-900">{channel_name}: {channel_id}</h2>
-                        <p className="text-sm text-gray-600">Channel • Everyone can view and join this channel</p>
+                        {channel_type === 'channel' ? <p className="text-sm text-gray-600">Channel • Everyone can view and join this channel</p> : null}
                     </div>
                     <div
                         ref={messagesContainerRef}
                         className="flex-1 overflow-y-auto p-6"
                     >
                         <div className="max-w-4xl mx-auto">
-                            {messages && messages.map((message) => (
-                                <Message key={message.id} message={message} />
+                            {messagesBox && user && messagesBox.map((message) => (
+                                <Message channel_type={channel_type} key={message.id} message={message} current_user_id={user.id} />
                             ))}
                             <div ref={messagesEndRef} />
                         </div>

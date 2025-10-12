@@ -38,6 +38,14 @@ io.use(async (socket, next) => {
 io.on('connection', async (socket) => {
     const user_id = socket.data.user_id;
     const socket_id = socket.id;
+    socket.on('join_channel', (data) => {
+        const { channel_id } = data;
+        console.log(channel_id);
+    })
+    socket.on('send_message', (data) => {
+        const { channel_id, content, sender_id } = data;
+        socket.emit('receive_message', { content: content, sender_id: sender_id, channel_id: channel_id });
+    });
     socket.on("close", (reason) => {
         console.log("❌ Connection closed:", socket.id, "Reason:", reason);
     });

@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, } from "@reduxjs/toolkit";
 
 interface Message {
     id: number;
@@ -25,8 +25,8 @@ interface User {
 interface InitailState {
     channel_id: number | null;
     channel_name: string | '';
-    channel_type?: 'dm' | 'group' | 'channel' | 'none';
-    messagesBox?: Array<Message> | [];
+    channel_type: 'dm' | 'group' | 'channel' | 'none';
+    messagesBox: Message[];
     status: 'idle' | 'loading' | 'success' | 'error';
     userIds: number[];
     members: Array<User>[] | [];
@@ -108,6 +108,15 @@ const ChatBoxSlice = createSlice({
                 state.channel_id = action.payload.channel_id;
                 state.status = 'idle';
             }
+        },
+        setMessage: (state, action) => {
+            const newMessage: Message = {
+                text: action.payload.content,
+                channelId: action.payload.channel_id,
+                senderId: action.payload.sender_id
+            }
+            state.messagesBox.push(newMessage);
+
         }
     },
     extraReducers: (builder) => {

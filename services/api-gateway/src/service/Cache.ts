@@ -1,4 +1,4 @@
-import { connectRedis } from "../config/redisconfig";
+import { connectRedis } from "@shared/redis-config/redisconfig";
 export async function setCache(key: string, ttl: number, value: any) {
     try {
         const redis = await connectRedis();
