@@ -40,7 +40,7 @@ const createSocket = (accessToken: string) => {
             // Token is invalid
             console.error('Authentication failed - redirecting to login');
             localStorage.removeItem('token');
-            window.location.href = '/login';
+            window.location.href = '/auth/site/login';
         }
     });
 
