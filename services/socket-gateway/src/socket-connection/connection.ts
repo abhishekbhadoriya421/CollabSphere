@@ -35,9 +35,9 @@ io.use(async (socket, next) => {
     }
 });
 
-io.on('connection', (socket) => {
-    console.log('Connect to socket id: ' + socket.handshake.auth.accessToken);
-
+io.on('connection', async (socket) => {
+    const user_id = socket.data.user_id;
+    const socket_id = socket.id;
     socket.on("close", (reason) => {
         console.log("❌ Connection closed:", socket.id, "Reason:", reason);
     });

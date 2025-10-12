@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import { Op, Sequelize } from "sequelize";
 import models from "../models/CentralModel";
 import { getUserId } from "../utils/GetUserDetails";
+import { setCache } from "../service/Cache";
 
 export const SearchUserAction = async (req: Request, res: Response) => {
     const { search, ou_id } = req.query;

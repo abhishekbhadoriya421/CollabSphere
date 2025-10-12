@@ -45,4 +45,5 @@ const messageSchema = new mongoose.Schema({
         default: Date.now
     }
 });
-module.exports = mongoose.model('Message', messageSchema);
+
+export default mongoose.model('Message', messageSchema);
