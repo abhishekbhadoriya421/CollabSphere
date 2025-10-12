@@ -106,6 +106,7 @@ const ChatBoxSlice = createSlice({
         setActiveChannel: (state, action) => {
             if (action.payload.channel_id) {
                 state.channel_id = action.payload.channel_id;
+                state.status = 'idle';
             }
         }
     },

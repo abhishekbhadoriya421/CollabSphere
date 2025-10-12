@@ -3,13 +3,18 @@ import type { Message as MessageType } from './types';
 import Message from './Message';
 import TeamWorkspace from './TeamWorkspace';
 // import { getSocket  } from '../../utils/socket';
-import { useAppSelector } from '../customHooks/reduxCustomHook';
+import { useAppSelector, useAppDispatch } from '../customHooks/reduxCustomHook';
 import LoadingPage from '../Loading/LoadingPage';
+import useGetUserCredentials from '../customHooks/getUserCredentials';
+import { getAllMessagesByChannelId } from '../../features/ChatBoxSlice/ChatBoxSlics';
+
 const ChatWorkspace: React.FC = () => {
+    const dispatch = useAppDispatch();
     const [messages, setMessages] = useState<MessageType[]>() || []
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
+    const { accessToken } = useGetUserCredentials();
     const { channel_id, status, messagesBox, channel_name, channel_type } = useAppSelector(state => state.ChatBoxReducer);
 
     const scrollToBottom = () => {    // scroll to bottom when messages change
@@ -25,6 +30,13 @@ const ChatWorkspace: React.FC = () => {
         setMessages([]);
     };
 
+    useEffect(() => {
+        if (status === 'idle' && channel_id && accessToken) {
+            dispatch(getAllMessagesByChannelId({ accessToken: accessToken, channel_id: channel_id }));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [status, channel_id])
+
     if (status === 'loading') {
         return (<LoadingPage />)
     } else if (status === 'error') {
@@ -32,7 +44,7 @@ const ChatWorkspace: React.FC = () => {
             <h1 className="text-2xl font-bold text-red-600">Error loading messages. Please try again later.</h1>
         </div>)
     } else {
-        setMessages(messagesBox);
+        <h1>This sis </h1>
         return (
             <div className="flex h-[calc(100vh-4.8rem)] bg-white">
                 {

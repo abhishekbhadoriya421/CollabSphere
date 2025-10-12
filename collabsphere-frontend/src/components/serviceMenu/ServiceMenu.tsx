@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from "../customHooks/reduxCustomHook";
 import useGetUserCredentials from "../customHooks/getUserCredentials";
 import ChannelItem from "./ChannelItem";
 import { GetAllChannelThunks } from "../../features/ChannelSlice/GetMyChannelsSlice";
-import { setActiveChannel, getAllMessagesByChannelId } from "../../features/ChatBoxSlice/ChatBoxSlics";
+import { setActiveChannel } from "../../features/ChatBoxSlice/ChatBoxSlics";
 
 
 interface Activity {
@@ -43,10 +43,7 @@ export default function ServiceMenu() {
     }
 
     const handleChannelOnClick = (id: number) => {
-        if (accessToken && user) {
-            dispatch(setActiveChannel({ channel_id: id }));
-            dispatch(getAllMessagesByChannelId({ channel_id: id, accessToken: accessToken }));
-        }
+        dispatch(setActiveChannel({ channel_id: id }));
     }
     return (
         <div className="w-full h-screen flex flex-col text-white">
