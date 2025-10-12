@@ -109,15 +109,15 @@ const ChatBoxSlice = createSlice({
                 state.status = 'idle';
             }
         },
-        setMessage: (state, action) => {
-            const newMessage: Message = {
-                text: action.payload.content,
-                channelId: action.payload.channel_id,
-                senderId: action.payload.sender_id
-            }
-            state.messagesBox.push(newMessage);
+        // setMessage: (state, action) => {
+        // const newMessage: Message = {
+        //     text: action.payload.content,
+        //     channelId: action.payload.channel_id,
+        //     senderId: action.payload.sender_id
+        // }
+        // state.messagesBox.push(newMessage);
 
-        }
+        // }
     },
     extraReducers: (builder) => {
         builder.addCase(getAllMessagesByChannelId.pending, (state) => {

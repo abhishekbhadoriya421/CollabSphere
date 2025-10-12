@@ -29,6 +29,9 @@
         },
         {
             "path": "./services/api-gateway"
+        },
+        {
+            "path": "./services/socket-gateway"
         }
     ]
 }

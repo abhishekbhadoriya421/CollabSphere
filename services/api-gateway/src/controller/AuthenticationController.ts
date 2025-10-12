@@ -184,6 +184,7 @@ export const RegisterAction = async (req: Request, res: Response) => {
 
 
 export const PageReloadAction = async (req: Request, res: Response) => {
+    console.log('this ');
     const refreshToken = req.cookies.refreshToken;
     /**
      * user has been logged out need to login again
