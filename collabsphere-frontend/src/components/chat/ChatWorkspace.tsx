@@ -7,6 +7,12 @@ import LoadingPage from '../Loading/LoadingPage';
 import useGetUserCredentials from '../customHooks/getUserCredentials';
 import { getAllMessagesByChannelId, setMessage } from '../../features/ChatBoxSlice/ChatBoxSlics';
 
+interface MessageData {
+    content: string;
+    channel_id: number;
+    sender_id: number;
+    message_temp_id: number;
+}
 const ChatWorkspace: React.FC = () => {
     const dispatch = useAppDispatch();
     const [newMessage, setNewMessage] = useState('');
@@ -24,19 +30,29 @@ const ChatWorkspace: React.FC = () => {
     }, [messagesBox]);
 
     useEffect(() => {
-        if (socket) {
-            socket.emit('join_channel', { channel_id: channel_id! });
+        if (!socket) return;
 
-            // socket.on('user_joined', (data) => {
-            //     // console.log(data);
-            // });
+        socket.emit('join_channel', { channel_id: channel_id! });
 
-            socket.on('receive_message', (data) => {
-                console.log(data)
-                dispatch(setMessage({ content: data.content, channel_id: data.channel_id, sender_id: data.sender_id, message_temp_id: data.message_temp_id }));
-            });
-        }
-    }, [])
+        /**
+         * Handle message receive 
+         */
+        const handleReceive = (data: MessageData): void => {
+            console.log(data);
+            dispatch(setMessage({
+                content: data.content,
+                channel_id: data.channel_id,
+                sender_id: data.sender_id,
+                message_temp_id: data.message_temp_id
+            }));
+        };
+        socket.on('receive_message', handleReceive);
+
+        return () => {
+            socket.off('receive_message', handleReceive);
+        };
+
+    }, [channel_id, socket, dispatch])
 
     function generateNumericId() { // Generate unique temporary message id 
         const timestamp = Date.now();
