@@ -38,7 +38,6 @@ const ChatWorkspace: React.FC = () => {
          * Handle message receive 
          */
         const handleReceive = (data: MessageData): void => {
-            console.log(data);
             dispatch(setMessage({
                 content: data.content,
                 channel_id: data.channel_id,
@@ -67,6 +66,7 @@ const ChatWorkspace: React.FC = () => {
             socket.emit('send_message', { channel_id: channel_id!, content: newMessage, sender_id: user.id!, message_temp_id: tempMessageId as number }); // generate temporary message id to store
             dispatch(setMessage({ content: newMessage, channel_id: channel_id, sender_id: user.id, message_temp_id: tempMessageId }));
         }
+        setNewMessage('');
     };
 
     useEffect(() => {
