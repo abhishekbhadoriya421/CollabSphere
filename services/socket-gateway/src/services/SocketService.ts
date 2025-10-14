@@ -1,10 +1,12 @@
 import { Socket, Server } from "socket.io";
 import UserCacheService from "./UserCacheService";
 import ChannelCacheService from "./ChannelCacheService";
+import ChatEventHandler from "../event-handler/chat/ChatEventHandler";
 export default class SocketService {
     private io: Server;
     private cacheObject: UserCacheService;
     public socket: Socket | undefined;
+    private chatEvenHandlerObject: ChatEventHandler = ChatEventHandler.getInstance();;
     constructor(io: Server) {
         this.io = io;
         this.initializeSocketHandlers();
@@ -33,24 +35,20 @@ export default class SocketService {
                 socket.to(channel_id).emit('user_joined', { user_id });
             });
 
+            socket.on('send_message', (data) => {
+                console.log(data);
+                this.chatEvenHandlerObject.sendMessage(socket, data.channel_id, data.content, data.sender_id, data.message_term_id);
+            });
+
             socket.on('disconnect', async () => {
-                await this.handleDisconnect(socket);
+                await this.chatEvenHandlerObject.handleDisconnect(socket);
+                console.log('disconnected: ' + socket.id)
             });
         });
 
     }
 
 
-    private async handleDisconnect(socket: Socket): Promise<void> {
-        try {
-            const user = await this.cacheObject.getUserBySocketId(socket.id);
-            if (user) {
-                await this.cacheObject.removeUser(user.userId);
-                console.log(`✅ User ${user.userId} disconnected and removed from cache`);
-            }
-        } catch (error) {
-            console.error('Error handling disconnect:', error);
-        }
-    }
+
 
 }

@@ -39,7 +39,8 @@ const initailState: InitailState = {
     messagesBox: [],
     status: 'idle',
     userIds: [],
-    members: []
+    members: [],
+    // online:
 }
 
 interface GetAllMessagesByChannelIdResponse {
@@ -109,15 +110,15 @@ const ChatBoxSlice = createSlice({
                 state.status = 'idle';
             }
         },
-        // setMessage: (state, action) => {
-        // const newMessage: Message = {
-        //     text: action.payload.content,
-        //     channelId: action.payload.channel_id,
-        //     senderId: action.payload.sender_id
-        // }
-        // state.messagesBox.push(newMessage);
-
-        // }
+        setMessage: (state, action) => {
+            const newMessage: Message = {
+                text: action.payload.content,
+                channelId: action.payload.channel_id,
+                senderId: action.payload.sender_id,
+                id: action.payload.message_temp_id,
+            }
+            state.messagesBox.push(newMessage);
+        }
     },
     extraReducers: (builder) => {
         builder.addCase(getAllMessagesByChannelId.pending, (state) => {
@@ -140,5 +141,5 @@ const ChatBoxSlice = createSlice({
     }
 });
 
-export const { setActiveChannel } = ChatBoxSlice.actions;
+export const { setActiveChannel, setMessage } = ChatBoxSlice.actions;
 export default ChatBoxSlice.reducer;

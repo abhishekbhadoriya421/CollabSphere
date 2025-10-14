@@ -1,12 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-
 import Message from './Message';
 import TeamWorkspace from './TeamWorkspace';
 import { getSocket } from '../../utils/socket';
 import { useAppSelector, useAppDispatch } from '../customHooks/reduxCustomHook';
 import LoadingPage from '../Loading/LoadingPage';
 import useGetUserCredentials from '../customHooks/getUserCredentials';
-import { getAllMessagesByChannelId } from '../../features/ChatBoxSlice/ChatBoxSlics';
+import { getAllMessagesByChannelId, setMessage } from '../../features/ChatBoxSlice/ChatBoxSlics';
 
 const ChatWorkspace: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -27,20 +26,30 @@ const ChatWorkspace: React.FC = () => {
     useEffect(() => {
         if (socket) {
             socket.emit('join_channel', { channel_id: channel_id! });
-            socket.on('user_joined', (data) => {
-                console.log(data);
+
+            // socket.on('user_joined', (data) => {
+            //     // console.log(data);
+            // });
+
+            socket.on('receive_message', (data) => {
+                console.log(data)
+                dispatch(setMessage({ content: data.content, channel_id: data.channel_id, sender_id: data.sender_id, message_temp_id: data.message_temp_id }));
             });
         }
-    }, [channel_id, socket])
+    }, [])
 
+    function generateNumericId() { // Generate unique temporary message id 
+        const timestamp = Date.now();
+        const random = Math.floor(Math.random() * 1000);
+        return Number(`${timestamp}${random}`);
+    }
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
         const socket = getSocket();
         if (socket && user) { // User has no probability of having null value
-            socket.emit('send_message', { channel_id: channel_id!, content: newMessage, sender_id: user.id!, temp_id: Math.random() + Date.now() as number }); // generate temporary message id to store
-            socket.on('receive_message', (data) => {
-                console.log(data)
-            })
+            const tempMessageId = generateNumericId();
+            socket.emit('send_message', { channel_id: channel_id!, content: newMessage, sender_id: user.id!, message_temp_id: tempMessageId as number }); // generate temporary message id to store
+            dispatch(setMessage({ content: newMessage, channel_id: channel_id, sender_id: user.id, message_temp_id: tempMessageId }));
         }
     };
 
@@ -75,8 +84,8 @@ const ChatWorkspace: React.FC = () => {
                         className="flex-1 overflow-y-auto p-6"
                     >
                         <div className="max-w-4xl mx-auto">
-                            {messagesBox && user && messagesBox.map((message) => (
-                                <Message channel_type={channel_type} key={message.id} message={message} current_user_id={user.id} />
+                            {messagesBox && user && messagesBox.map((message, index) => (
+                                <Message channel_type={channel_type} key={index} message={message} current_user_id={user.id} />
                             ))}
                             <div ref={messagesEndRef} />
                         </div>

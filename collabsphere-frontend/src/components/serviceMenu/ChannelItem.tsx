@@ -24,6 +24,5 @@ export default function ChannelItem({ id, name, type, handleChannelOnClick }: Ch
                 </div>
             </div>
         </div>
-
     );
 }

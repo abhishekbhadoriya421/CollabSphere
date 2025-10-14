@@ -6,7 +6,7 @@ interface UserTyping {
 }
 
 interface UserReceiveMessage {
-    temp_id: number;
+    message_temp_id: number;
     content: string;
     sender_id: number;
     channel_id: number;
