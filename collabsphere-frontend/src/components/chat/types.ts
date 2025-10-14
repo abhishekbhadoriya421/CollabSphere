@@ -1,5 +1,5 @@
 export interface Message {
-    id: number | null;
+    id: string | null;
     channelId: number;
     senderId: number;
     text: string;

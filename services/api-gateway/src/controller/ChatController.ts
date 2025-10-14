@@ -77,3 +77,34 @@ export const GetMessageByChannelIdAction = async (req: Request, res: Response) =
         );
     }
 };
+
+
+export const CreateNewMessageAction = async (req: Request, res: Response) => {
+    try {
+        const { sender_id, content, channel_id } = req.body;
+        console.log("sender_id: " + sender_id + ' content: ' + content + " channel_id: " + channel_id);
+        if (!sender_id || !channel_id) {
+            return res.status(404).json({
+                message: 'sender id and channel id can not be null',
+                status: 404
+            })
+        }
+
+        const model = await Message.create({
+            senderId: sender_id,
+            text: content,
+            channelId: channel_id
+        });
+        console.log('message saved successfully');
+        return res.status(200).json({
+            message: 'message is saved',
+            status: 200,
+            message_id: model._id
+        })
+    } catch (err) {
+        return res.status(500).json({
+            message: ErrorHandler.getMessage(err),
+            status: 500
+        });
+    }
+}

@@ -1,6 +1,13 @@
 import { Socket, Server } from "socket.io";
 import UserCacheService from "../../services/UserCacheService";
 import ChannelCacheService from "../../services/ChannelCacheService";
+import axios from 'axios';
+
+interface SaveNewMessageApiResponse {
+    status: number;
+    message: string;
+    message_id: string;
+}
 export default class ChatEventHandler {
     static instance: ChatEventHandler;
     private cacheObject: UserCacheService;
@@ -22,8 +29,29 @@ export default class ChatEventHandler {
         console.log(`User with socket ID ${socket.id} joined channel ${channel_id}`);
     }
 
-    public sendMessage(socket: Socket, channel_id: string, content: string, sender_id: number, message_temp_id: number) {
-        socket.to(channel_id).emit('receive_message', { channel_id: channel_id, content: content, sender_id: sender_id, message_temp_id: message_temp_id });
+    public sendMessage(socket: Socket, channel_id: number, content: string, sender_id: number, message_temp_id: string) {
+        socket.to(channel_id.toString()).emit('receive_message', { channel_id: channel_id, content: content, sender_id: sender_id, message_temp_id: message_temp_id });
+    }
+
+    public async saveNewMessageEvent(io: Server, channel_id: number, content: string, sender_id: number, message_temp_id: string) {
+        try {
+            const response: SaveNewMessageApiResponse = await axios.post('http://localhost:8080/api/chat/save-new-message', {
+                sender_id: sender_id,
+                content: content,
+                channel_id: channel_id
+            });
+            console.log(response);
+            if (response.status === 200) {
+                io.to(channel_id.toString()).emit('message_saved', {
+                    message_temp_id: message_temp_id,
+                    channel_id: channel_id,
+                    message_id: response.message_id
+                });
+            }
+
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     public async handleDisconnect(socket: Socket): Promise<void> {

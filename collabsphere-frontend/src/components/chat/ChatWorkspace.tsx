@@ -5,13 +5,20 @@ import { getSocket } from '../../utils/socket';
 import { useAppSelector, useAppDispatch } from '../customHooks/reduxCustomHook';
 import LoadingPage from '../Loading/LoadingPage';
 import useGetUserCredentials from '../customHooks/getUserCredentials';
-import { getAllMessagesByChannelId, setMessage } from '../../features/ChatBoxSlice/ChatBoxSlics';
+import { getAllMessagesByChannelId, setMessage, updateTempMessageId } from '../../features/ChatBoxSlice/ChatBoxSlics';
+import { v4 as uuidv4 } from 'uuid';
 
 interface MessageData {
     content: string;
     channel_id: number;
     sender_id: number;
-    message_temp_id: number;
+    message_temp_id: string;
+}
+
+interface MessageSaved {
+    message_temp_id: string;
+    channel_id: number;
+    message_id: string;
 }
 const ChatWorkspace: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -33,7 +40,6 @@ const ChatWorkspace: React.FC = () => {
         if (!socket) return;
 
         socket.emit('join_channel', { channel_id: channel_id! });
-
         /**
          * Handle message receive 
          */
@@ -45,25 +51,30 @@ const ChatWorkspace: React.FC = () => {
                 message_temp_id: data.message_temp_id
             }));
         };
-        socket.on('receive_message', handleReceive);
 
+        const handleMessageSaved = (data: MessageSaved) => {
+            console.log("message saved: ");
+            console.log(data);
+            dispatch(updateTempMessageId({
+                message_temp_id: data.message_temp_id,
+                message_id: data.message_id
+            }));
+        }
+
+        socket.on('receive_message', handleReceive);
+        socket.on('message_saved', handleMessageSaved);
         return () => {
             socket.off('receive_message', handleReceive);
         };
 
     }, [channel_id, socket, dispatch])
 
-    function generateNumericId() { // Generate unique temporary message id 
-        const timestamp = Date.now();
-        const random = Math.floor(Math.random() * 1000);
-        return Number(`${timestamp}${random}`);
-    }
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
         const socket = getSocket();
         if (socket && user) { // User has no probability of having null value
-            const tempMessageId = generateNumericId();
-            socket.emit('send_message', { channel_id: channel_id!, content: newMessage, sender_id: user.id!, message_temp_id: tempMessageId as number }); // generate temporary message id to store
+            const tempMessageId = uuidv4();
+            socket.emit('send_message', { channel_id: channel_id!, content: newMessage, sender_id: user.id!, message_temp_id: tempMessageId as string }); // generate temporary message id to store
             dispatch(setMessage({ content: newMessage, channel_id: channel_id, sender_id: user.id, message_temp_id: tempMessageId }));
         }
         setNewMessage('');

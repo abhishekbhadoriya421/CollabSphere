@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, } from "@reduxjs/toolkit";
 
 interface Message {
-    id: number;
+    id: string;
     channelId: number;
     senderId: number;
     text: string;
@@ -118,6 +118,15 @@ const ChatBoxSlice = createSlice({
                 id: action.payload.message_temp_id,
             }
             state.messagesBox.push(newMessage);
+        },
+        updateTempMessageId: (state, action) => {
+            const temp_message_id = action.payload.temp_message_id;
+            const message_id = action.payload.message_id;
+            state.messagesBox.forEach(msg => {
+                if (msg.id == temp_message_id) {
+                    msg.id = message_id;
+                }
+            });
         }
     },
     extraReducers: (builder) => {
@@ -141,5 +150,5 @@ const ChatBoxSlice = createSlice({
     }
 });
 
-export const { setActiveChannel, setMessage } = ChatBoxSlice.actions;
+export const { setActiveChannel, setMessage, updateTempMessageId } = ChatBoxSlice.actions;
 export default ChatBoxSlice.reducer;
