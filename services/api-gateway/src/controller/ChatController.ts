@@ -34,8 +34,7 @@ export const GetMessageByChannelIdAction = async (req: Request, res: Response) =
             return res.status(403).json({ message: 'Forbidden: You are not a member of this channel', status: 403 });
         }
 
-        const messages = await Message.find({ channelId: channel.id }).sort({ createdAt: -1 }).limit(100);
-
+        const messages = await Message.find({ channelId: channel.id }).sort({ _id: 1 }).limit(100);
         const members = membersOfChannel
             .filter((member: any) => member.user_id !== user_id)
             .map((member: any) => {
@@ -54,8 +53,6 @@ export const GetMessageByChannelIdAction = async (req: Request, res: Response) =
             channel_name = members[0].username;
             channel_type = 'dm';
         }
-        console.log('Channel Members:', members);
-        console.log('Messages Retrieved:', messages.length);
         return res.status(200).json(
             {
                 message: 'Messages retrieved successfully',
@@ -82,20 +79,17 @@ export const GetMessageByChannelIdAction = async (req: Request, res: Response) =
 export const CreateNewMessageAction = async (req: Request, res: Response) => {
     try {
         const { sender_id, content, channel_id } = req.body;
-        console.log("sender_id: " + sender_id + ' content: ' + content + " channel_id: " + channel_id);
         if (!sender_id || !channel_id) {
             return res.status(404).json({
                 message: 'sender id and channel id can not be null',
                 status: 404
             })
         }
-
         const model = await Message.create({
             senderId: sender_id,
             text: content,
             channelId: channel_id
         });
-        console.log('message saved successfully');
         return res.status(200).json({
             message: 'message is saved',
             status: 200,

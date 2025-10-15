@@ -25,7 +25,6 @@ export default class ChatEventHandler {
     }
 
     public joinChannel(socket: Socket, channel_id: string) {
-        socket.join(channel_id);
         console.log(`User with socket ID ${socket.id} joined channel ${channel_id}`);
     }
 
@@ -49,12 +48,13 @@ export default class ChatEventHandler {
             });
 
             if (response.status === 200) {
-                console.log(message_temp_id + ' ' + channel_id + ' ' + response.data.message_id)
                 io.to(channel_id).emit('message_saved', {
                     message_temp_id: message_temp_id,
                     channel_id: channel_id,
                     message_id: response.data.message_id
                 });
+            } else {
+                throw new Error(response.data.message)
             }
 
         } catch (err) {

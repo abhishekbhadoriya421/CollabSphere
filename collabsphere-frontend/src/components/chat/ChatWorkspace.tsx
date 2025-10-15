@@ -34,7 +34,6 @@ const ChatWorkspace: React.FC = () => {
 
     useEffect(() => { // scroll to bottom when messages change
         scrollToBottom();
-        console.log(messagesBox);
     }, [messagesBox]);
 
     useEffect(() => {
