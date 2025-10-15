@@ -29,14 +29,14 @@ export default class ChatEventHandler {
         console.log(`User with socket ID ${socket.id} joined channel ${channel_id}`);
     }
 
-    public sendMessage(socket: Socket, channel_id: number, content: string, sender_id: number, message_temp_id: string) {
-        socket.to(channel_id.toString()).emit('receive_message', { channel_id: channel_id, content: content, sender_id: sender_id, message_temp_id: message_temp_id });
+    public sendMessage(socket: Socket, channel_id: string, content: string, sender_id: number, message_temp_id: string) {
+        socket.to(channel_id).emit('receive_message', { channel_id: channel_id, content: content, sender_id: sender_id, message_temp_id: message_temp_id });
     }
 
-    public async saveNewMessageEvent(io: Server, socket: Socket, channel_id: number, content: string, sender_id: number, message_temp_id: string) {
+    public async saveNewMessageEvent(io: Server, socket: Socket, channel_id: string, content: string, sender_id: number, message_temp_id: string) {
         const refreshToken = socket.data.refresh_token;
         try {
-            const response: SaveNewMessageApiResponse = await axios.post('http://localhost:8080/api/chat/save-new-message',
+            const response = await axios.post('http://localhost:8080/api/chat/save-new-message',
                 {
                     sender_id: sender_id,
                     content: content,
@@ -47,12 +47,13 @@ export default class ChatEventHandler {
                     'Content-Type': 'application/json'
                 }
             });
-            console.log(response);
+
             if (response.status === 200) {
-                io.to(channel_id.toString()).emit('message_saved', {
+                console.log(message_temp_id + ' ' + channel_id + ' ' + response.data.message_id)
+                io.to(channel_id).emit('message_saved', {
                     message_temp_id: message_temp_id,
                     channel_id: channel_id,
-                    message_id: response.message_id
+                    message_id: response.data.message_id
                 });
             }
 

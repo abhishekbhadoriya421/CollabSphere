@@ -34,6 +34,7 @@ const ChatWorkspace: React.FC = () => {
 
     useEffect(() => { // scroll to bottom when messages change
         scrollToBottom();
+        console.log(messagesBox);
     }, [messagesBox]);
 
     useEffect(() => {
@@ -53,8 +54,6 @@ const ChatWorkspace: React.FC = () => {
         };
 
         const handleMessageSaved = (data: MessageSaved) => {
-            console.log("message saved: ");
-            console.log(data);
             dispatch(updateTempMessageId({
                 message_temp_id: data.message_temp_id,
                 message_id: data.message_id
@@ -65,6 +64,7 @@ const ChatWorkspace: React.FC = () => {
         socket.on('message_saved', handleMessageSaved);
         return () => {
             socket.off('receive_message', handleReceive);
+            socket.off('message_saved', handleMessageSaved);
         };
 
     }, [channel_id, socket, dispatch])

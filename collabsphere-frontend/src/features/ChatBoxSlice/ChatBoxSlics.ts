@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, } from "@reduxjs/toolkit";
 
 interface Message {
-    id: string;
+    _id: string;
     channelId: number;
     senderId: number;
     text: string;
@@ -14,8 +14,8 @@ interface Message {
     sequence?: number;
     read_by?: number[];
     status?: 'sent' | 'delivered' | 'read';
-    createdAt?: Date;
-    updatedAt?: Date;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 interface User {
@@ -115,16 +115,16 @@ const ChatBoxSlice = createSlice({
                 text: action.payload.content,
                 channelId: action.payload.channel_id,
                 senderId: action.payload.sender_id,
-                id: action.payload.message_temp_id,
+                _id: action.payload.message_temp_id,
             }
             state.messagesBox.push(newMessage);
         },
         updateTempMessageId: (state, action) => {
-            const temp_message_id = action.payload.temp_message_id;
+            const message_temp_id = action.payload.message_temp_id;
             const message_id = action.payload.message_id;
             state.messagesBox.forEach(msg => {
-                if (msg.id == temp_message_id) {
-                    msg.id = message_id;
+                if (msg._id == message_temp_id) {
+                    msg._id = message_id;
                 }
             });
         }
