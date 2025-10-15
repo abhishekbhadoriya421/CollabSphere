@@ -35,6 +35,7 @@ const createSocket = (accessToken: string) => {
     socket = io('http://localhost:4000', {
         autoConnect: false,
         transports: ['websocket'],
+        withCredentials: true,
         auth: {
             accessToken
         }

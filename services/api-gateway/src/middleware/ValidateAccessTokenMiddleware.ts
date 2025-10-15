@@ -16,3 +16,19 @@ export const ValidateAccessToken = (req: Request, res: Response, next: NextFunct
     }
     next();
 }
+
+
+export const ValidateRefreshToken = (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers["authorization"];
+    const refreshToken = authHeader?.split(' ')[1];
+    if (!refreshToken) {
+        return res.redirect('back');
+    }
+
+    const authenticate = Authentication.getInstance();
+    const isValid = authenticate.Verify_Refresh_Token(refreshToken);
+    if (!isValid) {
+        return res.redirect('back');
+    }
+    next();
+}

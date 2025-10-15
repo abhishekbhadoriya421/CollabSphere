@@ -28,7 +28,7 @@ const Message: React.FC<MessageProps> = ({ message, current_user_id, channel_typ
                         {channel_type !== 'dm' && !isCurrentUser && (
                             <span className="font-semibold text-gray-900 mr-2">Abhishek</span>
                         )}
-                        <span className="text-xs text-gray-500">{message.createdAt?.toDateString()}</span>
+                        <span className="text-xs text-gray-500">{message.createdAt}</span>
                         {channel_type !== 'dm' && isCurrentUser && (
                             <span className="font-semibold text-gray-900 ml-2">KA</span>
                         )}

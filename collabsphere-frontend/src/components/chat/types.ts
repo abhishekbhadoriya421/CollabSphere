@@ -12,8 +12,8 @@ export interface Message {
     sequence?: number;
     read_by?: number[];
     status?: 'sent' | 'delivered' | 'read';
-    createdAt?: Date;
-    updatedAt?: Date;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export interface User {

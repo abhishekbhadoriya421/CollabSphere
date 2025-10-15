@@ -37,7 +37,7 @@ export default class SocketService {
 
             socket.on('send_message', (data) => {
                 this.chatEvenHandlerObject.sendMessage(socket, data.channel_id, data.content, data.sender_id, data.message_term_id);
-                this.chatEvenHandlerObject.saveNewMessageEvent(this.io, data.channel_id, data.content, data.sender_id, data.message_term_id);
+                this.chatEvenHandlerObject.saveNewMessageEvent(this.io, socket, data.channel_id, data.content, data.sender_id, data.message_term_id);
             });
 
             socket.on('disconnect', async () => {

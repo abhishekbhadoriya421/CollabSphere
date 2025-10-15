@@ -33,12 +33,19 @@ export default class ChatEventHandler {
         socket.to(channel_id.toString()).emit('receive_message', { channel_id: channel_id, content: content, sender_id: sender_id, message_temp_id: message_temp_id });
     }
 
-    public async saveNewMessageEvent(io: Server, channel_id: number, content: string, sender_id: number, message_temp_id: string) {
+    public async saveNewMessageEvent(io: Server, socket: Socket, channel_id: number, content: string, sender_id: number, message_temp_id: string) {
+        const refreshToken = socket.data.refresh_token;
         try {
-            const response: SaveNewMessageApiResponse = await axios.post('http://localhost:8080/api/chat/save-new-message', {
-                sender_id: sender_id,
-                content: content,
-                channel_id: channel_id
+            const response: SaveNewMessageApiResponse = await axios.post('http://localhost:8080/api/chat/save-new-message',
+                {
+                    sender_id: sender_id,
+                    content: content,
+                    channel_id: channel_id
+                }, {
+                headers: {
+                    Authorization: `Bearer ${refreshToken}`,
+                    'Content-Type': 'application/json'
+                }
             });
             console.log(response);
             if (response.status === 200) {

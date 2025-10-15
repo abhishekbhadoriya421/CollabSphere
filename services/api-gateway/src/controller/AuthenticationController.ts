@@ -287,29 +287,30 @@ export const LogoutAction = async (req: Request, res: Response) => {
 }
 
 
-export const ValidateAccessTokenAction = async (req: Request, res: Response) => {
+export const ValidateRefreshTokenAction = async (req: Request, res: Response) => {
     try {
-        const { accessToken } = req.body;
-        if (!accessToken) {
+        const { refreshToken } = req.body;
+        console.log('ValidateRefreshTokenAction: ' + refreshToken);
+        if (!refreshToken) {
             return res.status(400).json({
                 status: 400,
-                message: 'Access token is required',
+                message: 'Refresh token is required',
                 user_id: null
             });
         }
 
         const authenticate = Authentication.getInstance();
-        const authData = authenticate.Verify_Access_Token(accessToken);
+        const authData = authenticate.Verify_Refresh_Token(refreshToken);
         if (!authData) {
             return res.status(401).json({
                 status: 401,
-                message: 'Invalid or expired access token',
+                message: 'Invalid or expired Refresh token',
                 user_id: null
             });
         }
         return res.status(200).json({
             status: 200,
-            message: 'Access token is valid',
+            message: 'Refresh token is valid',
             user_id: authData.user_id
         });
     }

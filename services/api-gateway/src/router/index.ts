@@ -14,6 +14,6 @@ router.use('/service', ValidateAccessToken, serviceRoute);
 router.use('/channel', ValidateAccessToken, channeRoute);
 router.use('/organization', ValidateAccessToken, organizationRoute);
 router.use('/user', ValidateAccessToken, userRoute);
-router.use('/chat', ValidateAccessToken, chatRoute);
+router.use('/chat', chatRoute);
 
 export default router;
