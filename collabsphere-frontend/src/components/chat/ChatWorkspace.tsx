@@ -111,7 +111,7 @@ const ChatWorkspace: React.FC = () => {
             <div className="flex h-[calc(100vh-4.8rem)] bg-white">
                 {
                     (channel_type === 'group' || channel_type === 'channel') ?
-                        <TeamWorkspace />
+                        <TeamWorkspace channel_name={channel_name} user_id={user?.id} channel_type={channel_type} arrangedUserData={arrangedUserData} />
                         : null
                 }
                 <div className="flex-1 flex flex-col">
