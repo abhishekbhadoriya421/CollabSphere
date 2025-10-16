@@ -11,6 +11,7 @@ const Navigation = () => {
     const { user } = useAppSelector((state) => state.LoginReducer);
     const { accessToken, userOu } = useGetUserCredentials();
     const { userList, status } = useAppSelector((state) => state.SearchUserReducer);
+    const { channels } = useAppSelector((state) => state.GetMyChannelReducer);
     const [OpenSetting, setSetting] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -39,7 +40,15 @@ const Navigation = () => {
     };
 
     const handleOnClickUser = (userId: number) => {
-        dispatch(GetChannelByUserThunk({ accessToken: accessToken, target_user_id: userId }));
+        let createChannel = true;
+        channels.forEach(channel => {
+            if (channel.member_user_id == userId) {
+                createChannel = false;
+            }
+        });
+        if (createChannel) {
+            dispatch(GetChannelByUserThunk({ accessToken: accessToken, target_user_id: userId }));
+        }
         dispatch(setUserList([]));
     }
     return (
