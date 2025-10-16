@@ -26,21 +26,17 @@ const ChatWorkspace: React.FC = () => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const { accessToken, user } = useGetUserCredentials();
-    const { channel_id, status, messagesBox, channel_name, channel_type, members } = useAppSelector(
-        (state) => ({
-            channel_id: state.ChatBoxReducer.channel_id,
-            status: state.ChatBoxReducer.status,
-            messagesBox: state.ChatBoxReducer.messagesBox,
-            channel_name: state.ChatBoxReducer.channel_name,
-            channel_type: state.ChatBoxReducer.channel_type,
-            members: state.ChatBoxReducer.members as { id: number; username: string }[]
-        })
-    );
+    const channel_id = useAppSelector((state) => state.ChatBoxReducer.channel_id);
+    const status = useAppSelector((state) => state.ChatBoxReducer.status);
+    const messagesBox = useAppSelector((state) => state.ChatBoxReducer.messagesBox);
+    const channel_name = useAppSelector((state) => state.ChatBoxReducer.channel_name);
+    const channel_type = useAppSelector((state) => state.ChatBoxReducer.channel_type);
+    const members = useAppSelector((state) => state.ChatBoxReducer.members);
+
     const arrangedUserData = React.useMemo(() => {
         if (!members?.length) return new Map();
         const map = new Map();
         members.forEach((member: { id: number; username: string }) => {
-            console.log(member.id + ' ' + member.username)
             map.set(member.id, member.username);
         });
         return map;
