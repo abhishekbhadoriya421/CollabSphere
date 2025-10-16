@@ -34,7 +34,7 @@ export const GetMessageByChannelIdAction = async (req: Request, res: Response) =
             return res.status(403).json({ message: 'Forbidden: You are not a member of this channel', status: 403 });
         }
 
-        const messages = await Message.find({ channelId: channel.id }).sort({ _id: 1 }).limit(100);
+        const messages = await Message.find({ channelId: channel.id }).sort({ createdAt: -1 }).limit(20);
         const members = membersOfChannel
             .filter((member: any) => member.user_id !== user_id)
             .map((member: any) => {
