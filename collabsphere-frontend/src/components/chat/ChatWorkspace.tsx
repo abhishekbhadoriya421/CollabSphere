@@ -26,7 +26,25 @@ const ChatWorkspace: React.FC = () => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const { accessToken, user } = useGetUserCredentials();
-    const { channel_id, status, messagesBox, channel_name, channel_type } = useAppSelector(state => state.ChatBoxReducer);
+    const { channel_id, status, messagesBox, channel_name, channel_type, members } = useAppSelector(
+        (state) => ({
+            channel_id: state.ChatBoxReducer.channel_id,
+            status: state.ChatBoxReducer.status,
+            messagesBox: state.ChatBoxReducer.messagesBox,
+            channel_name: state.ChatBoxReducer.channel_name,
+            channel_type: state.ChatBoxReducer.channel_type,
+            members: state.ChatBoxReducer.members as { id: number; username: string }[]
+        })
+    );
+    const arrangedUserData = React.useMemo(() => {
+        if (!members?.length) return new Map();
+        const map = new Map();
+        members.forEach((member: { id: number; username: string }) => {
+            console.log(member.id + ' ' + member.username)
+            map.set(member.id, member.username);
+        });
+        return map;
+    }, [members]);
     const socket = getSocket();
     const scrollToBottom = () => {    // scroll to bottom when messages change
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -84,7 +102,7 @@ const ChatWorkspace: React.FC = () => {
             dispatch(getAllMessagesByChannelId({ accessToken: accessToken, channel_id: channel_id }));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [status, channel_id])
+    }, [status, channel_id]);
 
     if (status === 'loading' && user) {
         return (<LoadingPage />)
@@ -111,7 +129,13 @@ const ChatWorkspace: React.FC = () => {
                     >
                         <div className="max-w-4xl mx-auto">
                             {messagesBox && user && messagesBox.map((message, index) => (
-                                <Message channel_type={channel_type} key={index} message={message} current_user_id={user.id} />
+                                <Message
+                                    channel_type={channel_type}
+                                    key={index}
+                                    message={message}
+                                    current_user_id={user.id}
+                                    arrangedUserData={arrangedUserData}
+                                />
                             ))}
                             <div ref={messagesEndRef} />
                         </div>

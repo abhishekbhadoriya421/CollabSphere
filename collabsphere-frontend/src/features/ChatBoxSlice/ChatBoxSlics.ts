@@ -29,7 +29,7 @@ interface InitailState {
     messagesBox: Message[];
     status: 'idle' | 'loading' | 'success' | 'error';
     userIds: number[];
-    members: Array<User>[] | [];
+    members: User[];
 }
 
 const initailState: InitailState = {
@@ -50,7 +50,7 @@ interface GetAllMessagesByChannelIdResponse {
     channel_name: string;
     channel_type: 'dm' | 'group' | 'channel' | 'none';
     userIds: number[];
-    members: Array<User>[];
+    members: User[];
 }
 
 interface GetAllMessagesByChannelIdRequest {
@@ -65,7 +65,7 @@ interface GetAllMessagesByChannelIdAPIResponse {
     channel_name: string;
     channel_type: 'dm' | 'group' | 'channel' | 'none';
     userIds: number[];
-    members: Array<User>[];
+    members: User[];
 }
 export const getAllMessagesByChannelId = createAsyncThunk<GetAllMessagesByChannelIdResponse, GetAllMessagesByChannelIdRequest, { rejectValue: string }>
     ('chat-box/getAllMessagesByChannelId', async (req: GetAllMessagesByChannelIdRequest, { rejectWithValue }) => {
