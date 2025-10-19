@@ -35,6 +35,7 @@ const ChatWorkspace: React.FC = () => {
     const channel_type = useAppSelector((state) => state.ChatBoxReducer.channel_type);
     const members = useAppSelector((state) => state.ChatBoxReducer.members);
 
+
     const arrangedUserData = React.useMemo(() => {
         if (!members?.length) return new Map();
         const map = new Map();
