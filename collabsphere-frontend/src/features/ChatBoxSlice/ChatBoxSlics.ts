@@ -85,7 +85,7 @@ export const getAllMessagesByChannelId = createAsyncThunk<GetAllMessagesByChanne
             if (!response.ok && response.status !== 200) {
                 return rejectWithValue(data.message || 'Failed to fetch messages');
             }
-
+            data.messagesBox = data.messagesBox.reverse(); // to print message in reverse order 
             return {
                 message: data.message,
                 status: true,
