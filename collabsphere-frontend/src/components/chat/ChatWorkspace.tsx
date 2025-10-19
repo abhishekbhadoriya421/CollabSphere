@@ -7,7 +7,8 @@ import LoadingPage from '../Loading/LoadingPage';
 import useGetUserCredentials from '../customHooks/getUserCredentials';
 import { getAllMessagesByChannelId, setMessage, updateTempMessageId } from '../../features/ChatBoxSlice/ChatBoxSlics';
 import { v4 as uuidv4 } from 'uuid';
-
+import EmojiPickerComponent from '../emoji/EmojiPicker';
+import { type EmojiClickData } from "emoji-picker-react";
 interface MessageData {
     content: string;
     channel_id: number;
@@ -23,6 +24,7 @@ interface MessageSaved {
 const ChatWorkspace: React.FC = () => {
     const dispatch = useAppDispatch();
     const [newMessage, setNewMessage] = useState('');
+    const [showEmoji, setShowEmoji] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const { accessToken, user } = useGetUserCredentials();
@@ -100,6 +102,14 @@ const ChatWorkspace: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [status, channel_id]);
 
+    const handleCloseEmoji = () => {
+        setShowEmoji(false);
+    }
+
+    const handleSelectEmoji = (emojiData: EmojiClickData) => {
+        setNewMessage((prev: string) => prev + emojiData.emoji);
+    }
+
     if (status === 'loading' && user) {
         return (<LoadingPage />)
     } else if (status === 'error') {
@@ -138,7 +148,12 @@ const ChatWorkspace: React.FC = () => {
                     </div>
                     <div className="border-t border-gray-200 px-6 py-4">
                         <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto">
-                            <div className="flex space-x-4">
+                            <div className="flex items-center space-x-4">
+                                <div className="flex items-center justify-center w-10 h-10 text-gray-500 text-2xl cursor-pointer hover:text-gray-700 transition">
+                                    <div className='relative  inline-block'>
+                                        {showEmoji === false ? <i className="fa-regular fa-face-smile" onClick={() => setShowEmoji(true)}></i> : <EmojiPickerComponent handleSelectEmoji={handleSelectEmoji} handleCloseEmoji={handleCloseEmoji} />}
+                                    </div>
+                                </div>
                                 <input
                                     type="text"
                                     value={newMessage}
@@ -148,12 +163,13 @@ const ChatWorkspace: React.FC = () => {
                                 />
                                 <button
                                     type="submit"
-                                    className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors"
+                                    className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition"
                                 >
                                     Send
                                 </button>
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>
