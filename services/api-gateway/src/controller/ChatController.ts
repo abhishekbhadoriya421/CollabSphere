@@ -6,9 +6,7 @@ import Message from "../models/mongoModels/Message";
 
 export const GetMessageByChannelIdAction = async (req: Request, res: Response) => {
     const { channelId } = req.params;
-    console.log('Channel ID from params:', channelId);
     const user_id = getUserId(req);
-    console.log('Authenticated User ID:', user_id);
     if (!user_id || channelId === undefined) {
         return res.status(401).json({ message: 'Unauthorized', status: 401 });
     }
