@@ -30,6 +30,7 @@ interface InitailState {
     status: 'idle' | 'loading' | 'success' | 'error';
     userIds: number[];
     members: User[];
+    messageLimit: number;
 }
 
 const initailState: InitailState = {
@@ -40,6 +41,7 @@ const initailState: InitailState = {
     status: 'idle',
     userIds: [],
     members: [],
+    messageLimit: 0,
     // online:
 }
 
@@ -99,6 +101,8 @@ export const getAllMessagesByChannelId = createAsyncThunk<GetAllMessagesByChanne
             return rejectWithValue((error instanceof Error) ? error.message : 'Something went wrong');
         }
     });
+
+
 
 const ChatBoxSlice = createSlice({
     name: 'chat-box',

@@ -26,6 +26,7 @@ const ChatWorkspace: React.FC = () => {
     const [newMessage, setNewMessage] = useState('');
     const [showEmoji, setShowEmoji] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesStatrRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const { accessToken, user } = useGetUserCredentials();
     const channel_id = useAppSelector((state) => state.ChatBoxReducer.channel_id);
@@ -34,7 +35,6 @@ const ChatWorkspace: React.FC = () => {
     const channel_name = useAppSelector((state) => state.ChatBoxReducer.channel_name);
     const channel_type = useAppSelector((state) => state.ChatBoxReducer.channel_type);
     const members = useAppSelector((state) => state.ChatBoxReducer.members);
-
 
     const arrangedUserData = React.useMemo(() => {
         if (!members?.length) return new Map();
@@ -111,6 +111,13 @@ const ChatWorkspace: React.FC = () => {
         setNewMessage((prev: string) => prev + emojiData.emoji);
     }
 
+    const handelScroll = (e: React.UIEvent<HTMLElement>) => {
+        const top = e.currentTarget.scrollTop;
+        if (top <= 20) {
+            console.log('fetch');
+        }
+    }
+
     if (status === 'loading' && user) {
         return (<LoadingPage />)
     } else if (status === 'error') {
@@ -133,8 +140,10 @@ const ChatWorkspace: React.FC = () => {
                     <div
                         ref={messagesContainerRef}
                         className="flex-1 overflow-y-auto p-6"
+                        onScroll={(e) => handelScroll(e)}
                     >
                         <div className="max-w-4xl mx-auto">
+                            <div ref={messagesStatrRef} />
                             {messagesBox && user && messagesBox.map((message, index) => (
                                 <Message
                                     channel_type={channel_type}
