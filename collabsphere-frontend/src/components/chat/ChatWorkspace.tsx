@@ -25,6 +25,7 @@ const ChatWorkspace: React.FC = () => {
     const dispatch = useAppDispatch();
     const [newMessage, setNewMessage] = useState('');
     const [showEmoji, setShowEmoji] = useState(false);
+    const hasMounted = useRef(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesStatrRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -49,7 +50,7 @@ const ChatWorkspace: React.FC = () => {
 
 
     const scrollToBottom = () => {    // scroll to bottom when messages change
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); 
     };
 
     useEffect(() => { // scroll to bottom when messages change
@@ -116,8 +117,12 @@ const ChatWorkspace: React.FC = () => {
 
     const handelScroll = (e: React.UIEvent<HTMLElement>) => {
         const top = e.currentTarget.scrollTop;
-        if (top <= 10) {
-            dispatch(getMessageOffset(channel_id))
+        if (!hasMounted.current) {
+            hasMounted.current = true;
+            return;
+        }
+        if (top == 0) {
+            dispatch(getMessageOffset({channel_id})); 
         }
     }
 

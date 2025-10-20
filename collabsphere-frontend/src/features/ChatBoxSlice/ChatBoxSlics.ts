@@ -101,7 +101,7 @@ export const getAllMessagesByChannelId = createAsyncThunk<GetAllMessagesByChanne
     });
 
 interface GetMessageOffsetRequest {
-    channel_id:number  | null;
+    channel_id:number | null;
 }
 
 interface GetMessageOffsetResponse{
@@ -121,7 +121,7 @@ export const getMessageOffset = createAsyncThunk<GetMessageOffsetResponse,GetMes
     const accessToken = state.LoginReducer.accessToken;
     const pageOffset = state.ChatBoxReducer.messagePageCount;
     try{
-        const apiResponse:Response = await fetch(`/api/chat/get-message-offset/${pageOffset}`,{
+        const apiResponse:Response = await fetch(`/api/chat/get-message-offset?pageOffset=${pageOffset}&channelId=${req.channel_id}`,{
             method:'GET',
             headers:{
                 'Content-Type': 'application/json',
@@ -130,7 +130,6 @@ export const getMessageOffset = createAsyncThunk<GetMessageOffsetResponse,GetMes
         });
 
         const data:GetMessageOffsetAPIResponse = await apiResponse.json();
-
         if(apiResponse.ok){
             return{
                 message: data.message,
@@ -198,10 +197,11 @@ const ChatBoxSlice = createSlice({
             state.messagesBox = [];
             console.error('Error fetching messages:', action.payload);
         });
-        builder.addCase(getMessageOffset.fulfilled,(state,action)=>{
+        builder.addCase(getMessageOffset.fulfilled,(state,action)=>{ 
             state.status = 'success';
-            state.messageBox = [...action.payload.messagesBox.reverse(),...state.messageBox];
-            state.messagePageCount += action.payload.messagesBox.length();
+            state.messagesBox = [...action.payload.messagesBox.reverse(),...state.messagesBox];
+            state.messagePageCount += action.payload.messagesBox.length;
+            console.log( state.messagesBox);
         });
         builder.addCase(getMessageOffset.pending,(state)=>{
             state.status = 'loading';

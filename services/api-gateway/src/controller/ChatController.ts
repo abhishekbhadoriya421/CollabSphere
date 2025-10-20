@@ -100,3 +100,21 @@ export const CreateNewMessageAction = async (req: Request, res: Response) => {
         });
     }
 }
+
+export const GetPageOffsetAction = async (req:Request,res: Response) => {
+    const pageOffset = parseInt(req.query.pageOffset as string, 10) || 0;
+    const channelId = parseInt(req.query.channelId as string, 10);
+    if(!pageOffset || !channelId){
+        return res.status(404).json({ message:'Channel Id and Page of set cannot be null',status:404,messagesBox:[]});
+    }
+    try{
+        const messages = await Message.find({ channelId: channelId }).sort({ createdAt: -1 }).skip(pageOffset).limit(20);
+        return res.status(200).json({
+            message:'successfully fetch',
+            status:200,
+            messagesBox: messages
+        })
+    }catch(err:any){
+        return res.status(404).json({ message: ErrorHandler.getMessage(err),status:404,messagesBox:[]});
+    }
+}
