@@ -5,7 +5,7 @@ import { getSocket } from '../../utils/socket';
 import { useAppSelector, useAppDispatch } from '../customHooks/reduxCustomHook';
 import LoadingPage from '../Loading/LoadingPage';
 import useGetUserCredentials from '../customHooks/getUserCredentials';
-import { getAllMessagesByChannelId, setMessage, updateTempMessageId } from '../../features/ChatBoxSlice/ChatBoxSlics';
+import { getAllMessagesByChannelId, setMessage, updateTempMessageId,getMessageOffset } from '../../features/ChatBoxSlice/ChatBoxSlics';
 import { v4 as uuidv4 } from 'uuid';
 import EmojiPickerComponent from '../emoji/EmojiPicker';
 import { type EmojiClickData } from "emoji-picker-react";
@@ -35,6 +35,8 @@ const ChatWorkspace: React.FC = () => {
     const channel_name = useAppSelector((state) => state.ChatBoxReducer.channel_name);
     const channel_type = useAppSelector((state) => state.ChatBoxReducer.channel_type);
     const members = useAppSelector((state) => state.ChatBoxReducer.members);
+    const socket = getSocket();
+    
 
     const arrangedUserData = React.useMemo(() => {
         if (!members?.length) return new Map();
@@ -44,7 +46,8 @@ const ChatWorkspace: React.FC = () => {
         });
         return map;
     }, [members]);
-    const socket = getSocket();
+
+
     const scrollToBottom = () => {    // scroll to bottom when messages change
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -113,8 +116,8 @@ const ChatWorkspace: React.FC = () => {
 
     const handelScroll = (e: React.UIEvent<HTMLElement>) => {
         const top = e.currentTarget.scrollTop;
-        if (top <= 20) {
-            console.log('fetch');
+        if (top <= 10) {
+            dispatch(getMessageOffset(channel_id))
         }
     }
 

@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk, } from "@reduxjs/toolkit";
-
 interface Message {
     _id: string;
     channelId: number;
@@ -30,7 +29,7 @@ interface InitailState {
     status: 'idle' | 'loading' | 'success' | 'error';
     userIds: number[];
     members: User[];
-    messageLimit: number;
+    messagePageCount: number;
 }
 
 const initailState: InitailState = {
@@ -41,8 +40,7 @@ const initailState: InitailState = {
     status: 'idle',
     userIds: [],
     members: [],
-    messageLimit: 0,
-    // online:
+    messagePageCount: 0
 }
 
 interface GetAllMessagesByChannelIdResponse {
@@ -102,7 +100,55 @@ export const getAllMessagesByChannelId = createAsyncThunk<GetAllMessagesByChanne
         }
     });
 
+interface GetMessageOffsetRequest {
+    channel_id:number  | null;
+}
 
+interface GetMessageOffsetResponse{
+    message: string
+    status: 'success' |'error';
+    messagesBox: Message[];
+}
+
+interface GetMessageOffsetAPIResponse{
+    message: string;
+    status: number;
+    messagesBox: Message[];
+}
+export const getMessageOffset = createAsyncThunk<GetMessageOffsetResponse,GetMessageOffsetRequest,{state:RootState,rejectValue: string}>
+('chat-box/getMessagePageOffset',async (req:GetMessageOffsetRequest, {getState,rejectWithValuet})=>{
+    const state = getState();
+    const accessToken = state.LoginReducer.accessToken;
+    const pageOffset = state.ChatBoxReducer.messagePageCount;
+    try{
+        const apiResponse:Response = await fetch(`/api/chat/get-message-offset/${pageOffset}`,{
+            method:'GET',
+            headers:{
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        const data:GetMessageOffsetAPIResponse = await apiResponse.json();
+
+        if(apiResponse.ok){
+            return{
+                message: data.message,
+                status: 'success',
+                messagesBox: data.messagesBox
+            }
+        }else{
+            return rejectWithValue({
+                message:data.message
+            });
+        }
+    }catch(err:unknown){
+        return rejectWithValue({
+            message:'Unknown Error Occurred'
+        });
+    }
+
+});
 
 const ChatBoxSlice = createSlice({
     name: 'chat-box',
@@ -121,6 +167,7 @@ const ChatBoxSlice = createSlice({
                 senderId: action.payload.sender_id,
                 _id: action.payload.message_temp_id,
             }
+            state.messagePageCount = state.messagePageCount+1;
             state.messagesBox.push(newMessage);
         },
         updateTempMessageId: (state, action) => {
@@ -144,13 +191,26 @@ const ChatBoxSlice = createSlice({
             state.channel_type = action.payload.channel_type;
             state.userIds = action.payload.userIds;
             state.members = action.payload.members;
-        }
-        );
+            state.messagePageCount = action.payload.messagesBox.length;
+        });
         builder.addCase(getAllMessagesByChannelId.rejected, (state, action) => {
             state.status = 'error';
             state.messagesBox = [];
             console.error('Error fetching messages:', action.payload);
         });
+        builder.addCase(getMessageOffset.fulfilled,(state,action)=>{
+            state.status = 'success';
+            state.messageBox = [...action.payload.messagesBox.reverse(),...state.messageBox];
+            state.messagePageCount += action.payload.messagesBox.length();
+        });
+        builder.addCase(getMessageOffset.pending,(state)=>{
+            state.status = 'loading';
+        });
+        builder.addCase(getMessageOffset.rejected,(state,action)=>{
+            state.status = 'error';
+            console.log(action.payload.message);
+        });
+
     }
 });
 
