@@ -1,4 +1,4 @@
-import React, { type Dispatch, type SetStateAction } from 'react';
+import React, { type RefObject } from 'react';
 import type { Message as MessageType } from './types';
 
 interface MessageProps {
@@ -6,15 +6,16 @@ interface MessageProps {
     current_user_id: number;
     channel_type: 'dm' | 'group' | 'channel' | 'none' | undefined;
     arrangedUserData: Map<number, string>;
-    setMoreOptions: Dispatch<SetStateAction<string>>;
+    handleCloseMoreManu: (message_id: string) => void;
     moreOptions: string;
+    userReactRef: RefObject<HTMLDivElement | null>;
 }
 
-const Message: React.FC<MessageProps> = ({ message, current_user_id, channel_type, arrangedUserData, setMoreOptions, moreOptions }) => {
+const Message: React.FC<MessageProps> = ({ message, current_user_id, channel_type, arrangedUserData, handleCloseMoreManu, moreOptions, userReactRef }) => {
     // const reactEmojis = ['👍', '❤️', '😂', '😁', '😥'];
     const isCurrentUser = (message.senderId === current_user_id);
     return (
-        <div onClick={() => setMoreOptions(message._id!)} className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-6`}>
+        <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-6`}>
             <div className={`flex ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'} max-w-2xl w-full`}>
                 {/* User Avatar */}
                 {channel_type !== 'dm' &&
@@ -38,7 +39,7 @@ const Message: React.FC<MessageProps> = ({ message, current_user_id, channel_typ
                         className={`flex items-center relative ${isCurrentUser ? 'justify-end' : 'justify-start'
                             }`}
                     >
-                        <div className={`flex items-center gap-2 ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'}`}>
+                        <div onClick={() => handleCloseMoreManu(message._id!)} className={`flex items-center gap-2 ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'}`}>
                             <p
                                 className={`inline-block px-4 py-2 rounded-lg max-w-md break-words ${isCurrentUser
                                     ? 'bg-purple-600 text-white'
@@ -49,7 +50,7 @@ const Message: React.FC<MessageProps> = ({ message, current_user_id, channel_typ
                             </p>
                             {
                                 moreOptions === message._id &&
-                                <div className={` absolute z-10 flex flex-col rounded-lg shadow-lg bg-white text-sm border border-gray-200 ${isCurrentUser ? 'mr-2' : 'ml-2'}`}>
+                                <div ref={userReactRef} className={` absolute z-10 flex flex-col rounded-lg shadow-lg bg-white text-sm border border-gray-200 ${isCurrentUser ? 'mr-2' : 'ml-2'}`}>
                                     <button className="block w-full text-left px-3 py-2 hover:bg-gray-100">
                                         💬 Reply
                                     </button>

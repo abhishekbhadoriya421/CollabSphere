@@ -9,6 +9,7 @@ import { getAllMessagesByChannelId, setMessage, updateTempMessageId, getMessageO
 import { v4 as uuidv4 } from 'uuid';
 import EmojiPickerComponent from '../emoji/EmojiPicker';
 import { type EmojiClickData } from "emoji-picker-react";
+import { useClickOutside } from '../customHooks/useClickOutside';
 interface MessageData {
     content: string;
     channel_id: number;
@@ -27,8 +28,9 @@ const ChatWorkspace: React.FC = () => {
     const [showEmoji, setShowEmoji] = useState(false);
     const [moreOptions, setMoreOptions] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const previouseScrollerHeightRef = useRef(0);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
+    const previouseScrollerHeightRef = useRef(0);
+    const userReactRef = useRef<HTMLDivElement>(null);
     const [isUserAtBottom, setIsUserAtBottom] = useState(true);
     const { accessToken, user } = useGetUserCredentials();
     const channel_id = useAppSelector((state) => state.ChatBoxReducer.channel_id);
@@ -38,7 +40,6 @@ const ChatWorkspace: React.FC = () => {
     const channel_type = useAppSelector((state) => state.ChatBoxReducer.channel_type);
     const members = useAppSelector((state) => state.ChatBoxReducer.members);
     const socket = getSocket();
-
 
 
     const arrangedUserData = React.useMemo(() => {
@@ -137,6 +138,12 @@ const ChatWorkspace: React.FC = () => {
         }
     };
 
+    const handleCloseMoreManu = (message_id: string) => {
+        setMoreOptions(message_id);
+    }
+
+    useClickOutside(userReactRef, () => handleCloseMoreManu(''));
+
     if (status === 'loading' && user) {
         return (<LoadingPage />)
     } else if (status === 'error') {
@@ -169,8 +176,9 @@ const ChatWorkspace: React.FC = () => {
                                     message={message}
                                     current_user_id={user.id}
                                     arrangedUserData={arrangedUserData}
-                                    setMoreOptions={setMoreOptions}
+                                    handleCloseMoreManu={handleCloseMoreManu}
                                     moreOptions={moreOptions}
+                                    userReactRef={userReactRef}
                                 />
                             ))}
                             <div ref={messagesEndRef} />
