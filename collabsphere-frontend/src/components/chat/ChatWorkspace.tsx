@@ -27,10 +27,12 @@ const ChatWorkspace: React.FC = () => {
     const [newMessage, setNewMessage] = useState('');
     const [showEmoji, setShowEmoji] = useState(false);
     const [moreOptions, setMoreOptions] = useState('');
+    const [userReact, setUserReact] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const previouseScrollerHeightRef = useRef(0);
-    const userReactRef = useRef<HTMLDivElement>(null);
+    const userMoreOptionsRef = useRef<HTMLDivElement>(null);
+    const userEmojiRef = useRef<HTMLDivElement>(null);
     const [isUserAtBottom, setIsUserAtBottom] = useState(true);
     const { accessToken, user } = useGetUserCredentials();
     const channel_id = useAppSelector((state) => state.ChatBoxReducer.channel_id);
@@ -138,11 +140,23 @@ const ChatWorkspace: React.FC = () => {
         }
     };
 
-    const handleCloseMoreManu = (message_id: string) => {
+    /**\
+     * handle when user click on react button
+     */
+    const handleUserReact = (message_id: string) => {
+        setUserReact(message_id);
+    }
+    /**
+     * Close More Options Button when user click outside anywhere 
+     */
+    const handleMoreManu = (message_id: string) => {
         setMoreOptions(message_id);
     }
 
-    useClickOutside(userReactRef, () => handleCloseMoreManu(''));
+    useClickOutside(userMoreOptionsRef, () => handleMoreManu(''));
+    useClickOutside(userEmojiRef, () => handleUserReact(''));
+
+
 
     if (status === 'loading' && user) {
         return (<LoadingPage />)
@@ -176,9 +190,12 @@ const ChatWorkspace: React.FC = () => {
                                     message={message}
                                     current_user_id={user.id}
                                     arrangedUserData={arrangedUserData}
-                                    handleCloseMoreManu={handleCloseMoreManu}
+                                    handleMoreManu={handleMoreManu}
                                     moreOptions={moreOptions}
-                                    userReactRef={userReactRef}
+                                    userMoreOptionsRef={userMoreOptionsRef}
+                                    handleUserReact={handleUserReact}
+                                    userReact={userReact}
+                                    userEmojiRef={userEmojiRef}
                                 />
                             ))}
                             <div ref={messagesEndRef} />
