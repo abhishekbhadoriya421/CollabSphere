@@ -27,7 +27,7 @@ const ChatWorkspace: React.FC = () => {
     const [showEmoji, setShowEmoji] = useState(false);
     const hasMounted = useRef(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const messagesStatrRef = useRef<HTMLDivElement>(null);
+    const messagesStartRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const { accessToken, user } = useGetUserCredentials();
     const channel_id = useAppSelector((state) => state.ChatBoxReducer.channel_id);
@@ -53,8 +53,16 @@ const ChatWorkspace: React.FC = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); 
     };
 
+     const scrollToTop = () => {    // scroll to bottom when messages change
+        messagesStartRef.current?.scrollIntoView({ behavior: 'smooth' }); 
+    };
     useEffect(() => { // scroll to bottom when messages change
-        scrollToBottom();
+        if(hasMounted.current === true){
+            console.log(messagesStartRef)
+        }else{
+            scrollToBottom();
+        }
+
     }, [messagesBox]);
 
     useEffect(() => {
@@ -121,7 +129,7 @@ const ChatWorkspace: React.FC = () => {
             hasMounted.current = true;
             return;
         }
-        if (top == 0) {
+        if (top === 0) {
             dispatch(getMessageOffset({channel_id})); 
         }
     }
@@ -151,8 +159,17 @@ const ChatWorkspace: React.FC = () => {
                         onScroll={(e) => handelScroll(e)}
                     >
                         <div className="max-w-4xl mx-auto">
-                            <div ref={messagesStatrRef} />
                             {messagesBox && user && messagesBox.map((message, index) => (
+                                <div>
+                                (index === 0)?
+                                    <Message
+                                        channel_type={channel_type}
+                                        key={index}
+                                        message={message}
+                                        current_user_id={user.id}
+                                        arrangedUserData={arrangedUserData}
+                                    />
+                                :
                                 <Message
                                     channel_type={channel_type}
                                     key={index}
@@ -160,6 +177,7 @@ const ChatWorkspace: React.FC = () => {
                                     current_user_id={user.id}
                                     arrangedUserData={arrangedUserData}
                                 />
+                                </div> 
                             ))}
                             <div ref={messagesEndRef} />
                         </div>

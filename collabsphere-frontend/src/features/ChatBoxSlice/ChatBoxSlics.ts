@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, } from "@reduxjs/toolkit";
+import type { RootState } from "../../store/store";
 interface Message {
     _id: string;
     channelId: number;
@@ -101,53 +102,50 @@ export const getAllMessagesByChannelId = createAsyncThunk<GetAllMessagesByChanne
     });
 
 interface GetMessageOffsetRequest {
-    channel_id:number | null;
+    channel_id: number | null;
 }
 
-interface GetMessageOffsetResponse{
+interface GetMessageOffsetResponse {
     message: string
-    status: 'success' |'error';
+    status: 'success' | 'error';
     messagesBox: Message[];
 }
 
-interface GetMessageOffsetAPIResponse{
+interface GetMessageOffsetAPIResponse {
     message: string;
     status: number;
     messagesBox: Message[];
 }
-export const getMessageOffset = createAsyncThunk<GetMessageOffsetResponse,GetMessageOffsetRequest,{state:RootState,rejectValue: string}>
-('chat-box/getMessagePageOffset',async (req:GetMessageOffsetRequest, {getState,rejectWithValuet})=>{
-    const state = getState();
-    const accessToken = state.LoginReducer.accessToken;
-    const pageOffset = state.ChatBoxReducer.messagePageCount;
-    try{
-        const apiResponse:Response = await fetch(`/api/chat/get-message-offset?pageOffset=${pageOffset}&channelId=${req.channel_id}`,{
-            method:'GET',
-            headers:{
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
-            }
-        });
-
-        const data:GetMessageOffsetAPIResponse = await apiResponse.json();
-        if(apiResponse.ok){
-            return{
-                message: data.message,
-                status: 'success',
-                messagesBox: data.messagesBox
-            }
-        }else{
-            return rejectWithValue({
-                message:data.message
+export const getMessageOffset = createAsyncThunk<GetMessageOffsetResponse, GetMessageOffsetRequest, { state: RootState, rejectValue: string }>
+    ('chat-box/getMessagePageOffset', async (req: GetMessageOffsetRequest, { getState, rejectWithValue }) => {
+        const state = getState();
+        const accessToken = state.LoginReducer.accessToken;
+        const pageOffset = state.ChatBoxReducer.messagePageCount;
+        try {
+            const apiResponse: Response = await fetch(`/api/chat/get-message-offset?pageOffset=${pageOffset}&channelId=${req.channel_id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                }
             });
-        }
-    }catch(err:unknown){
-        return rejectWithValue({
-            message:'Unknown Error Occurred'
-        });
-    }
 
-});
+            const data: GetMessageOffsetAPIResponse = await apiResponse.json();
+            if (apiResponse.ok) {
+                return {
+                    message: data.message,
+                    status: 'success',
+                    messagesBox: data.messagesBox
+                }
+            } else {
+                return rejectWithValue(data.message);
+            }
+        } catch (err: unknown) {
+            console.log(err);
+            return rejectWithValue("Unexpected Error Occurred");
+        }
+
+    });
 
 const ChatBoxSlice = createSlice({
     name: 'chat-box',
@@ -166,7 +164,7 @@ const ChatBoxSlice = createSlice({
                 senderId: action.payload.sender_id,
                 _id: action.payload.message_temp_id,
             }
-            state.messagePageCount = state.messagePageCount+1;
+            state.messagePageCount = state.messagePageCount + 1;
             state.messagesBox.push(newMessage);
         },
         updateTempMessageId: (state, action) => {
@@ -197,18 +195,16 @@ const ChatBoxSlice = createSlice({
             state.messagesBox = [];
             console.error('Error fetching messages:', action.payload);
         });
-        builder.addCase(getMessageOffset.fulfilled,(state,action)=>{ 
+        builder.addCase(getMessageOffset.fulfilled, (state, action) => {
             state.status = 'success';
-            state.messagesBox = [...action.payload.messagesBox.reverse(),...state.messagesBox];
+            state.messagesBox = [...action.payload.messagesBox.reverse(), ...state.messagesBox];
             state.messagePageCount += action.payload.messagesBox.length;
-            console.log( state.messagesBox);
         });
-        builder.addCase(getMessageOffset.pending,(state)=>{
+        builder.addCase(getMessageOffset.pending, (state) => {
             state.status = 'loading';
         });
-        builder.addCase(getMessageOffset.rejected,(state,action)=>{
+        builder.addCase(getMessageOffset.rejected, (state) => {
             state.status = 'error';
-            console.log(action.payload.message);
         });
 
     }
