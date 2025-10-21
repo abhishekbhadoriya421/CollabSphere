@@ -57,7 +57,8 @@ const ChatWorkspace: React.FC = () => {
         const container = messagesContainerRef.current;
         if (!container) return;
         if (previouseScrollerHeightRef.current && container.scrollHeight > previouseScrollerHeightRef.current) {
-            const newScrollTop = container.scrollHeight - previouseScrollerHeightRef.current; container.scrollTop = newScrollTop;
+            const newScrollTop = container.scrollHeight - previouseScrollerHeightRef.current;
+            container.scrollTop = newScrollTop;
             previouseScrollerHeightRef.current = 0;
         } else if (isUserAtBottom) {
             scrollToBottom("smooth");
