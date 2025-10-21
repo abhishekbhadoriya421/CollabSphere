@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type Dispatch, type SetStateAction } from 'react';
 import type { Message as MessageType } from './types';
 
 interface MessageProps {
@@ -6,17 +6,15 @@ interface MessageProps {
     current_user_id: number;
     channel_type: 'dm' | 'group' | 'channel' | 'none' | undefined;
     arrangedUserData: Map<number, string>;
+    setMoreOptions: Dispatch<SetStateAction<string>>;
+    moreOptions: string;
 }
 
-const Message: React.FC<MessageProps> = ({ message, current_user_id, channel_type, arrangedUserData }) => {
-    const reactEmojis = ['👍', '❤️', '😂', '😁', '😥'];
+const Message: React.FC<MessageProps> = ({ message, current_user_id, channel_type, arrangedUserData, setMoreOptions, moreOptions }) => {
+    // const reactEmojis = ['👍', '❤️', '😂', '😁', '😥'];
     const isCurrentUser = (message.senderId === current_user_id);
-
-    const handleMouseOver = () => {
-        console.log('here');
-    }
     return (
-        <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-6`}>
+        <div onClick={() => setMoreOptions(message._id!)} className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-6`}>
             <div className={`flex ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'} max-w-2xl w-full`}>
                 {/* User Avatar */}
                 {channel_type !== 'dm' &&
@@ -36,14 +34,37 @@ const Message: React.FC<MessageProps> = ({ message, current_user_id, channel_typ
                         <span className="text-xs text-gray-500">{message.createdAt}</span>
                     </div>
 
-                    <div onMouseOver={handleMouseOver} className={`${isCurrentUser ? 'text-right' : 'text-left'}`}>
-                        <p className={`inline-block px-4 py-2 rounded-lg ${isCurrentUser
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-gray-100 text-gray-800'
-                            }`}>
-                            {message.text}
-                        </p>
+                    <div
+                        className={`flex items-center relative ${isCurrentUser ? 'justify-end' : 'justify-start'
+                            }`}
+                    >
+                        <div className={`flex items-center gap-2 ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'}`}>
+                            <p
+                                className={`inline-block px-4 py-2 rounded-lg max-w-md break-words ${isCurrentUser
+                                    ? 'bg-purple-600 text-white'
+                                    : 'bg-gray-100 text-gray-800'
+                                    }`}
+                            >
+                                {message.text}
+                            </p>
+                            {
+                                moreOptions === message._id &&
+                                <div className={` absolute z-10 flex flex-col rounded-lg shadow-lg bg-white text-sm border border-gray-200 ${isCurrentUser ? 'mr-2' : 'ml-2'}`}>
+                                    <button className="block w-full text-left px-3 py-2 hover:bg-gray-100">
+                                        💬 Reply
+                                    </button>
+                                    <button className="block w-full text-left px-3 py-2 hover:bg-gray-100">
+                                        😊 React
+                                    </button>
+                                    <button className="block w-full text-left px-3 py-2 text-red-600 hover:bg-gray-100">
+                                        🗑 Delete
+                                    </button>
+                                </div>
+                            }
+
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>

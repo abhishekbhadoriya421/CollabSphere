@@ -25,6 +25,7 @@ const ChatWorkspace: React.FC = () => {
     const dispatch = useAppDispatch();
     const [newMessage, setNewMessage] = useState('');
     const [showEmoji, setShowEmoji] = useState(false);
+    const [moreOptions, setMoreOptions] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const previouseScrollerHeightRef = useRef(0);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -37,6 +38,7 @@ const ChatWorkspace: React.FC = () => {
     const channel_type = useAppSelector((state) => state.ChatBoxReducer.channel_type);
     const members = useAppSelector((state) => state.ChatBoxReducer.members);
     const socket = getSocket();
+
 
 
     const arrangedUserData = React.useMemo(() => {
@@ -167,6 +169,8 @@ const ChatWorkspace: React.FC = () => {
                                     message={message}
                                     current_user_id={user.id}
                                     arrangedUserData={arrangedUserData}
+                                    setMoreOptions={setMoreOptions}
+                                    moreOptions={moreOptions}
                                 />
                             ))}
                             <div ref={messagesEndRef} />
