@@ -5,7 +5,7 @@ import { getSocket } from '../../utils/socket';
 import { useAppSelector, useAppDispatch } from '../customHooks/reduxCustomHook';
 import LoadingPage from '../Loading/LoadingPage';
 import useGetUserCredentials from '../customHooks/getUserCredentials';
-import { getAllMessagesByChannelId, setMessage, updateTempMessageId,getMessageOffset } from '../../features/ChatBoxSlice/ChatBoxSlics';
+import { getAllMessagesByChannelId, setMessage, updateTempMessageId, getMessageOffset } from '../../features/ChatBoxSlice/ChatBoxSlics';
 import { v4 as uuidv4 } from 'uuid';
 import EmojiPickerComponent from '../emoji/EmojiPicker';
 import { type EmojiClickData } from "emoji-picker-react";
@@ -25,10 +25,10 @@ const ChatWorkspace: React.FC = () => {
     const dispatch = useAppDispatch();
     const [newMessage, setNewMessage] = useState('');
     const [showEmoji, setShowEmoji] = useState(false);
-    const hasMounted = useRef(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const messagesStartRef = useRef<HTMLDivElement>(null);
+    const previouseScrollerHeightRef = useRef(0);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
+    const [isUserAtBottom, setIsUserAtBottom] = useState(true);
     const { accessToken, user } = useGetUserCredentials();
     const channel_id = useAppSelector((state) => state.ChatBoxReducer.channel_id);
     const status = useAppSelector((state) => state.ChatBoxReducer.status);
@@ -37,7 +37,7 @@ const ChatWorkspace: React.FC = () => {
     const channel_type = useAppSelector((state) => state.ChatBoxReducer.channel_type);
     const members = useAppSelector((state) => state.ChatBoxReducer.members);
     const socket = getSocket();
-    
+
 
     const arrangedUserData = React.useMemo(() => {
         if (!members?.length) return new Map();
@@ -49,21 +49,20 @@ const ChatWorkspace: React.FC = () => {
     }, [members]);
 
 
-    const scrollToBottom = () => {    // scroll to bottom when messages change
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); 
+    const scrollToBottom = (behavior: ScrollBehavior = "auto") => {
+        messagesEndRef.current?.scrollIntoView({ behavior });
     };
 
-     const scrollToTop = () => {    // scroll to bottom when messages change
-        messagesStartRef.current?.scrollIntoView({ behavior: 'smooth' }); 
-    };
-    useEffect(() => { // scroll to bottom when messages change
-        if(hasMounted.current === true){
-            console.log(messagesStartRef)
-        }else{
-            scrollToBottom();
+    useEffect(() => {
+        const container = messagesContainerRef.current;
+        if (!container) return;
+        if (previouseScrollerHeightRef.current && container.scrollHeight > previouseScrollerHeightRef.current) {
+            const newScrollTop = container.scrollHeight - previouseScrollerHeightRef.current; container.scrollTop = newScrollTop;
+            previouseScrollerHeightRef.current = 0;
+        } else if (isUserAtBottom) {
+            scrollToBottom("smooth");
         }
-
-    }, [messagesBox]);
+    }, [isUserAtBottom, messagesBox]);
 
     useEffect(() => {
         if (!socket) return;
@@ -123,16 +122,17 @@ const ChatWorkspace: React.FC = () => {
         setNewMessage((prev: string) => prev + emojiData.emoji);
     }
 
-    const handelScroll = (e: React.UIEvent<HTMLElement>) => {
-        const top = e.currentTarget.scrollTop;
-        if (!hasMounted.current) {
-            hasMounted.current = true;
-            return;
+    const handleScroll = (e: React.UIEvent<HTMLElement>) => {
+        const el = e.currentTarget;
+        const isAtBottom = el.scrollHeight - el.scrollTop === el.clientHeight;
+        setIsUserAtBottom(isAtBottom);
+
+        if (el.scrollTop === 0) {
+            // store scroll height before loading new messages
+            previouseScrollerHeightRef.current = el.scrollHeight;
+            dispatch(getMessageOffset({ channel_id }));
         }
-        if (top === 0) {
-            dispatch(getMessageOffset({channel_id})); 
-        }
-    }
+    };
 
     if (status === 'loading' && user) {
         return (<LoadingPage />)
@@ -156,12 +156,11 @@ const ChatWorkspace: React.FC = () => {
                     <div
                         ref={messagesContainerRef}
                         className="flex-1 overflow-y-auto p-6"
-                        onScroll={(e) => handelScroll(e)}
+                        onScroll={(e) => handleScroll(e)}
                     >
                         <div className="max-w-4xl mx-auto">
                             {messagesBox && user && messagesBox.map((message, index) => (
                                 <div>
-                                (index === 0)?
                                     <Message
                                         channel_type={channel_type}
                                         key={index}
@@ -169,15 +168,7 @@ const ChatWorkspace: React.FC = () => {
                                         current_user_id={user.id}
                                         arrangedUserData={arrangedUserData}
                                     />
-                                :
-                                <Message
-                                    channel_type={channel_type}
-                                    key={index}
-                                    message={message}
-                                    current_user_id={user.id}
-                                    arrangedUserData={arrangedUserData}
-                                />
-                                </div> 
+                                </div>
                             ))}
                             <div ref={messagesEndRef} />
                         </div>
