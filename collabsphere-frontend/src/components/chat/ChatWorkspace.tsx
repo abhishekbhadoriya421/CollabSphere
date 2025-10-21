@@ -161,15 +161,13 @@ const ChatWorkspace: React.FC = () => {
                     >
                         <div className="max-w-4xl mx-auto">
                             {messagesBox && user && messagesBox.map((message, index) => (
-                                <div>
-                                    <Message
-                                        channel_type={channel_type}
-                                        key={index}
-                                        message={message}
-                                        current_user_id={user.id}
-                                        arrangedUserData={arrangedUserData}
-                                    />
-                                </div>
+                                <Message
+                                    channel_type={channel_type}
+                                    key={index}
+                                    message={message}
+                                    current_user_id={user.id}
+                                    arrangedUserData={arrangedUserData}
+                                />
                             ))}
                             <div ref={messagesEndRef} />
                         </div>

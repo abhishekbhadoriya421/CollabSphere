@@ -9,7 +9,12 @@ interface MessageProps {
 }
 
 const Message: React.FC<MessageProps> = ({ message, current_user_id, channel_type, arrangedUserData }) => {
+    const reactEmojis = ['👍', '❤️', '😂', '😁', '😥'];
     const isCurrentUser = (message.senderId === current_user_id);
+
+    const handleMouseOver = () => {
+        console.log('here');
+    }
     return (
         <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-6`}>
             <div className={`flex ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'} max-w-2xl w-full`}>
@@ -31,7 +36,7 @@ const Message: React.FC<MessageProps> = ({ message, current_user_id, channel_typ
                         <span className="text-xs text-gray-500">{message.createdAt}</span>
                     </div>
 
-                    <div className={`${isCurrentUser ? 'text-right' : 'text-left'}`}>
+                    <div onMouseOver={handleMouseOver} className={`${isCurrentUser ? 'text-right' : 'text-left'}`}>
                         <p className={`inline-block px-4 py-2 rounded-lg ${isCurrentUser
                             ? 'bg-purple-600 text-white'
                             : 'bg-gray-100 text-gray-800'
