@@ -11,6 +11,10 @@ interface Message {
         size?: number;
         mime?: string;
     }>;
+    reactions?: Array<{
+        react: string;
+        reactorId: number;
+    }>,
     sequence?: number;
     read_by?: number[];
     status?: 'sent' | 'delivered' | 'read';

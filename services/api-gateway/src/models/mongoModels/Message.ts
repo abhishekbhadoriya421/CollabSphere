@@ -9,6 +9,17 @@ const attachmentSchema = new mongoose.Schema({
     size: Number,
     mime: String
 });
+
+const reactionsSchema = new mongoose.Schema({
+    react: {
+        type: String,
+        required: true
+    },
+    reactorId: {
+        type: Number,
+        required: true
+    }
+})
 const messageSchema = new mongoose.Schema({
     channelId: {
         type: Number,
@@ -23,6 +34,7 @@ const messageSchema = new mongoose.Schema({
         type: String
     },
     attachments: [attachmentSchema],
+    reactions: [reactionsSchema],
     sequence: {
         type: Number,
         index: true
