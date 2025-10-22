@@ -42,8 +42,9 @@ const Message: React.FC<MessageProps> = ({ message, current_user_id, channel_typ
                         className={`flex items-center relative ${isCurrentUser ? 'justify-end' : 'justify-start'
                             }`}
                     >
-                        <div onClick={() => handleMoreManu(message._id!)} className={`flex items-center gap-2 ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'}`}>
+                        <div className={`flex items-center gap-2 ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'}`}>
                             <p
+                                onClick={() => handleMoreManu(message._id!)}
                                 className={`inline-block px-4 py-2 rounded-lg max-w-md break-words ${isCurrentUser
                                     ? 'bg-purple-600 text-white'
                                     : 'bg-gray-100 text-gray-800'
@@ -66,8 +67,8 @@ const Message: React.FC<MessageProps> = ({ message, current_user_id, channel_typ
                                         </button>
                                         <button onClick={
                                             () => {
-                                                handleUserReact(message._id!);
                                                 handleMoreManu('');
+                                                handleUserReact(message._id!);
                                             }
                                         } className="block w-full text-left px-3 py-2 hover:bg-gray-100">
                                             😊 React
