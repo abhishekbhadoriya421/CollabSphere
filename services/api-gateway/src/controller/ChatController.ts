@@ -101,20 +101,50 @@ export const CreateNewMessageAction = async (req: Request, res: Response) => {
     }
 }
 
-export const GetPageOffsetAction = async (req:Request,res: Response) => {
+export const GetPageOffsetAction = async (req: Request, res: Response) => {
     const pageOffset = parseInt(req.query.pageOffset as string, 10) || 0;
     const channelId = parseInt(req.query.channelId as string, 10);
-    if(!pageOffset || !channelId){
-        return res.status(404).json({ message:'Channel Id and Page of set cannot be null',status:404,messagesBox:[]});
+    if (!pageOffset || !channelId) {
+        return res.status(404).json({ message: 'Channel Id and Page of set cannot be null', status: 404, messagesBox: [] });
     }
-    try{
+    try {
         const messages = await Message.find({ channelId: channelId }).sort({ createdAt: -1 }).skip(pageOffset).limit(20);
         return res.status(200).json({
-            message:'successfully fetch',
-            status:200,
+            message: 'successfully fetch',
+            status: 200,
             messagesBox: messages
         })
-    }catch(err:any){
-        return res.status(404).json({ message: ErrorHandler.getMessage(err),status:404,messagesBox:[]});
+    } catch (err: any) {
+        return res.status(404).json({ message: ErrorHandler.getMessage(err), status: 404, messagesBox: [] });
+    }
+}
+
+
+export const SaveUserReactionAction = async (req: Request, res: Response) => {
+    try {
+        const { reactor_id, message_id, channel_id, react } = req.body;
+        /**
+         * update the react value if reaction already exist else add reaction
+         */
+
+        const result = await Message.updateOne(
+            { _id: message_id, channelId: channel_id, "reactions.reactorId": reactor_id },
+            { $set: { "reactions.$.react": react } }
+        );
+        if (result.matchedCount === 0) { // if reaction not found create one 
+            await Message.updateOne(
+                { _id: message_id, channelId: channel_id },
+                { $push: { reactions: { react: react, reactorId: reactor_id } } }
+            )
+        }
+        return res.status(200).json({
+            message: 'Successfully saved the reaction',
+            status: 200,
+        });
+    } catch (err: any) {
+        return res.status(404).json({
+            message: ErrorHandler.getMessage(err),
+            status: 404
+        });
     }
 }

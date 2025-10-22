@@ -74,13 +74,34 @@ export default class ChatEventHandler {
     }
 
     public async sendUserReaction(socket: Socket, reactor_id: number, channel_id: string, message_id: string, react: string) {
-        console.log(reactor_id, ' ' + channel_id + " " + message_id + " " + react)
         socket.to(channel_id).emit('receive_user_reaction', {
             reactor_id: reactor_id,
             message_id: message_id,
             react: react,
             channel_id: channel_id
         });
+
+        /**
+         * save message reaction 
+         */
+        try {
+            const refreshToken = socket.data.refresh_token;
+            const response = await axios.post('http://localhost:8080/api/chat/save-user-reaction',
+                {
+                    react: react,
+                    reactor_id: reactor_id,
+                    message_id: message_id,
+                    channel_id: channel_id
+                }, {
+                headers: {
+                    Authorization: `Bearer ${refreshToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            console.log(response);
+        } catch (err: any) {
+            console.log(err);
+        }
     }
 }
 
