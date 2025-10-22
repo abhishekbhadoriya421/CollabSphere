@@ -84,7 +84,9 @@ const Message: React.FC<MessageProps> = ({
                             >
                                 {message.text}
                             </p>
-                            <span></span>
+                            {message && message.reactions && message.reactions.map((react, index) => {
+                                return <span key={index}>{react.react}</span>
+                            })}
                             <div>
                                 {/* Use local showReactions state and ref for this message */}
                                 {showReactions && (

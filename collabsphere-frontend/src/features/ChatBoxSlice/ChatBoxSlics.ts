@@ -179,6 +179,27 @@ const ChatBoxSlice = createSlice({
                     msg._id = message_id;
                 }
             });
+        },
+        addReaction: (state, action) => {
+            const { message_id, react, reactor_id } = action.payload;
+            state.messagesBox.forEach((message) => {
+                if (message._id === message_id) {
+                    let isReactExist = false;
+                    message.reactions?.forEach(reactions => {
+                        if (reactions.reactorId === reactor_id) {
+                            reactions.react = react
+                            isReactExist = true;
+                        }
+                    });
+                    if (!isReactExist) {
+                        message.reactions?.push({
+                            react: react,
+                            reactorId: reactor_id
+                        });
+                    }
+                }
+            });
+            console.log(state.messagesBox);
         }
     },
     extraReducers: (builder) => {
@@ -214,5 +235,5 @@ const ChatBoxSlice = createSlice({
     }
 });
 
-export const { setActiveChannel, setMessage, updateTempMessageId } = ChatBoxSlice.actions;
+export const { setActiveChannel, setMessage, updateTempMessageId, addReaction } = ChatBoxSlice.actions;
 export default ChatBoxSlice.reducer;

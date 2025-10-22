@@ -5,7 +5,7 @@ import { getSocket } from '../../utils/socket';
 import { useAppSelector, useAppDispatch } from '../customHooks/reduxCustomHook';
 import LoadingPage from '../Loading/LoadingPage';
 import useGetUserCredentials from '../customHooks/getUserCredentials';
-import { getAllMessagesByChannelId, setMessage, updateTempMessageId, getMessageOffset } from '../../features/ChatBoxSlice/ChatBoxSlics';
+import { getAllMessagesByChannelId, setMessage, updateTempMessageId, getMessageOffset, addReaction } from '../../features/ChatBoxSlice/ChatBoxSlics';
 import { v4 as uuidv4 } from 'uuid';
 import EmojiPickerComponent from '../emoji/EmojiPicker';
 import { type EmojiClickData } from "emoji-picker-react";
@@ -82,7 +82,7 @@ const ChatWorkspace: React.FC = () => {
         }
 
         const handleUserReaction = (data: UserReaction) => {
-            console.log(data);
+            dispatch(addReaction({ message_id: data.message_id, react: data.react, reactor_id: data.reactor_id }));
         }
 
         socket.on('receive_message', handleReceive);
@@ -152,6 +152,7 @@ const ChatWorkspace: React.FC = () => {
     const handleOnClickReact = (message_id: string, emoji: string) => {
         if (socket) {
             socket.emit('send_user_reaction', { reactor_id: user!.id, channel_id: channel_id!, react: emoji, message_id: message_id });
+            dispatch(addReaction({ message_id: message_id, react: emoji, reactor_id: user!.id }))
         }
     }
     if (status === 'loading' && user) {
