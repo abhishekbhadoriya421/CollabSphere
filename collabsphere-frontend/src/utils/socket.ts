@@ -1,19 +1,25 @@
 import { io, Socket } from 'socket.io-client';
 
-interface UserTyping {
+export interface UserTyping {
     user_id: number;
     channel_id: number;
 }
 
-interface UserReceiveMessage {
+export interface UserReceiveMessage {
     message_temp_id: string;
     content: string;
     sender_id: number;
     channel_id: number;
 }
 
-interface MessageSaved {
+export interface MessageSaved {
     message_temp_id: string;
+    channel_id: number;
+    message_id: string;
+}
+export interface UserReaction {
+    reactor_id: number;
+    react: string;
     channel_id: number;
     message_id: string;
 }
@@ -22,12 +28,14 @@ interface ServerToClientEvent {
     user_typing: (data: UserTyping) => void;
     user_joined: (data: { user_Id: number }) => void;
     message_saved: (data: MessageSaved) => void;
+    receive_user_reaction: (data: UserReaction) => void;
 }
 
 interface ClientToServerEvent {
     join_channel: (data: { channel_id: number }) => void;
     typing: (data: UserTyping) => void;
-    send_message: (data: UserReceiveMessage) => void
+    send_message: (data: UserReceiveMessage) => void;
+    send_user_reaction: (data: UserReaction) => void;
 }
 
 let socket: Socket<ServerToClientEvent, ClientToServerEvent> | null = null;

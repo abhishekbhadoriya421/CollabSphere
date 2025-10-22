@@ -10,29 +10,17 @@ import { v4 as uuidv4 } from 'uuid';
 import EmojiPickerComponent from '../emoji/EmojiPicker';
 import { type EmojiClickData } from "emoji-picker-react";
 import { useClickOutside } from '../customHooks/useClickOutside';
-interface MessageData {
-    content: string;
-    channel_id: number;
-    sender_id: number;
-    message_temp_id: string;
-}
+import { type MessageSaved, type UserReceiveMessage, type UserReaction } from '../../utils/socket';
 
-interface MessageSaved {
-    message_temp_id: string;
-    channel_id: number;
-    message_id: string;
-}
 const ChatWorkspace: React.FC = () => {
     const dispatch = useAppDispatch();
     const [newMessage, setNewMessage] = useState('');
     const [showEmoji, setShowEmoji] = useState(false);
     const [moreOptions, setMoreOptions] = useState('');
-    const [userReact, setUserReact] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const previouseScrollerHeightRef = useRef(0);
     const userMoreOptionsRef = useRef<HTMLDivElement>(null);
-    const userEmojiRef = useRef<HTMLDivElement>(null);
     const [isUserAtBottom, setIsUserAtBottom] = useState(true);
     const { accessToken, user } = useGetUserCredentials();
     const channel_id = useAppSelector((state) => state.ChatBoxReducer.channel_id);
@@ -77,7 +65,7 @@ const ChatWorkspace: React.FC = () => {
         /**
          * Handle message receive 
          */
-        const handleReceive = (data: MessageData): void => {
+        const handleReceive = (data: UserReceiveMessage): void => {
             dispatch(setMessage({
                 content: data.content,
                 channel_id: data.channel_id,
@@ -93,11 +81,17 @@ const ChatWorkspace: React.FC = () => {
             }));
         }
 
+        const handleUserReaction = (data: UserReaction) => {
+            console.log(data);
+        }
+
         socket.on('receive_message', handleReceive);
         socket.on('message_saved', handleMessageSaved);
+        socket.on('receive_user_reaction', handleUserReaction);
         return () => {
             socket.off('receive_message', handleReceive);
             socket.off('message_saved', handleMessageSaved);
+            socket.off('receive_user_reaction', handleUserReaction);
         };
 
     }, [channel_id, socket, dispatch])
@@ -143,9 +137,6 @@ const ChatWorkspace: React.FC = () => {
     /**\
      * handle when user click on react button
      */
-    const handleUserReact = (message_id: string) => {
-        setUserReact(message_id);
-    }
     /**
      * Close More Options Button when user click outside anywhere 
      */
@@ -154,10 +145,15 @@ const ChatWorkspace: React.FC = () => {
     }
 
     useClickOutside(userMoreOptionsRef, () => handleMoreManu(''));
-    useClickOutside(userEmojiRef, () => handleUserReact(''));
 
-
-
+    /**
+     * handle user clicked emoji 
+     */
+    const handleOnClickReact = (message_id: string, emoji: string) => {
+        if (socket) {
+            socket.emit('send_user_reaction', { reactor_id: user!.id, channel_id: channel_id!, react: emoji, message_id: message_id });
+        }
+    }
     if (status === 'loading' && user) {
         return (<LoadingPage />)
     } else if (status === 'error') {
@@ -193,9 +189,7 @@ const ChatWorkspace: React.FC = () => {
                                     handleMoreManu={handleMoreManu}
                                     moreOptions={moreOptions}
                                     userMoreOptionsRef={userMoreOptionsRef}
-                                    handleUserReact={handleUserReact}
-                                    userReact={userReact}
-                                    userEmojiRef={userEmojiRef}
+                                    handleOnClickReact={handleOnClickReact}
                                 />
                             ))}
                             <div ref={messagesEndRef} />

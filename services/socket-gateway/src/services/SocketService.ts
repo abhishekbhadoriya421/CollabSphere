@@ -40,6 +40,10 @@ export default class SocketService {
                 this.chatEvenHandlerObject.saveNewMessageEvent(this.io, socket, data.channel_id, data.content, data.sender_id, data.message_temp_id);
             });
 
+            socket.on('send_user_reaction', (data) => {
+                this.chatEvenHandlerObject.sendUserReaction(socket, data.reactor_id, data.channel_id, data.message_id, data.react);
+            });
+
             socket.on('disconnect', async () => {
                 await this.chatEvenHandlerObject.handleDisconnect(socket);
                 console.log('disconnected: ' + socket.id)
@@ -47,8 +51,4 @@ export default class SocketService {
         });
 
     }
-
-
-
-
 }

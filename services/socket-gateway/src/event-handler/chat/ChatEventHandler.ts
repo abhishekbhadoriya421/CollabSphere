@@ -1,6 +1,5 @@
 import { Socket, Server } from "socket.io";
 import UserCacheService from "../../services/UserCacheService";
-import ChannelCacheService from "../../services/ChannelCacheService";
 import axios from 'axios';
 
 interface SaveNewMessageApiResponse {
@@ -72,6 +71,16 @@ export default class ChatEventHandler {
         } catch (error) {
             console.error('Error handling disconnect:', error);
         }
+    }
+
+    public async sendUserReaction(socket: Socket, reactor_id: number, channel_id: string, message_id: string, react: string) {
+        console.log(reactor_id, ' ' + channel_id + " " + message_id + " " + react)
+        socket.to(channel_id).emit('receive_user_reaction', {
+            reactor_id: reactor_id,
+            message_id: message_id,
+            react: react,
+            channel_id: channel_id
+        });
     }
 }
 
