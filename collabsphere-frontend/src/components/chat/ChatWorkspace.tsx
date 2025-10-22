@@ -10,7 +10,8 @@ import { v4 as uuidv4 } from 'uuid';
 import EmojiPickerComponent from '../emoji/EmojiPicker';
 import { type EmojiClickData } from "emoji-picker-react";
 import { useClickOutside } from '../customHooks/useClickOutside';
-import { type MessageSaved, type UserReceiveMessage, type UserReaction } from '../../utils/socket';
+import type { UserReceiveMessage, UserReaction } from '../../utils/SharedEventInterfaces';
+import { type MessageSaved } from '../../utils/ServerToClientEvents';
 
 const ChatWorkspace: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -134,10 +135,8 @@ const ChatWorkspace: React.FC = () => {
         }
     };
 
-    /**\
+    /*
      * handle when user click on react button
-     */
-    /**
      * Close More Options Button when user click outside anywhere 
      */
     const handleMoreManu = (message_id: string) => {
@@ -154,6 +153,14 @@ const ChatWorkspace: React.FC = () => {
             socket.emit('send_user_reaction', { reactor_id: user!.id, channel_id: channel_id!, react: emoji, message_id: message_id });
             dispatch(addReaction({ message_id: message_id, react: emoji, reactor_id: user!.id }))
         }
+    }
+
+    /**
+     * Delete Message 
+     */
+
+    const handleDeleteMessage = (message_id: string) => {
+        console.log(message_id);
     }
     if (status === 'loading' && user) {
         return (<LoadingPage />)
@@ -191,6 +198,7 @@ const ChatWorkspace: React.FC = () => {
                                     moreOptions={moreOptions}
                                     userMoreOptionsRef={userMoreOptionsRef}
                                     handleOnClickReact={handleOnClickReact}
+                                    handleDeleteMessage={handleDeleteMessage}
                                 />
                             ))}
                             <div ref={messagesEndRef} />

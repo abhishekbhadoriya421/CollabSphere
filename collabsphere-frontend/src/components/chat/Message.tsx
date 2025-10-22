@@ -10,7 +10,8 @@ interface MessageProps {
     handleMoreManu: (message_id: string) => void;
     moreOptions: string;
     userMoreOptionsRef: RefObject<HTMLDivElement | null>;
-    handleOnClickReact: (message_id: string, emoji: string) => void
+    handleOnClickReact: (message_id: string, emoji: string) => void;
+    handleDeleteMessage: (message_id: string) => void;
 }
 
 const Message: React.FC<MessageProps> = ({
@@ -21,7 +22,8 @@ const Message: React.FC<MessageProps> = ({
     handleMoreManu,
     moreOptions,
     userMoreOptionsRef,
-    handleOnClickReact
+    handleOnClickReact,
+    handleDeleteMessage
 }) => {
     // Add local state for showing reactions for this specific message
     const [showReactions, setShowReactions] = useState(false);
@@ -110,7 +112,9 @@ const Message: React.FC<MessageProps> = ({
                                         <button onClick={handleReactClick} className="block w-full text-left px-3 py-2 hover:bg-gray-100">
                                             😊 React
                                         </button>
-                                        <button className="block w-full text-left px-3 py-2 text-red-600 hover:bg-gray-100">
+                                        <button
+                                            onClick={() => handleDeleteMessage(message._id!)}
+                                            className="block w-full text-left px-3 py-2 text-red-600 hover:bg-gray-100">
                                             🗑 Delete
                                         </button>
                                     </div>
