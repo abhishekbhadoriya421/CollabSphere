@@ -86,7 +86,7 @@ export default class ChatEventHandler {
          */
         try {
             const refreshToken = socket.data.refresh_token;
-            const response = await axios.post('http://localhost:8080/api/chat/save-user-reaction',
+            await axios.post('http://localhost:8080/api/chat/save-user-reaction',
                 {
                     react: react,
                     reactor_id: reactor_id,
@@ -98,9 +98,9 @@ export default class ChatEventHandler {
                     'Content-Type': 'application/json'
                 }
             });
-            console.log(response);
         } catch (err: any) {
             console.log(err);
+            socket.disconnect();
         }
     }
 }
