@@ -5,13 +5,16 @@ import { getSocket } from '../../utils/socket';
 import { useAppSelector, useAppDispatch } from '../customHooks/reduxCustomHook';
 import LoadingPage from '../Loading/LoadingPage';
 import useGetUserCredentials from '../customHooks/getUserCredentials';
-import { getAllMessagesByChannelId, setMessage, updateTempMessageId, getMessageOffset, addReaction } from '../../features/ChatBoxSlice/ChatBoxSlics';
+import {
+    getAllMessagesByChannelId, setMessage, updateTempMessageId,
+    getMessageOffset, addReaction, deleteMessage
+} from '../../features/ChatBoxSlice/ChatBoxSlics';
 import { v4 as uuidv4 } from 'uuid';
 import EmojiPickerComponent from '../emoji/EmojiPicker';
 import { type EmojiClickData } from "emoji-picker-react";
 import { useClickOutside } from '../customHooks/useClickOutside';
 import type { UserReceiveMessage, UserReaction } from '../../utils/SharedEventInterfaces';
-import { type MessageSaved } from '../../utils/ServerToClientEvents';
+import { type MessageSaved, type ReceiveDeleteMessage } from '../../utils/ServerToClientEvents';
 
 const ChatWorkspace: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -86,13 +89,24 @@ const ChatWorkspace: React.FC = () => {
             dispatch(addReaction({ message_id: data.message_id, react: data.react, reactor_id: data.reactor_id }));
         }
 
+        const handleDeleteMessage = (data: ReceiveDeleteMessage) => {
+            dispatch(deleteMessage(
+                {
+                    message_id: data.message_id,
+                    channel_id: data.channel_id!,
+                    user_id: data.user_id
+                }));
+        }
         socket.on('receive_message', handleReceive);
         socket.on('message_saved', handleMessageSaved);
         socket.on('receive_user_reaction', handleUserReaction);
+        socket.on('receive_delete_message', handleDeleteMessage);
+
         return () => {
             socket.off('receive_message', handleReceive);
             socket.off('message_saved', handleMessageSaved);
             socket.off('receive_user_reaction', handleUserReaction);
+            socket.off('receive_delete_message', handleDeleteMessage);
         };
 
     }, [channel_id, socket, dispatch])
@@ -160,7 +174,10 @@ const ChatWorkspace: React.FC = () => {
      */
 
     const handleDeleteMessage = (message_id: string) => {
-        console.log(message_id);
+        if (socket) {
+            socket.emit('send_delete_message', { message_id: message_id, channel_id: channel_id! });
+            dispatch(deleteMessage({ message_id: message_id, channel_id: channel_id!, user_id: user!.id }));
+        }
     }
     if (status === 'loading' && user) {
         return (<LoadingPage />)

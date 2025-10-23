@@ -200,6 +200,11 @@ const ChatBoxSlice = createSlice({
                 }
             });
             console.log(state.messagesBox);
+        },
+        deleteMessage: (state, action) => {
+            if (state.channel_id !== action.payload.channel_id) return;
+            state.messagesBox = state.messagesBox.filter(msg => !(msg._id === action.payload.message_id && msg.senderId === action.payload.user_id)
+            );
         }
     },
     extraReducers: (builder) => {
@@ -235,5 +240,5 @@ const ChatBoxSlice = createSlice({
     }
 });
 
-export const { setActiveChannel, setMessage, updateTempMessageId, addReaction } = ChatBoxSlice.actions;
+export const { setActiveChannel, setMessage, updateTempMessageId, addReaction, deleteMessage } = ChatBoxSlice.actions;
 export default ChatBoxSlice.reducer;

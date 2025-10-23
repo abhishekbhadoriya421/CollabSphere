@@ -6,10 +6,16 @@ export interface MessageSaved {
     message_id: string;
 }
 
+export interface ReceiveDeleteMessage {
+    channel_id: number;
+    message_id: string;
+    user_id: number;
+}
 export interface ServerToClientEvent {
     receive_message: (data: UserReceiveMessage) => void;
     user_typing: (data: UserTyping) => void;
     user_joined: (data: { user_Id: number }) => void;
     message_saved: (data: MessageSaved) => void;
     receive_user_reaction: (data: UserReaction) => void;
+    receive_delete_message: (data: ReceiveDeleteMessage) => void;
 }

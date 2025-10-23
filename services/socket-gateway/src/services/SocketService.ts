@@ -44,6 +44,9 @@ export default class SocketService {
                 this.chatEvenHandlerObject.sendUserReaction(socket, data.reactor_id, data.channel_id, data.message_id, data.react);
             });
 
+            socket.on('send_delete_message', (data) => {
+                this.chatEvenHandlerObject.sendDeleteMessage(socket, data.channel_id, data.message_id);
+            })
             socket.on('disconnect', async () => {
                 await this.chatEvenHandlerObject.handleDisconnect(socket);
                 console.log('disconnected: ' + socket.id)

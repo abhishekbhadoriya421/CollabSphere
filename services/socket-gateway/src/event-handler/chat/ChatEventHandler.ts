@@ -58,6 +58,7 @@ export default class ChatEventHandler {
 
         } catch (err) {
             console.log(err);
+            socket.disconnect();
         }
     }
 
@@ -68,8 +69,10 @@ export default class ChatEventHandler {
                 await this.cacheObject.removeUser(user.userId);
                 console.log(`✅ User ${user.userId} disconnected and removed from cache`);
             }
+            socket.disconnect();
         } catch (error) {
             console.error('Error handling disconnect:', error);
+            socket.disconnect();
         }
     }
 
@@ -102,6 +105,34 @@ export default class ChatEventHandler {
             console.log(err);
             socket.disconnect();
         }
+    }
+
+    public async sendDeleteMessage(socket: Socket, channel_id: string, message_id: string) {
+        const user_id = socket.data.user_id;
+        const refreshToken = socket.data.refresh_token;
+        socket.to(channel_id.toString()).emit('receive_delete_message', {
+            message_id: message_id,
+            channel_id: channel_id,
+            user_id: user_id
+        });
+        try {
+            await axios.post('http://localhost:8080/api/chat/delete-message',
+                {
+                    message_id: message_id,
+                    channel_id: channel_id,
+                    user_id: user_id
+                }, {
+                headers: {
+                    Authorization: `Bearer ${refreshToken}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+            );
+        } catch (err: any) {
+            console.log(err);
+            socket.disconnect();
+        }
+
     }
 }
 
