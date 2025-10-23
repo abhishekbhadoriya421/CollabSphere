@@ -110,7 +110,7 @@ export default class ChatEventHandler {
     public async sendDeleteMessage(socket: Socket, channel_id: string, message_id: string) {
         const user_id = socket.data.user_id;
         const refreshToken = socket.data.refresh_token;
-        socket.to(channel_id.toString()).emit('receive_delete_message', {
+        socket.to(channel_id).emit('receive_delete_message', {
             message_id: message_id,
             channel_id: channel_id,
             user_id: user_id

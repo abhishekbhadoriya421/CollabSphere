@@ -199,7 +199,6 @@ const ChatBoxSlice = createSlice({
                     }
                 }
             });
-            console.log(state.messagesBox);
         },
         deleteMessage: (state, action) => {
             if (state.channel_id !== action.payload.channel_id) return;
