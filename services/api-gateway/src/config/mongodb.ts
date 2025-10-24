@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 const connectDB = async () => {
     try {
         if (mongoose.connection.readyState === 0) {
-            await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/collabsphere', { useNewUrlParser: true, useUnifiedTopology: true, } as mongoose.ConnectOptions);
+            await mongoose.connect(process.env.MONGO_URI_PROD || 'mongodb://localhost:27017/collabsphere', { useNewUrlParser: true, useUnifiedTopology: true, } as mongoose.ConnectOptions);
             console.log('MongoDB connected');
         }
     } catch (error) {
