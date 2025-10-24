@@ -3,14 +3,11 @@ import { type ServerToClientEvent } from './ServerToClientEvents';
 import { type ClientToServerEvent } from './ClientToServerEvents';
 
 let socket: Socket<ServerToClientEvent, ClientToServerEvent> | null = null;
-const createSocket = (accessToken: string) => {
+const createSocket = () => {
     socket = io('http://localhost:4000', {
         autoConnect: false,
         transports: ['websocket'],
-        withCredentials: true,
-        auth: {
-            accessToken
-        }
+        withCredentials: true
     });
 
 
@@ -33,9 +30,9 @@ const createSocket = (accessToken: string) => {
     return socket;
 }
 
-export const createConnectSocket = (accessToken: string) => {
+export const createConnectSocket = () => {
     if (!socket) {
-        socket = createSocket(accessToken);
+        socket = createSocket();
     }
     socket.connect();
     return socket;

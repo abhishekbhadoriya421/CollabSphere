@@ -1,4 +1,4 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { createConnectSocket, getSocket } from "../../utils/socket";
 
 interface InitailState {
@@ -9,22 +9,17 @@ const initialState: InitailState = {
     isConnected: false
 }
 
-interface PayloadData {
-    accessToken: string | null
-}
 const SocketConnectSlice = createSlice({
     name: 'socket/connect',
     initialState: initialState,
     reducers: {
-        connectSocket: (state, action: PayloadAction<PayloadData>) => {
+        connectSocket: (state) => {
             if (state.isConnected) {
                 console.log('Socket is already connected');
                 return;
             }
             console.log('Connecting to socket...');
-            if (action.payload.accessToken) {
-                createConnectSocket(action.payload.accessToken);
-            }
+            createConnectSocket();
             state.isConnected = true;
         },
         disconnectSocket: (state) => {
