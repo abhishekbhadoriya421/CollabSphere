@@ -63,7 +63,6 @@ export const GetMessageByChannelIdAction = async (req: Request, res: Response) =
             });
     }
     catch (error) {
-        console.error('Error fetching messages:', error);
         return res.status(500).json(
             {
                 message: ErrorHandler.getMessage(error),
@@ -151,14 +150,12 @@ export const SaveUserReactionAction = async (req: Request, res: Response) => {
 
 export const DeleteUserMassage = async (req: Request, res: Response) => {
     const { message_id, channel_id, user_id } = req.body;
-    console.log(message_id);
     try {
-        const result = await Message.deleteOne(
+        await Message.deleteOne(
             { _id: message_id, channelId: channel_id, senderId: user_id }
         );
         return res.status(200).json({ message: 'Deleted Successfully', status: 200 });
     } catch (err: any) {
-        console.log(ErrorHandler.getMessage(err));
         return res.status(500).json({ message: ErrorHandler.getMessage(err), status: 500 });
     }
 

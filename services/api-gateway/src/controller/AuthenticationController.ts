@@ -184,7 +184,6 @@ export const RegisterAction = async (req: Request, res: Response) => {
 
 
 export const PageReloadAction = async (req: Request, res: Response) => {
-    console.log('this ');
     const refreshToken = req.cookies.refreshToken;
     /**
      * user has been logged out need to login again
@@ -290,7 +289,6 @@ export const LogoutAction = async (req: Request, res: Response) => {
 export const ValidateRefreshTokenAction = async (req: Request, res: Response) => {
     try {
         const { refreshToken } = req.body;
-        console.log('ValidateRefreshTokenAction: ' + refreshToken);
         if (!refreshToken) {
             return res.status(400).json({
                 status: 400,
