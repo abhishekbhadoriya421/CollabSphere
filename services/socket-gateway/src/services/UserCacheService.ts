@@ -13,7 +13,7 @@ interface CachedUser { // User data format will be cached
 export default class UserCacheService {
     private readonly USER_PREFIX = 'user:';
     private readonly ONLINE_USERS_KEY = 'online_users';
-    protected redisClientObject = redisClient;
+    protected redisClientObject: any = redisClient;
     /**
      * Cache user data when user connection stablished
      */

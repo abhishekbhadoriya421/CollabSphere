@@ -1,23 +1,23 @@
-# Use official Node.js LTS image
 FROM node:20-alpine
+WORKDIR /app
 
-# Create app directory
-WORKDIR /usr/src/app
+COPY tsconfig.json ./
 
-# Copy package files and install dependencies
-COPY package*.json ./
+COPY shared-services ./shared-services
+WORKDIR /app/shared-services
 RUN npm install
+RUN npm install typescript -g
+RUN tsc
 
-# Copy all source files
-COPY . .
+WORKDIR /app
+COPY services/api-gateway ./services/api-gateway
 
-# Build TypeScript
+WORKDIR /app/services/api-gateway
+
+RUN npm install
+RUN npm install dotenv
+RUN npm install dotenv redis
 RUN npm run build
 
-# Expose port
-EXPOSE 8080
-
-ENV PORT=8080
-
-# Start the service
+EXPOSE 5000
 CMD ["npm", "start"]

@@ -1,15 +1,21 @@
 FROM node:20-alpine
+WORKDIR /app
 
-WORKDIR /usr/src/app
+COPY tsconfig.json ./
 
-COPY package*.json ./
+COPY shared-services ./shared-services
+WORKDIR /app/shared-services
 RUN npm install
+RUN npm install typescript -g
+RUN tsc
 
-COPY . .
+WORKDIR /app
+COPY services/message-service ./services/message-service
 
+WORKDIR /app/services/message-service
+
+RUN npm install
+RUN npm install dotenv
 RUN npm run build
 
-EXPOSE 5001
-
-ENV PORT = 5001
 CMD ["npm", "start"]

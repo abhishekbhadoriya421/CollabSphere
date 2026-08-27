@@ -1,17 +1,19 @@
 FROM node:20-alpine
+WORKDIR /app
+COPY tsconfig.json ./
+COPY shared-services ./shared-services
+WORKDIR /app/shared-services
+RUN npm install
+RUN npm install typescript -g
+RUN tsc
 
-WORKDIR /usr/src/app
+WORKDIR /app
+COPY services/upload-service ./services/upload-service
 
-COPY package*.json ./
+WORKDIR /app/services/upload-service
 
 RUN npm install
-
-COPY . .
-
+RUN npm install dotenv
 RUN npm run build
-
-EXPOSE 8000
-
-ENV PORT = 8000
 
 CMD ["npm", "start"]
