@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register src/index.ts",
-    "start": "node -r tsconfig-paths/register dist/src/index.js",
+    "start": "node -r tsconfig-paths/register dist/index.js",
     "build": "tsc"
   },
   "dependencies": {
