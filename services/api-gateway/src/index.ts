@@ -18,8 +18,8 @@ db();
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8080;
 // Dynamic CORS config
 const allowedOrigins = [
-    "http://localhost:5173", // frontend
-    "http://localhost:4000", // socket gateway
+    process.env.FRONTEND_URL, // frontend
+    process.env.SOCKET_URL, // socket gateway
 ];
 
 app.use(cors({
@@ -40,8 +40,10 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api', router);
+app.use('/api',function(){
+console.log("request toh ayi hai");
+}, router);
 
 app.listen(PORT, () => {
-    console.log(`API Gateway is running on http://localhost:${PORT}`);
+    console.log(`API abhi Gateway is running on http://localhost:${PORT}`);
 });

@@ -1,0 +1,129 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: collabsphere_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    env_file:
+      - /home/ubunntu/app-secrets/.env
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - collabsphere_network
+
+  mysql:
+    image: mysql:8.0
+    container_name: collabsphere_mysql
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: examplepassword
+      MYSQL_DATABASE: collabsphere_db
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # To initialize tables automatically, uncomment the line below and ensure the SQL file exists in a 'scripts' folder
+      # - ./PostgreSQLTables.sql:/docker-entrypoint-initdb.d/init.sql 
+    networks:
+      - collabsphere_network
+
+  redis:
+    image: redis:alpine
+    container_name: collabsphere_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - collabsphere_network
+
+  # ==========================================
+  # BACKEND MICROSERVICES
+  # ==========================================
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./services/api-gateway/Dockerfile
+    container_name: collabsphere_api_gateway
+    restart: unless-stopped
+    ports:
+      - "5000:5000" # Adjust port based on your actual config
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb://root:examplepassword@mongodb:27017/collabsphere?authSource=admin
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=examplepassword
+      - MYSQL_DB=collabsphere_db
+      - REDIS_HOST=redis
+    depends_on:
+      - mongodb
+      - mysql
+      - redis
+    networks:
+      - collabsphere_network
+
+  message-service:
+    build:
+      context: .
+      dockerfile: ./services/message-service/Dockerfile
+    container_name: collabsphere_message_service
+    restart: unless-stopped
+    # Add ports and environment variables specific to this service
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - collabsphere_network
+
+  socket-gateway:
+    build:
+      context: .
+      dockerfile: ./services/socket-gateway/Dockerfile
+    container_name: collabsphere_socket_gateway
+    restart: unless-stopped
+    ports:
+      - "5001:5001" # Adjust port based on your actual config
+    # Add environment variables specific to this service
+    depends_on:
+      - redis
+      - api-gateway
+    networks:
+      - collabsphere_network
+
+  upload-service:
+    build:
+      context: .
+      dockerfile: ./services/upload-service/Dockerfile
+    container_name: collabsphere_upload_service
+    restart: unless-stopped
+    # Add ports and environment variables specific to this service
+    networks:
+      - collabsphere_network
+
+  # ==========================================
+  # FRONTEND
+  # ==========================================
+  frontend:
+    build:
+      context: ./collabsphere-frontend
+      dockerfile: Dockerfile
+    container_name: collabsphere_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80" # Map to standard HTTP port
+    depends_on:
+      - api-gateway
+      - socket-gateway
+    networks:
+      - collabsphere_network
+
+# Define persistent storage for databases
+volumes:
+  mongodb_data:
+  mysql_data:
+
+# Define a custom network so containers can talk to each other
+networks:
+  collabsphere_network:
+    driver: bridge
