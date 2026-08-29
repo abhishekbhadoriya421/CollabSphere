@@ -219,7 +219,6 @@ export const GetOrganizationThunk = createAsyncThunk<GetOrganizationThunkRespons
             });
 
             const resData: GetOuResponseAPI = await apiResponse.json();
-
             if (!apiResponse.ok) {
                 return rejectWithValue({
                     status: 'error',
@@ -329,19 +328,29 @@ const OrganizationSlice = createSlice({
              */
             .addCase(GetOrganizationThunk.fulfilled, (state, action) => {
                 if (action.payload.status === 'success') {
-                    const organizationItem: OrganizationObject = {
-                        name: action.payload.organization?.name || '',
-                        code: action.payload.organization?.code || '',
-                        id: action.payload.organization?.id || null,
-                        description: action.payload.organization?.description || '',
-                        created_by: action.payload.organization?.created_by || ''
+                    if (Array.isArray(action.payload.organization) && action.payload.organization.length === 0) {
+                        state.userMembership = Array.isArray(action.payload.membership)
+                            ? action.payload.membership
+                            : [action.payload.membership];
+                        state.userOrganization = null;
+                        state.message = action.payload.message;
+                        state.status = action.payload.status;
+                    } else {
+                        const organizationItem: OrganizationObject = {
+                            name: action.payload.organization?.name || '',
+                            code: action.payload.organization?.code || '',
+                            id: action.payload.organization?.id || null,
+                            description: action.payload.organization?.description || '',
+                            created_by: action.payload.organization?.created_by || ''
+                        }
+                        state.userMembership = Array.isArray(action.payload.membership)
+                            ? action.payload.membership
+                            : [action.payload.membership];
+                        state.userOrganization = organizationItem;
+                        state.message = action.payload.message;
+                        state.status = action.payload.status;
                     }
-                    state.userMembership = Array.isArray(action.payload.membership)
-                        ? action.payload.membership
-                        : [action.payload.membership];
-                    state.userOrganization = organizationItem;
-                    state.message = action.payload.message;
-                    state.status = action.payload.status;
+
                 } else {
                     state.status = 'error';
                     state.message = action.payload.message;

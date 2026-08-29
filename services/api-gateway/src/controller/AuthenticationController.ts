@@ -175,6 +175,7 @@ export const RegisterAction = async (req: Request, res: Response) => {
         }
     }
     catch (error) {
+        throw error;
         return res.status(400).json({
             status: 400,
             message: ErrorHandler.getMessage(error),

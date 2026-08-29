@@ -45,7 +45,6 @@ export default function OuDashboard() {
         }
         if (user && accessToken) {
             if (!updateForm && !userOrganization) {
-
                 dispatch(OrganizationCreateThunk({
                     user_id: user.id,
                     accessToken: accessToken,
